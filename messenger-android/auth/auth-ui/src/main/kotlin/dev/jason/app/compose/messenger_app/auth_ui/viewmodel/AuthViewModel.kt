@@ -1,5 +1,6 @@
 package dev.jason.app.compose.messenger_app.auth_ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jason.app.compose.messenger_app.auth.Authentication
@@ -8,16 +9,23 @@ import dev.jason.app.compose.messenger_app.auth_ui.controller.NavigationControll
 import dev.jason.app.compose.messenger_app.auth_ui.controller.SnackbarController
 import dev.jason.app.compose.messenger_app.auth_ui.route.AuthRoute
 import dev.jason.app.compose.messenger_app.domain.AuthResult
+import dev.jason.app.compose.messenger_app.domain.LocalStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class AuthViewModel(
-    private val authentication: Authentication
+    private val authentication: Authentication,
+    private val localStorage: LocalStorage
 ) : ViewModel(CoroutineScope(Dispatchers.IO)) {
+
+    companion object {
+        lateinit var onDone: () -> Unit
+    }
 
     data class UiState(
         val username: String = "",
@@ -35,9 +43,16 @@ internal class AuthViewModel(
 
     fun onAction(action: AuthAction) {
         viewModelScope.launch {
+            Log.d("AuthViewModel", "Performing action $action")
             when (action) {
                 AuthAction.LoginAction -> login()
                 AuthAction.SigninAction -> signin()
+                AuthAction.SaveUserCredentials -> storeUserCredentialsLocally()
+                AuthAction.Done -> {
+                    viewModelScope.launch(Dispatchers.Main.immediate) {
+                        onDone.invoke()
+                    }
+                }
             }
         }
     }
@@ -53,7 +68,8 @@ internal class AuthViewModel(
         ).apply {
             _uiState.update {
                 if (this@apply is AuthResult.Success) {
-                    // TODO: onDone()
+                    onAction(AuthAction.SaveUserCredentials)
+                    onAction(AuthAction.Done)
                     return
                 }
 
@@ -86,7 +102,6 @@ internal class AuthViewModel(
         ).apply {
             _uiState.update {
                 if (this@apply is AuthResult.Success) {
-                    // TODO: onDone()
                     login()
                     return
                 }
@@ -100,6 +115,13 @@ internal class AuthViewModel(
                 throw IllegalStateException()
             }
         }
+    }
+
+    private suspend fun storeUserCredentialsLocally() {
+        localStorage.addUser(
+            _uiState.value.username,
+            _uiState.value.password
+        )
     }
 
     private suspend inline fun checkIfEmpty(onEmpty: () -> Unit) {
@@ -117,6 +139,23 @@ internal class AuthViewModel(
         if (uiState.password != uiState.conformPassword) {
             SnackbarController.sendPasswordsDidNotMatch()
             onFail()
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            val savedUser = localStorage.getUser().first()
+
+            if (savedUser == null) return@launch
+
+            _uiState.update {
+                it.copy(
+                    username = savedUser.username,
+                    password = savedUser.password
+                )
+            }
+
+            login()
         }
     }
 }

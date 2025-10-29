@@ -4,4 +4,6 @@ sealed interface AuthAction {
 
     data object LoginAction : AuthAction
     data object SigninAction : AuthAction
+    data object SaveUserCredentials : AuthAction
+    data object Done : AuthAction
 }

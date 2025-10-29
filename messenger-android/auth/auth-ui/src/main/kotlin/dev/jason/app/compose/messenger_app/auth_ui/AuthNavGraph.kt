@@ -25,18 +25,22 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @SuppressLint("RestrictedApi")
 @Composable
-fun AuthNavGraph() {
+fun AuthNavGraph(onDone: () -> Unit) {
     val viewModel: AuthViewModel = koinViewModel()
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(true) {
-        NavigationController.destination.collect { (route, inclusive) ->
+        AuthViewModel.onDone = onDone
+    }
+
+    LaunchedEffect(true) {
+        NavigationController.destination.collect { (route, popBackStack) ->
             Log.d("AuthNavGraph", "----------------------------------------------------------------------------------------------------------------")
             navController.navigate(route) {
-                if (inclusive) {
+                if (popBackStack) {
                     popUpTo(route) {
-                        this.inclusive = true
+                        inclusive = true
                     }
                 }
             }

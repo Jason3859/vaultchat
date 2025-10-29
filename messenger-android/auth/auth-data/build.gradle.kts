@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(projects.messengerAndroid.auth.authDomain)
+    implementation(projects.messengerAndroid.localStorage.roomDb.roomDbDomain)
 }
 
 android {

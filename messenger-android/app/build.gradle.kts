@@ -1,12 +1,23 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 val packageName = "dev.jason.app.compose.messenger"
+
+val localProps = Properties()
+val propsFile = rootProject.file("local.properties")
+
+if (propsFile.exists()) {
+    propsFile.inputStream().use { stream ->
+        localProps.load(stream)
+    }
+}
 
 android {
     namespace = packageName
@@ -20,6 +31,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        android.buildFeatures.buildConfig = true
+
+        buildConfigField(
+            type = "String",
+            name = "API_HOST_URL",
+            value = localProps.getProperty("app.host.url") ?: "http://10.0.2.2:8080"
+        )
     }
 
     buildTypes {
@@ -53,9 +72,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(projects.messengerAndroid.auth.authUi)
     implementation(projects.messengerAndroid.auth.authData)
+    implementation(projects.messengerAndroid.localStorage.roomDb.roomDbData)
 }

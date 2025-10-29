@@ -44,4 +44,4 @@ local.properties
 /messenger-desktop/res/
 
 # Environment files
-.env
+messenger-server/.env
