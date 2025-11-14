@@ -17,6 +17,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
+import io.ktor.server.routing.head
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.serialization.Serializable
@@ -39,6 +40,10 @@ fun Application.configureRouting() {
     val audience = dotenv?.get("JWT_AUDIENCE") ?: System.getenv("JWT_AUDIENCE")
 
     routing {
+        head("/") {
+            call.respond(HttpStatusCode.OK)
+        }
+
         get("/") {
             call.respondText("Hello World!")
         }
