@@ -45,3 +45,5 @@ local.properties
 
 # Environment files
 messenger-server/.env
+
+/messenger-android/google-services.json

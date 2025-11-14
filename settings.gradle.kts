@@ -20,12 +20,3 @@ dependencyResolutionManagement {
 
 include(":messenger-server")
 include(":messenger-android")
-include(":messenger-android:app")
-include(":messenger-android:auth")
-include(":messenger-android:auth:auth-data")
-include(":messenger-android:auth:auth-domain")
-include(":messenger-android:auth:auth-ui")
-include(":messenger-android:local-storage")
-include(":messenger-android:local-storage:room-db")
-include(":messenger-android:local-storage:room-db:room-db-data")
-include(":messenger-android:local-storage:room-db:room-db-domain")
