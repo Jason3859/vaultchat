@@ -32,12 +32,11 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
     implementation(libs.koin.ktor)
-    implementation(libs.ktor.server.auth)
-    implementation(libs.ktor.server.auth.jwt)
     implementation(libs.mongo.driver.kotlin)
     implementation(libs.mongo.bson.kotlinx)
     implementation(libs.dotenv)
     implementation(platform(libs.mongo.driver.bom))
+    implementation(libs.google.firebase.admin)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

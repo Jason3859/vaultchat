@@ -1,8 +1,10 @@
 package dev.jason.project.ktor.messenger
 
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import dev.jason.project.ktor.messenger.data.projectModule
 import dev.jason.project.ktor.messenger.plugins.configureRouting
-import dev.jason.project.ktor.messenger.plugins.configureSecurity
 import dev.jason.project.ktor.messenger.plugins.configureSerialization
 import dev.jason.project.ktor.messenger.plugins.configureSockets
 import io.github.cdimascio.dotenv.Dotenv
@@ -12,14 +14,15 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
 import org.koin.ktor.plugin.Koin
+import java.io.FileInputStream
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
 }
 
 fun Application.module() {
+    initFirebase()
     initKoin()
-    configureSecurity()
     configureSerialization()
     configureSockets()
     configureRouting()
@@ -38,4 +41,15 @@ private fun Application.initKoin() {
     install(Koin) {
         modules(projectModule)
     }
+}
+
+@Suppress("UnusedReceiverParameter")
+private fun Application.initFirebase() {
+    val serviceAccount = FileInputStream("vaultchat-admin-sdk.json")
+
+    val options = FirebaseOptions.builder()
+        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .build()
+
+    FirebaseApp.initializeApp(options)
 }

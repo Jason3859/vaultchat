@@ -6,5 +6,5 @@ import dev.jason.project.ktor.messenger.domain.model.Result
 interface MessagesDatabaseRepository {
     suspend fun addMessage(message: Message)
     suspend fun getAllMessages(): List<Message>
-    suspend fun deleteChatRoom(chatroomID: String): Result
+    suspend fun deleteChatRoom(roomId: String): Result
 }

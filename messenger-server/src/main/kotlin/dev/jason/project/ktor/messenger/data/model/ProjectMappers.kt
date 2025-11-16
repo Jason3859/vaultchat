@@ -1,31 +1,24 @@
 package dev.jason.project.ktor.messenger.data.model
 
+import com.google.firebase.auth.FirebaseAuth
 import dev.jason.project.ktor.messenger.domain.model.Message
-import dev.jason.project.ktor.messenger.domain.model.User
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 fun Message.toDto(): MessageDto = MessageDto(
     id = id,
-    chatRoomId = chatRoomId,
-    sender = sender,
+    roomId = roomId,
+    sender = getUserDtoFromFirebaseUserUid(senderUid),
     message = message,
     timestamp = timestamp.toLong()
 )
 
-fun MessageDto.toDomain(): Message = Message(
-    id = id,
-    chatRoomId = chatRoomId,
-    sender = sender,
-    message = message,
-    timestamp = timestamp.toLocalDateTime()
-)
+fun getUserDtoFromFirebaseUserUid(uid: String): UserDto {
+    val user = FirebaseAuth.getInstance().getUser(uid)
 
-fun UsersDto.toDomain(): User = User(
-    username = username,
-    password = password
-)
+    return UserDto(user.displayName, user.photoUrl)
+}
 
 fun LocalDateTime.toLong(): Long {
     return this.atZone(ZoneId.systemDefault()).toEpochSecond()
