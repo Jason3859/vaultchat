@@ -1,41 +1,69 @@
 [versions]
+# kotlin
 kotlin-version = "2.2.21"
+kotlinx-coroutines = "1.10.2"
+serialization = "1.9.0"
+
+# ktor server core
 ktor-version = "3.3.0"
 logback-version = "1.5.19"
-okhttp = "5.3.0"
+
+# shadow
 shadow = "8.1.1"
-koin = "4.1.1"
+
+# mongo-db
+mongo-version = "5.6.1"
+
+# dotenv
+dotenv = "6.5.1"
+
+# android core
 agp = "8.13.0"
+compose-bom = "2025.09.01"
+androidx-activity = "1.11.0"
+androidx-lifecycle = "2.9.4"
+core-ktx = "1.17.0"
+lifecycle-runtime-ktx = "2.9.4"
+
+# material3
+material3 = "1.5.0-alpha08"
+m3-adaptive = "1.2.0"
+
+# android sdk versions
 android-compileSdk = "36"
 android-minSdk = "27"
 android-targetSdk = "36"
-androidx-activity = "1.11.0"
-androidx-lifecycle = "2.9.4"
-postgresql = "42.7.7"
-sqlite = "3.50.3.0"
-serialization = "1.9.0"
-core-ktx = "1.17.0"
-lifecycle-runtime-ktx = "2.9.4"
-compose-bom = "2025.09.01"
-kotlinx-coroutines = "1.10.2"
-mongo-version = "5.6.1"
-dotenv = "6.5.1"
-material3 = "1.5.0-alpha08"
-ksp = "2.2.21-2.0.4"
-room = "2.8.3"
-nav3Core = "1.0.0-rc01"
-lifecycleViewmodelNav3 = "2.10.0-rc01"
-material3AdaptiveNav3 = "1.3.0-alpha03"
-m3-adaptive = "1.2.0"
-googleGmsGoogleServices = "4.4.4"
-firebaseAuth = "24.0.1"
-credentials = "1.5.0"
-credentialsPlayServicesAuth = "1.5.0"
-googleid = "1.1.1"
+
+# di
+koin = "4.1.1"
+
+# http
+okhttp = "5.3.0"
+
+# navigation
+nav3-core = "1.0.0-rc01"
+material3-adaptive-nav3 = "1.3.0-alpha03"
+lifecycle-viewmodel-nav3 = "2.10.0-rc01"
+
+# firebase admin
 firebase-admin = "9.7.0"
 
+# firebase app auth
+google-gms-google-services = "4.4.4"
+firebase-auth = "24.0.1"
+credentials = "1.5.0"
+credentials-play-services-auth = "1.5.0"
+googleid = "1.1.1"
+
+
+
 [libraries]
-google-firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+# kotlin
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
+
+# ktor core
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-version" }
@@ -44,14 +72,21 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-version" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor-version" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor-version" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
+
+# firebase admin
+google-firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+
+# dotenv
+dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
+
+# mongo-db
+mongo-driver-bom = { module = "org.mongodb:mongodb-driver-bom", version.ref = "mongo-version" }
+mongo-driver-kotlin = { module = "org.mongodb:mongodb-driver-kotlin-coroutine" }
+mongo-bson-kotlinx = { module = "org.mongodb:bson-kotlinx" }
+
+# android core
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-version" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor-version" }
-ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor-version" }
-koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -60,38 +95,48 @@ androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+
+# navigation
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3-core" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3-core" }
+androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-viewmodel-nav3" }
+androidx-navigation3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "material3-adaptive-nav3" }
+
+# material3
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "m3-adaptive" }
+
+# firebase app auth
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebase-auth" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials-play-services-auth" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+# http
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+
+# di
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
-mongo-driver-bom = { module = "org.mongodb:mongodb-driver-bom", version.ref = "mongo-version" }
-mongo-driver-kotlin = { module = "org.mongodb:mongodb-driver-kotlin-coroutine" }
-mongo-bson-kotlinx = { module = "org.mongodb:bson-kotlinx" }
-dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-androidx-room-runtime-android = { module = "androidx.room:room-runtime-android", version.ref = "room" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
-androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
-androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
-androidx-navigation3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "material3AdaptiveNav3" }
-androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "m3-adaptive" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
-androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
-androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+
 
 [plugins]
+# kotlin
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+
+# shadow
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+
+# android core
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-version" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-room = { id = "androidx.room", version.ref = "room" }
-google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+
+# google services
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "google-gms-google-services" }
