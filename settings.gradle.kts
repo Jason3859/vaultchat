@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-include(":messenger-server")
-include(":messenger-android")
+include(":vaultchat-server")
+include(":vaultchat-android")
