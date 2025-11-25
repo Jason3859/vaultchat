@@ -25,7 +25,8 @@ internal object AppConstants {
     )
 
     data class StaticAppDpValues(
-        val roundedCornerShape: Dp = 40.dp
+        val roundedCornerShape: Dp = 40.dp,
+        val textFieldCornerShape: Dp = 15.dp
     )
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)

@@ -115,7 +115,7 @@ internal fun SigninEmailForm(
             placeholder = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
             singleLine = true,
-            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.roundedCornerShape),
+            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.textFieldCornerShape),
             modifier = Modifier
                 .fillMaxWidth()
                 .then(modifier)
@@ -129,7 +129,7 @@ internal fun SigninEmailForm(
             placeholder = { Text(stringResource(R.string.password)) },
             singleLine = true,
             visualTransformation = visualTransformation,
-            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.roundedCornerShape),
+            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.textFieldCornerShape),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { onSignInClick() }),
             modifier = Modifier

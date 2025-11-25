@@ -31,7 +31,7 @@ fun LandscapePhoneEmailLoginScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = stringResource(R.string.signin_using_email),
+                text = stringResource(R.string.email_login),
                 style = AppConstants.compactTextStyle
             )
 

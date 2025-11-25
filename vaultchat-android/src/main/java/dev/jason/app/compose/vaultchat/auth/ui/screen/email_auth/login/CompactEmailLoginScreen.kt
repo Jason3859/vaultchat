@@ -66,7 +66,7 @@ internal fun CompactEmailLoginScreen(
                         .fillMaxHeight(1f - bottomColumnHeightValue)
                 ) {
                     Text(
-                        text = stringResource(R.string.signin_using_email),
+                        text = stringResource(R.string.email_login),
                         style = AppConstants.compactTextStyle
                     )
                 }
@@ -111,15 +111,19 @@ internal fun LoginEmailForm(
             value = uiState.email,
             onValueChange = { updateState(uiState.copy(email = it)) },
             placeholder = { Text(stringResource(R.string.email)) },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email
+            ),
             singleLine = true,
-            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.roundedCornerShape),
+            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.textFieldCornerShape),
             modifier = Modifier
                 .fillMaxWidth()
                 .then(modifier)
         )
 
-        val visualTransformation = if (uiState.showPassword) VisualTransformation.None else PasswordVisualTransformation()
+        val visualTransformation =
+            if (uiState.showPassword) VisualTransformation.None else PasswordVisualTransformation()
 
         OutlinedTextField(
             value = uiState.password,
@@ -127,7 +131,7 @@ internal fun LoginEmailForm(
             placeholder = { Text(stringResource(R.string.password)) },
             singleLine = true,
             visualTransformation = visualTransformation,
-            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.roundedCornerShape),
+            shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.textFieldCornerShape),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { onSignInClick() }),
             modifier = Modifier

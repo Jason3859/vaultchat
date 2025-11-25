@@ -50,39 +50,41 @@ sealed class DeviceType : Comparable<DeviceType> {
         override val minHeight: Int,
         override val rank: Int = 5,
     ) : DeviceType()
-}
 
-fun getDeviceType(
-    windowAdaptiveInfo: WindowAdaptiveInfo,
-): DeviceType {
-    val width = windowAdaptiveInfo.windowSizeClass.minWidthDp
-    val height = windowAdaptiveInfo.windowSizeClass.minHeightDp
+    val isLandscapePhone: Boolean
+        get() = minWidth > minHeight
+                && minHeight < 500
+                && (minWidth.toFloat() / minHeight.toFloat()) >= 1.8f
 
-    val aspectRatio = width.toFloat() / height.toFloat()
-    // Foldable check (remains first)
-    if (windowAdaptiveInfo.windowPosture.hingeList.isNotEmpty())
-        return DeviceType.Foldable(
-            minWidth = width,
-            minHeight = height,
-            isTabletop = windowAdaptiveInfo.windowPosture.isTabletop,
-            hingeList = windowAdaptiveInfo.windowPosture.hingeList
-        )
+    companion object {
+        fun fromWindowAdaptiveInfo(
+            windowAdaptiveInfo: WindowAdaptiveInfo,
+        ): DeviceType {
+            val width = windowAdaptiveInfo.windowSizeClass.minWidthDp
+            val height = windowAdaptiveInfo.windowSizeClass.minHeightDp
 
-    // Device classification based on width and aspect ratio
-    return when {
-        width >= WindowSizeClass.WIDTH_DP_EXTRA_LARGE_LOWER_BOUND -> DeviceType.ExtraLarge(width, height)
-        width >= WindowSizeClass.WIDTH_DP_LARGE_LOWER_BOUND -> DeviceType.Large(width, height)
-        width >= WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND -> DeviceType.Expanded(width, height)
-        width >= WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND -> {
-            // For tablets: medium width (and not a very wide landscape phone)
-            if (aspectRatio < 1.6f) DeviceType.Medium(width, height)
-            else DeviceType.Compact(width, height) // Fallback to compact if extreme landscape
+            val aspectRatio = width.toFloat() / height.toFloat()
+            // Foldable check (remains first)
+            if (windowAdaptiveInfo.windowPosture.hingeList.isNotEmpty())
+                return Foldable(
+                    minWidth = width,
+                    minHeight = height,
+                    isTabletop = windowAdaptiveInfo.windowPosture.isTabletop,
+                    hingeList = windowAdaptiveInfo.windowPosture.hingeList
+                )
+
+            // Device classification based on width and aspect ratio
+            return when {
+                width >= WindowSizeClass.WIDTH_DP_EXTRA_LARGE_LOWER_BOUND -> ExtraLarge(width, height)
+                width >= WindowSizeClass.WIDTH_DP_LARGE_LOWER_BOUND -> Large(width, height)
+                width >= WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND -> Expanded(width, height)
+                width >= WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND -> {
+                    // For tablets: medium width (and not a very wide landscape phone)
+                    if (aspectRatio < 1.6f) Medium(width, height)
+                    else Compact(width, height) // Fallback to compact if extreme landscape
+                }
+                else -> Compact(width, height)
+            }
         }
-        else -> DeviceType.Compact(width, height)
     }
 }
-
-val DeviceType.isLandscapePhone: Boolean
-    get() = minWidth > minHeight
-            && minHeight < 500
-            && (minWidth.toFloat() / minHeight.toFloat()) >= 1.8f

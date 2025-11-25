@@ -9,9 +9,11 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
-val packageName = "dev.jason.app.compose.vaultchat"
+kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
 
+val packageName = "dev.jason.app.compose.vaultchat"
 val localProps = Properties()
+
 val propsFile = rootProject.file("local.properties")
 
 if (propsFile.exists()) {
@@ -61,12 +63,6 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
-
 dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
@@ -75,6 +71,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation3.ui)
@@ -89,4 +86,5 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.okhttp)
 }

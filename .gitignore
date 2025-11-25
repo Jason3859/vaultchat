@@ -44,7 +44,7 @@ local.properties
 /messenger-desktop/res/
 
 # Environment files
-messenger-server/.env
+vaultchat-server/.env
 
-/messenger-android/google-services.json
-/messenger-server/vaultchat-admin-sdk.json
+/vaultchat-server/vaultchat-admin-sdk.json
+/vaultchat-android/google-services.json

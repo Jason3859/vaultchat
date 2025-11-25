@@ -39,7 +39,7 @@ internal fun LargeEmailLoginScreen(
         ) {
 
             Text(
-                text = stringResource(R.string.signin_using_email),
+                text = stringResource(R.string.email_login),
                 style = AppConstants.largeTextStyle
             )
 

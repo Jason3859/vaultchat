@@ -33,11 +33,11 @@ fun ExtraLargeEmailLoginScreen(
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally)
         ) {
 
             Text(
-                text = stringResource(R.string.signin_using_email),
+                text = stringResource(R.string.email_login),
                 style = AppConstants.largeTextStyle
             )
 
