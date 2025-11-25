@@ -1,8 +1,8 @@
 package dev.jason.app.compose.vaultchat.auth.ui.screen.email_auth.login
 
 import androidx.compose.runtime.Composable
-import dev.jason.app.compose.vaultchat.auth.ui.util.DeviceType
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.email_auth.EmailAuthUiState
+import dev.jason.app.compose.vaultchat.util.DeviceType
 
 @Composable
 fun EmailLoginScreen(

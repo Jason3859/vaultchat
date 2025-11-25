@@ -30,11 +30,11 @@ import dev.jason.app.compose.vaultchat.auth.ui.route.AuthRoute
 import dev.jason.app.compose.vaultchat.auth.ui.screen.email_auth.login.EmailLoginScreen
 import dev.jason.app.compose.vaultchat.auth.ui.screen.email_auth.signin.EmailSigninScreen
 import dev.jason.app.compose.vaultchat.auth.ui.screen.login.LoginScreen
-import dev.jason.app.compose.vaultchat.auth.ui.util.DeviceType
 import dev.jason.app.compose.vaultchat.auth.ui.util.SnackbarController
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.email_auth.EmailAuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.github_auth.GitHubAuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.google_auth.GoogleAuthViewModel
+import dev.jason.app.compose.vaultchat.util.DeviceType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

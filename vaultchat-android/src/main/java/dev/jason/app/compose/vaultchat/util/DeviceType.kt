@@ -1,6 +1,4 @@
-// Credits: Stevdza-San
-
-package dev.jason.app.compose.vaultchat.auth.ui.util
+package dev.jason.app.compose.vaultchat.util
 
 import androidx.compose.material3.adaptive.HingeInfo
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo

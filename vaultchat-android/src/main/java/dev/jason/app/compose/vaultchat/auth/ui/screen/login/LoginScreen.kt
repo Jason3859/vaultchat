@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.auth.ui.screen.login
 
 import androidx.compose.runtime.Composable
-import dev.jason.app.compose.vaultchat.auth.ui.util.DeviceType
+import dev.jason.app.compose.vaultchat.util.DeviceType
 
 @Composable
 fun LoginScreen(
