@@ -17,7 +17,10 @@ fun Message.toDto(): MessageDto = MessageDto(
 fun getUserDtoFromFirebaseUserUid(uid: String): UserDto {
     val user = FirebaseAuth.getInstance().getUser(uid)
 
-    return UserDto(user.displayName, user.photoUrl)
+    return UserDto(
+        name = user.displayName ?: user.email.substringBefore('@'),
+        profilePictureUrl = user.photoUrl
+    )
 }
 
 fun LocalDateTime.toLong(): Long {

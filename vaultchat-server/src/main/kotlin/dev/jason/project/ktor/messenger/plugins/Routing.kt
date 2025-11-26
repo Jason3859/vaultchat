@@ -10,8 +10,15 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
+
+@Serializable
+data class Rooms(
+    val uid: String,
+    val roomId: String
+)
 
 fun Application.configureRouting() {
 
@@ -37,7 +44,7 @@ fun Application.configureRouting() {
 
             verifyToken(token).apply {
                 if (this == null) {
-                    call.respond(HttpStatusCode.Unauthorized, "Invalid token")
+                    call.respond(HttpStatusCode.Unauthorized, "Token is invalid or has expired")
                     return@get
                 }
             }
@@ -49,6 +56,33 @@ fun Application.configureRouting() {
             val serialized = Json.encodeToString(messages)
 
             call.respond(HttpStatusCode.Accepted, serialized)
+        }
+
+        get("/get-rooms") {
+
+            val token = call.request.headers["Token"]
+
+            if (token == null) {
+                call.respond(HttpStatusCode.BadRequest, "Token header is missing")
+                return@get
+            }
+
+            val user = verifyToken(token).apply {
+                if (this == null) {
+                    call.respond(HttpStatusCode.Unauthorized, "Token is invalid or has expired")
+                }
+            }
+
+            val rooms = messagesDbRepository
+                .getAllMessages()
+                .map { message ->
+                    Rooms(message.senderUid, message.roomId)
+                }
+                .filter { it.uid == user?.uid!! }
+                .map { it.roomId }
+                .distinct()
+
+            call.respond(HttpStatusCode.Accepted, Json.encodeToString(rooms))
         }
     }
 }

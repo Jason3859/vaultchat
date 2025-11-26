@@ -14,7 +14,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
 import org.koin.ktor.plugin.Koin
-import java.io.FileInputStream
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -43,9 +42,9 @@ private fun Application.initKoin() {
     }
 }
 
-@Suppress("UnusedReceiverParameter")
 private fun Application.initFirebase() {
-    val serviceAccount = FileInputStream("vaultchat-admin-sdk.json")
+    val serviceAccount = javaClass.classLoader
+        .getResourceAsStream("vaultchat-admin-sdk.json")
 
     val options = FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
