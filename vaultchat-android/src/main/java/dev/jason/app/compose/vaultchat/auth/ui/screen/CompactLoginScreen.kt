@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.auth.ui.screen.login
+package dev.jason.app.compose.vaultchat.auth.ui.screen
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -42,8 +42,7 @@ import dev.jason.app.compose.vaultchat.theme.MessengerTheme
 @Composable
 internal fun CompactLoginScreen(
     onSignInUsingGoogleClick: () -> Unit,
-    onSigninUsingGitHubClick: () -> Unit,
-    onSigninUsingEmailClick: () -> Unit
+    onSigninUsingGitHubClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -87,8 +86,7 @@ internal fun CompactLoginScreen(
                 ) {
                     AuthButtonsGroup(
                         onSignInUsingGoogleClick = onSignInUsingGoogleClick,
-                        onSigninUsingGitHubClick = onSigninUsingGitHubClick,
-                        onSigninUsingEmailClick = onSigninUsingEmailClick
+                        onSigninUsingGitHubClick = onSigninUsingGitHubClick
                     )
                 }
             }
@@ -100,7 +98,6 @@ internal fun CompactLoginScreen(
 internal fun AuthButtonsGroup(
     onSignInUsingGoogleClick: () -> Unit,
     onSigninUsingGitHubClick: () -> Unit,
-    onSigninUsingEmailClick: () -> Unit,
     modifier: Modifier = Modifier,
     buttonHeight: Dp = AppConstants.COMPACT_DP_VALUES.height,
     fontSize: TextUnit = AppConstants.COMPACT_DP_VALUES.fontSize,
@@ -127,15 +124,6 @@ internal fun AuthButtonsGroup(
             onClick = onSigninUsingGitHubClick,
             icon = painterResource(R.drawable.github),
             text = stringResource(R.string.signin_using_github),
-            buttonHeight = buttonHeight,
-            fontSize = fontSize,
-            iconSize = iconSize
-        )
-
-        AuthButton(
-            onClick = onSigninUsingEmailClick,
-            icon = painterResource(R.drawable.email),
-            text = stringResource(R.string.signin_using_email),
             buttonHeight = buttonHeight,
             fontSize = fontSize,
             iconSize = iconSize
@@ -221,7 +209,6 @@ private fun Button(
 private fun CompactLoginScreen() {
     CompactLoginScreen(
         onSignInUsingGoogleClick = {},
-        onSigninUsingEmailClick = {},
         onSigninUsingGitHubClick = {}
     )
 }

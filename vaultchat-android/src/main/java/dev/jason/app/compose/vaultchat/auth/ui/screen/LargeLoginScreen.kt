@@ -1,10 +1,12 @@
-package dev.jason.app.compose.vaultchat.auth.ui.screen.login
+package dev.jason.app.compose.vaultchat.auth.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -24,33 +26,33 @@ import dev.jason.app.compose.vaultchat.theme.MessengerTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ExtraLargeLoginScreen(
+internal fun LargeLoginScreen(
     onSignInUsingGoogleClick: () -> Unit,
-    onSigninUsingGitHubClick: () -> Unit,
-    onSigninUsingEmailClick: () -> Unit
+    onSigninUsingGitHubClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
-        Row(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(R.string.welcome),
                 style = AppConstants.largeTextStyle
             )
 
+            Spacer(Modifier.height(150.dp))
+
             Card(
-                shape = RoundedCornerShape(40.dp),
+                shape = RoundedCornerShape(AppConstants.STATIC_APP_DP_VALUES.roundedCornerShape),
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
+                    .fillMaxWidth(0.65f)
             ) {
                 AuthButtonsGroup(
                     onSignInUsingGoogleClick = onSignInUsingGoogleClick,
                     onSigninUsingGitHubClick = onSigninUsingGitHubClick,
-                    onSigninUsingEmailClick = onSigninUsingEmailClick,
                     buttonHeight = AppConstants.LARGE_DP_VALUES.height,
                     fontSize = AppConstants.LARGE_DP_VALUES.fontSize,
                     iconSize = AppConstants.LARGE_DP_VALUES.iconSize,
@@ -63,33 +65,33 @@ fun ExtraLargeLoginScreen(
 }
 
 @Composable
-private fun ExtraLargeLoginScreen() {
-    ExtraLargeLoginScreen(
-        onSigninUsingEmailClick = {},
-        onSignInUsingGoogleClick = {},
-        onSigninUsingGitHubClick = {}
+private fun LargeLoginScreen() {
+    LargeLoginScreen(
+        onSigninUsingGitHubClick = {},
+        onSignInUsingGoogleClick = {}
     )
 }
 
 @Preview(
-    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
-    uiMode = Configuration.UI_MODE_TYPE_NORMAL, device = "spec:width=1280dp,height=800dp,dpi=240"
+    device = "spec:width=1280dp,height=800dp,dpi=240,orientation=portrait",
+    wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
+    uiMode = Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-private fun ExtraLargeLoginScreenLightModePreview() {
+private fun TabletLoginScreenLightModePreview() {
     MessengerTheme {
-        ExtraLargeLoginScreen()
+        LargeLoginScreen()
     }
 }
 
 @Preview(
-    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE,
-    device = "spec:width=1280dp,height=800dp,dpi=240",
+    device = "spec:width=1280dp,height=800dp,dpi=240,orientation=portrait",
+    wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-private fun ExtraLargeLoginScreenDarkModePreview() {
+private fun TabletLoginScreenDarkModePreview() {
     MessengerTheme {
-        ExtraLargeLoginScreen()
+        LargeLoginScreen()
     }
 }

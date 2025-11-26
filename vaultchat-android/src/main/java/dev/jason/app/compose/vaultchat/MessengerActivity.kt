@@ -15,6 +15,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import dev.jason.app.compose.vaultchat.auth.ui.AuthNavGraph
 import dev.jason.app.compose.vaultchat.theme.MessengerTheme
+import dev.jason.app.compose.vaultchat.util.DeviceType
 import org.koin.androidx.compose.koinViewModel
 
 class MessengerActivity : ComponentActivity() {
@@ -29,11 +30,13 @@ class MessengerActivity : ComponentActivity() {
 
                 val backStack = rememberNavBackStack(startDestination)
 
+                val deviceType = DeviceType.rememberWindowSize()
+
                 NavDisplay(backStack) { key ->
                     when (key) {
                         is AppRoute.Authentication -> {
                             NavEntry(key) {
-                                AuthNavGraph {
+                                AuthNavGraph(deviceType) {
                                     backStack.add(AppRoute.WebSocketConnection)
                                     backStack.removeAt(0)
                                 }

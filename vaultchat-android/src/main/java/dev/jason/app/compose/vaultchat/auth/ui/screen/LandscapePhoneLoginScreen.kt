@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.auth.ui.screen.login
+package dev.jason.app.compose.vaultchat.auth.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,8 +22,7 @@ import dev.jason.app.compose.vaultchat.auth.ui.util.AppConstants
 @Composable
 fun LandscapePhoneLoginScreen(
     onSignInUsingGoogleClick: () -> Unit,
-    onSigninUsingGitHubClick: () -> Unit,
-    onSigninUsingEmailClick: () -> Unit
+    onSigninUsingGitHubClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -46,7 +45,6 @@ fun LandscapePhoneLoginScreen(
                 AuthButtonsGroup(
                     onSignInUsingGoogleClick = onSignInUsingGoogleClick,
                     onSigninUsingGitHubClick = onSigninUsingGitHubClick,
-                    onSigninUsingEmailClick = onSigninUsingEmailClick,
                     modifier = Modifier.padding(10.dp)
                 )
             }

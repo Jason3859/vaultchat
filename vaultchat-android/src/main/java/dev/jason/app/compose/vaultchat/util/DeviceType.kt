@@ -2,7 +2,12 @@ package dev.jason.app.compose.vaultchat.util
 
 import androidx.compose.material3.adaptive.HingeInfo
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 
 sealed class DeviceType : Comparable<DeviceType> {
     abstract val minWidth: Int
@@ -83,6 +88,27 @@ sealed class DeviceType : Comparable<DeviceType> {
                 }
                 else -> Compact(width, height)
             }
+        }
+
+        @Composable
+        fun rememberWindowSize(): DeviceType {
+            val windowInfo = LocalWindowInfo.current
+            val density = LocalDensity.current
+            val adaptiveInfo = currentWindowAdaptiveInfo()
+
+            val containerSize = windowInfo.containerSize
+
+            val width = with(density) { containerSize.width.toDp() }
+            val height = with(density) { containerSize.height.toDp() }
+
+            val windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(
+                widthDp = width.value,
+                heightDp = height.value
+            )
+
+            val windowAdaptiveInfo = WindowAdaptiveInfo(windowSizeClass, adaptiveInfo.windowPosture)
+
+            return fromWindowAdaptiveInfo(windowAdaptiveInfo)
         }
     }
 }

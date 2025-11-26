@@ -46,5 +46,5 @@ local.properties
 # Environment files
 vaultchat-server/.env
 
-/vaultchat-server/vaultchat-admin-sdk.json
+/vaultchat-server/src/main/resources/vaultchat-admin-sdk.json
 /vaultchat-android/google-services.json
