@@ -5,18 +5,11 @@
 
     <string name="signin_using_google">Signin using Google</string>
     <string name="signin_using_github">Signin using GitHub</string>
-    <string name="signin_using_email">Signin using email</string>
-
-    <string name="email">Email</string>
-    <string name="password">Password</string>
-
-    <string name="email_login">Login using email</string>
-    <string name="login_using_email">Already signed in? Click here to login</string>
-
-    <string name="login">Login</string>
-    <string name="signin">Signin</string>
 
     <string
         name="default_web_client_id"
         translatable="false">948435700451-ajl0sbecjdmhncd42put30jn2d8245h5.apps.googleusercontent.com</string>
+
+    <string name="your_recent_connections">Your Recent Connections</string>
+    <string name="placeholder_text">Select chat to display here.</string>
 </resources>

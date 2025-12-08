@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -36,7 +37,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import dev.jason.app.compose.vaultchat.R
 import dev.jason.app.compose.vaultchat.auth.ui.util.AppConstants
-import dev.jason.app.compose.vaultchat.theme.MessengerTheme
+import dev.jason.app.compose.vaultchat.core.theme.MessengerTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -47,7 +48,7 @@ internal fun CompactLoginScreen(
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
-        val bottomColumnHeightValue = 0.3f
+        val bottomColumnHeightValue = 0.2f
 
         Box(
             contentAlignment = Alignment.BottomCenter,
@@ -147,8 +148,8 @@ internal fun AuthButton(
         outlined = outlined,
         onClick = onClick,
         modifier = Modifier
-            .fillMaxWidth()
             .height(buttonHeight)
+            .widthIn(400.dp, 600.dp)
             .then(modifier)
     ) {
         Box {

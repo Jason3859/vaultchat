@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.jason.app.compose.vaultchat.R
 import dev.jason.app.compose.vaultchat.auth.ui.util.AppConstants
+import dev.jason.app.compose.vaultchat.core.theme.MessengerTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -49,5 +51,13 @@ fun LandscapePhoneLoginScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(device = "spec:parent=pixel_5,orientation=landscape")
+@Composable
+private fun LandscapePhoneLoginScreenLightModePreview() {
+    MessengerTheme {
+        LandscapePhoneLoginScreen({}, {})
     }
 }

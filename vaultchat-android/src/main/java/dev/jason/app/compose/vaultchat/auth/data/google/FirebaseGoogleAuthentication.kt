@@ -42,7 +42,6 @@ class FirebaseGoogleAuthentication {
 
             } catch (e: GetCredentialException) {
                 SnackbarController.sendEvent(e.message!!)
-                SnackbarController.sendEvent("Try signing in using Email or GitHub.")
                 Log.e("FirebaseGoogleAuth", "launchCredentialManagerBottomSheet: exception", e)
             }
         }

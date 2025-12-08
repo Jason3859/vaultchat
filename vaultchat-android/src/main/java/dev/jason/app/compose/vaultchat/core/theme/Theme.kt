@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.theme
+package dev.jason.app.compose.vaultchat.core.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

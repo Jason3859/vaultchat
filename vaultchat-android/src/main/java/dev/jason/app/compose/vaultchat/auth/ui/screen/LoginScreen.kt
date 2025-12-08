@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.auth.ui.screen
 
 import androidx.compose.runtime.Composable
-import dev.jason.app.compose.vaultchat.util.DeviceType
+import dev.jason.app.compose.vaultchat.core.util.DeviceType
 
 @Composable
 fun LoginScreen(
@@ -9,10 +9,19 @@ fun LoginScreen(
     onSigninUsingGitHubClick: () -> Unit,
     deviceType: DeviceType
 ) = when (deviceType) {
-    is DeviceType.Expanded -> ExtraLargeLoginScreen(
-        onSignInUsingGoogleClick,
-        onSigninUsingGitHubClick
-    )
+
+    is DeviceType.Expanded -> {
+        if (deviceType.isLandscapePhone)
+            LandscapePhoneLoginScreen(
+                onSignInUsingGoogleClick,
+                onSigninUsingGitHubClick
+            )
+        else
+            ExtraLargeLoginScreen(
+                onSignInUsingGoogleClick,
+                onSigninUsingGitHubClick
+            )
+    }
 
     is DeviceType.ExtraLarge -> ExtraLargeLoginScreen(
         onSignInUsingGoogleClick,
@@ -34,14 +43,8 @@ fun LoginScreen(
         onSigninUsingGitHubClick
     )
 
-    is DeviceType.Compact -> {
-        if (deviceType.isLandscapePhone)
-            LandscapePhoneLoginScreen(onSignInUsingGoogleClick, onSigninUsingGitHubClick)
-
-        else
-            CompactLoginScreen(
-                onSignInUsingGoogleClick,
-                onSigninUsingGitHubClick
-            )
-    }
+    is DeviceType.Compact -> CompactLoginScreen(
+        onSignInUsingGoogleClick,
+        onSigninUsingGitHubClick
+    )
 }

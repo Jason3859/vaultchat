@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import dev.jason.app.compose.vaultchat.R
 import dev.jason.app.compose.vaultchat.auth.ui.util.AppConstants
-import dev.jason.app.compose.vaultchat.theme.MessengerTheme
+import dev.jason.app.compose.vaultchat.core.theme.MessengerTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

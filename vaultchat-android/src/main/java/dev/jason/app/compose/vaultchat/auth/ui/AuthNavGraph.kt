@@ -15,7 +15,7 @@ import dev.jason.app.compose.vaultchat.auth.ui.screen.LoginScreen
 import dev.jason.app.compose.vaultchat.auth.ui.util.SnackbarController
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.github_auth.GitHubAuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.viewmodel.google_auth.GoogleAuthViewModel
-import dev.jason.app.compose.vaultchat.util.DeviceType
+import dev.jason.app.compose.vaultchat.core.util.DeviceType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -78,18 +78,7 @@ private fun MessengerActivity.signInWithGoogle(
         lifecycleScope.launch {
             FirebaseGoogleAuthentication.launchCredentialManagerBottomSheet(this@signInWithGoogle) { credential ->
                 googleAuthViewModel.signin(credential)
-                    ?.addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            onDone()
-                        } else {
-                            SnackbarController.sendEvent(it.exception?.message!!)
-                            Log.e(
-                                "AuthNavGraph",
-                                "AuthNavGraph: exception while logging in using google",
-                                it.exception
-                            )
-                        }
-                    }
+                    ?.addOnCompleteListener { onDone() }
             }
         }
     }

@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.util
+package dev.jason.app.compose.vaultchat.core.util
 
 import androidx.compose.material3.adaptive.HingeInfo
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
@@ -91,10 +91,9 @@ sealed class DeviceType : Comparable<DeviceType> {
         }
 
         @Composable
-        fun rememberWindowSize(): DeviceType {
+        fun rememberWindowSize(adaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()): DeviceType {
             val windowInfo = LocalWindowInfo.current
             val density = LocalDensity.current
-            val adaptiveInfo = currentWindowAdaptiveInfo()
 
             val containerSize = windowInfo.containerSize
 

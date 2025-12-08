@@ -38,4 +38,9 @@ internal object AppConstants {
     val largeTextStyle: TextStyle
         @Composable
         get() = MaterialTheme.typography.displayMediumEmphasized
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    val extraLargeTextStyle: TextStyle
+        @Composable
+        get() = MaterialTheme.typography.displayLargeEmphasized
 }

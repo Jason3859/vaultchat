@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import dev.jason.app.compose.vaultchat.R
 import dev.jason.app.compose.vaultchat.auth.ui.util.AppConstants
-import dev.jason.app.compose.vaultchat.theme.MessengerTheme
+import dev.jason.app.compose.vaultchat.core.theme.MessengerTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -38,13 +38,13 @@ fun ExtraLargeLoginScreen(
         ) {
             Text(
                 text = stringResource(R.string.welcome),
-                style = AppConstants.largeTextStyle
+                style = AppConstants.extraLargeTextStyle
             )
 
             Card(
                 shape = RoundedCornerShape(40.dp),
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
+                    .wrapContentSize()
             ) {
                 AuthButtonsGroup(
                     onSignInUsingGoogleClick = onSignInUsingGoogleClick,
