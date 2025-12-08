@@ -11,7 +11,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
 
 @Serializable
@@ -53,9 +52,7 @@ fun Application.configureRouting() {
                 .getAllMessages()
                 .map { it.toDto() }
 
-            val serialized = Json.encodeToString(messages)
-
-            call.respond(HttpStatusCode.Accepted, serialized)
+            call.respond(HttpStatusCode.Accepted, messages)
         }
 
         get("/get-rooms") {
@@ -82,7 +79,7 @@ fun Application.configureRouting() {
                 .map { it.roomId }
                 .distinct()
 
-            call.respond(HttpStatusCode.Accepted, Json.encodeToString(rooms))
+            call.respond(HttpStatusCode.Accepted, rooms)
         }
     }
 }
