@@ -40,8 +40,8 @@ fun Application.configureSockets() {
     routing {
         val chatSessions = ConcurrentHashMap<String, MutableList<DefaultWebSocketServerSession>>()
 
-        webSocket("/chat/{roomId}") {
-            val roomId = call.parameters["RoomId"]
+        webSocket("/chat") {
+            val roomId = call.request.headers["RoomId"]
             val token = call.request.headers["Token"]
 
             if (token == null) {
