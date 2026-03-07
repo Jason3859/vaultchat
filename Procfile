@@ -1,1 +1,0 @@
-web: java -jar messenger-server/build/libs/messenger-server-0.0.1-all.jar
