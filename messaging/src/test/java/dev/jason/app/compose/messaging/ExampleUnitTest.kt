@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat
+package dev.jason.app.compose.messaging
 
 import org.junit.Test
 

@@ -1,3 +1,5 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         google {
@@ -20,4 +22,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "VaultChat"
+
 include(":app")
+include(":messaging")
