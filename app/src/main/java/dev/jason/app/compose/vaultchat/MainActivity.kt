@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import dev.jason.app.compose.messaging.ExampleMessagingComposable
+import dev.jason.app.compose.core.messaging.ExampleMessagingComposable
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.MainViewModel
 import dev.jason.app.compose.vaultchat.ui.theme.VaultChatTheme

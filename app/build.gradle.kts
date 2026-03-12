@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
-    implementation(projects.messaging)
+    implementation(projects.core)
 
     testImplementation(libs.junit)
 

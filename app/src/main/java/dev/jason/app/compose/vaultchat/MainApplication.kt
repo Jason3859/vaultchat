@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat
 
 import android.app.Application
-import dev.jason.app.compose.messaging.MessagingKoinModule
+import dev.jason.app.compose.core.messaging.MessagingKoinModule
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApiImpl
 import dev.jason.app.compose.vaultchat.auth.data.RetrofitApi
