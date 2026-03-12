@@ -1,4 +1,4 @@
-package dev.jason.app.compose.core.messaging.domain
+package dev.jason.app.compose.core.messaging.domain.model
 
 data class Message(
     val from: String,

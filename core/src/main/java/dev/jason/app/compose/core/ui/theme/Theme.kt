@@ -1,6 +1,5 @@
-package dev.jason.app.compose.vaultchat.ui.theme
+package dev.jason.app.compose.core.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

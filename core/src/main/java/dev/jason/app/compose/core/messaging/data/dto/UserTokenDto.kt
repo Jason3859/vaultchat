@@ -1,6 +1,6 @@
-package dev.jason.app.compose.core.messaging.data
+package dev.jason.app.compose.core.messaging.data.dto
 
-import dev.jason.app.compose.core.messaging.domain.UserToken
+import dev.jason.app.compose.core.messaging.domain.model.UserToken
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -28,7 +28,7 @@ import androidx.core.content.ContextCompat
 import dev.jason.app.compose.core.messaging.ExampleMessagingComposable
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.MainViewModel
-import dev.jason.app.compose.vaultchat.ui.theme.VaultChatTheme
+import dev.jason.app.compose.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(150.dp)
+                                    modifier = Modifier.size(100.dp)
                                 )
                             }
                         }

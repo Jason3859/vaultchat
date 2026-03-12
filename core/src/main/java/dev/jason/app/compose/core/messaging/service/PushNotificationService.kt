@@ -5,8 +5,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import dev.jason.app.compose.core.messaging.domain.RemoteApi
-import dev.jason.app.compose.core.messaging.domain.UserToken
+import dev.jason.app.compose.core.messaging.domain.remote.RemoteApi
+import dev.jason.app.compose.core.messaging.domain.model.UserToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
