@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat
 
 import android.app.Application
+import dev.jason.app.compose.core.local_storage.LocalStorageKoinModule
 import dev.jason.app.compose.core.messaging.MessagingKoinModule
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApiImpl
@@ -40,7 +41,7 @@ class MainApplication : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@MainApplication)
-            modules(baseModule, MessagingKoinModule)
+            modules(baseModule, MessagingKoinModule, LocalStorageKoinModule)
         }
     }
 }
