@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 android {
@@ -45,6 +46,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)

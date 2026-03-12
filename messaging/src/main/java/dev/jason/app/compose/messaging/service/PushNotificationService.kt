@@ -1,5 +1,6 @@
 package dev.jason.app.compose.messaging.service
 
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -19,10 +20,15 @@ class PushNotificationService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        val user = Firebase.auth.currentUser!!
+        try {
+            val user = Firebase.auth.currentUser!!
 
-        coroutineScope.launch {
-            remoteApi.updateFcmToken(UserToken(user.uid, token))
+            coroutineScope.launch {
+                remoteApi.updateFcmToken(UserToken(user.uid, token))
+                Log.d("PushNotificationService", "onNewToken: sent new token to server")
+            }
+        } catch (e: NullPointerException) {
+            Log.w("PushNotificationService", "onNewToken: exception", e)
         }
     }
 

@@ -41,7 +41,7 @@ class AppViewModel(private val api: RemoteApi) : ViewModel() {
                 }
             }
 
-        is Action.SendMessage -> sendMessage()
+            is Action.SendMessage -> sendMessage()
         }
     }
 

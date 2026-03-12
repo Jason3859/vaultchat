@@ -6,10 +6,10 @@ import dev.jason.app.compose.messaging.domain.UserToken
 
 class RemoteApiImpl(private val fcmApi: FcmApi) : RemoteApi {
     override suspend fun send(body: Message) {
-        fcmApi.send(body)
+        fcmApi.send(body.toDto())
     }
 
     override suspend fun updateFcmToken(body: UserToken) {
-        fcmApi.updateFcmToken(body)
+        fcmApi.updateFcmToken(body.toDto())
     }
 }
