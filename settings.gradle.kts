@@ -25,3 +25,4 @@ rootProject.name = "VaultChat"
 
 include(":app")
 include(":messaging")
+include(":local-storage")

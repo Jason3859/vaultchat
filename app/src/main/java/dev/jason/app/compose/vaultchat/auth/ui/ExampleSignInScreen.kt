@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import dev.jason.app.compose.vaultchat.MainActivity
-import dev.jason.app.compose.vaultchat.MainViewModel
 import dev.jason.app.compose.vaultchat.R
 import dev.jason.app.compose.vaultchat.SnackbarController
 import dev.jason.app.compose.vaultchat.auth.data.FirebaseGoogleAuthentication
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.core.content.edit
 
 @Composable
 fun MainActivity.ExampleSignInScreen(viewModel: MainViewModel = koinViewModel()) {
@@ -39,7 +39,7 @@ fun MainActivity.signInWithGoogle(viewModel: MainViewModel) {
             FirebaseGoogleAuthentication.signInWithCredential(credential)
                 .addOnSuccessListener {
                     viewModel.onAction(MainViewModel.Action.SignInComplete)
-                    sharedPrefs.edit().putBoolean(MainActivity.IS_SIGNED_IN_PREF_NAME, true).apply()
+                    sharedPrefs.edit { putBoolean(MainActivity.IS_SIGNED_IN_PREF_NAME, true) }
                 }
                 .addOnFailureListener { exception ->
                     Log.w("SignInScreen", "signInWithGoogle: exception while signing in with google", exception)

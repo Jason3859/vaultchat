@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
@@ -26,6 +27,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dev.jason.app.compose.messaging.ExampleMessagingComposable
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
+import dev.jason.app.compose.vaultchat.auth.ui.MainViewModel
 import dev.jason.app.compose.vaultchat.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,11 +42,12 @@ class MainActivity : ComponentActivity() {
 
     private val startDestination by lazy {
         if (sharedPrefs.getBoolean(IS_SIGNED_IN_PREF_NAME, false))
-            MainViewModel.Routes.Messaging
+            MainViewModel.Route.Messaging
         else
-            MainViewModel.Routes.Auth
+            MainViewModel.Route.Auth
     }
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNotificationPermission()
@@ -72,8 +75,8 @@ class MainActivity : ComponentActivity() {
                     snackbarHost = { SnackbarHost(snackbarHostState) }
                 ) {
                     when (currentRoute) {
-                        is MainViewModel.Routes.Auth -> ExampleSignInScreen()
-                        is MainViewModel.Routes.Messaging -> ExampleMessagingComposable()
+                        is MainViewModel.Route.Auth -> ExampleSignInScreen()
+                        is MainViewModel.Route.Messaging -> ExampleMessagingComposable()
 
                         else -> {
                             Box(
