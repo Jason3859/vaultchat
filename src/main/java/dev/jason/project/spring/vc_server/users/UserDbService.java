@@ -1,5 +1,6 @@
 package dev.jason.project.spring.vc_server.users;
 
+import dev.jason.project.spring.vc_server.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +12,30 @@ public class UserDbService {
     @Autowired
     UserDbRepository repository;
 
-    public void saveUser(DBUser DBUser) {
-        repository.save(DBUser);
+    public void saveUser(DBUser dbUser) {
+        repository.save(dbUser);
     }
 
-    public DBUser getUserByUid(String uid) {
-        return repository.findByUid(uid);
+    public List<User> getAllUsers() {
+        return repository.findAll().stream().map(DBUser::toDomainUser).toList();
     }
 
-    public List<DBUser> getUserByDisplayName(String displayName) {
-        return repository.findByDisplayName(displayName);
+    public User getUserByUid(String uid) {
+        return repository.findByUid(uid).toDomainUser();
+    }
+
+    public List<User> getUsersByDisplayName(String displayName) {
+        return repository.findByDisplayName(displayName).stream()
+                .map(DBUser::toDomainUser)
+                .toList();
+    }
+
+    public String getUserFcmTokenByUid(String uid) {
+        return repository.findByUid(uid).fcmToken();
     }
 
     public void updateUserFcmToken(String uid, String fcmToken) {
-        DBUser existingUser = getUserByUid(uid);
+        User existingUser = getUserByUid(uid);
         repository.save(new DBUser(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken));
     }
 }

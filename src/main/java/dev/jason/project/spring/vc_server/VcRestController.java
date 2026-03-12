@@ -7,12 +7,11 @@ import dev.jason.project.spring.vc_server.domain.User;
 import dev.jason.project.spring.vc_server.dto.AddUserDto;
 import dev.jason.project.spring.vc_server.dto.UserTokenDto;
 import dev.jason.project.spring.vc_server.user_dms.UserDmsService;
-import dev.jason.project.spring.vc_server.users.DBUser;
 import dev.jason.project.spring.vc_server.users.UserDbService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class VcRestController {
@@ -51,10 +50,14 @@ public class VcRestController {
         userDbService.saveUser(userDto.toDbUser());
     }
 
-    @GetMapping("/get-users/{name}")
-    public List<User> getUsers(@RequestParam String name) {
-        return userDbService.getUserByDisplayName(name).stream()
-                .map(DBUser::toDomainUser)
-                .collect(Collectors.toList());
+    @GetMapping("/search-users/{name}")
+    public List<User> searchUsers(@PathVariable("name") String name) {
+        List<User> requiredUsers = new ArrayList<>(List.of());
+
+        userDbService.getAllUsers().stream()
+                .filter(user -> user.displayName().toLowerCase().contains(name.toLowerCase()))
+                .forEach(requiredUsers::add);
+
+        return requiredUsers;
     }
 }

@@ -25,6 +25,6 @@ public class VCUtilityService {
     }
 
     public static String getUserFcmTokenFromUid(String uid) {
-        return userDbService.getUserByUid(uid).fcmToken();
+        return userDbService.getUserFcmTokenByUid(uid);
     }
 }
