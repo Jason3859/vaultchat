@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public record DBUser(@Id String uid, String displayName, String profilePictureUrl, String fcmToken) {
+public record DBUser(@Id String uid, String displayName, String profilePictureUrl, String fcmToken, String[] connections) {
 
     public User toDomainUser() {
         return new User(uid, displayName, profilePictureUrl);

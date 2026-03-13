@@ -6,9 +6,9 @@ import dev.jason.project.spring.vc_server.users.DBUser;
 
 public record AddUserDto(String uid, String fcmToken) {
 
-    public DBUser toDbUser() {
+    public DBUser toDbUser(String[] connections) {
         User user = VCUtilityService.getUserFromUid(uid);
 
-        return new DBUser(user.uid(), user.displayName(), user.profilePictureUrl(), fcmToken);
+        return new DBUser(user.uid(), user.displayName(), user.profilePictureUrl(), fcmToken, connections);
     }
 }

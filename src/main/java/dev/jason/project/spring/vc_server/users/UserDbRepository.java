@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface UserDbRepository extends MongoRepository<DBUser, String> {
     DBUser findByUid(String uid);
-    List<DBUser> findByDisplayName(String displayName);
+    List<DBUser> findByDisplayNameContainingIgnoreCase(String displayName);
 }
