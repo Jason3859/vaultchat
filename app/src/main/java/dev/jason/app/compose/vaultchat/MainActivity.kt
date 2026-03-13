@@ -25,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import dev.jason.app.compose.core.messaging.ExampleMessagingComposable
+import dev.jason.app.compose.core.messaging.ui.screen.HomeScreen
+import dev.jason.app.compose.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.MainViewModel
-import dev.jason.app.compose.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     when (currentRoute) {
                         is MainViewModel.Route.Auth -> ExampleSignInScreen()
-                        is MainViewModel.Route.Messaging -> ExampleMessagingComposable()
+                        is MainViewModel.Route.Messaging -> HomeScreen()
 
                         else -> {
                             Box(

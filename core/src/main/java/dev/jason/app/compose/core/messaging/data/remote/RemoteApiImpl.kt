@@ -17,7 +17,7 @@ class RemoteApiImpl(private val api: FcmApi) : RemoteApi {
         api.updateFcmToken(body.toDto())
     }
 
-    override suspend fun searchUsers(name: String): List<User> {
-        return api.searchUsers(name).map(UserDto::toDomain)
+    override suspend fun searchUsers(name: String, from: String): List<User> {
+        return api.searchUsers(name, from).map(UserDto::toDomain)
     }
 }

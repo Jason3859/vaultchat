@@ -3,6 +3,8 @@ package dev.jason.app.compose.core.messaging.ui.screen.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import dev.jason.app.compose.core.messaging.domain.model.User
 import dev.jason.app.compose.core.messaging.domain.remote.RemoteApi
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +33,7 @@ class SearchUsersViewModel(private val remoteApi: RemoteApi) : ViewModel(Corouti
     fun getAndUpdateUsers() {
         viewModelScope.launch {
             updateState(_uiState.value.copy(isLoading = true))
-            val response = remoteApi.searchUsers(_uiState.value.searchQuery)
+            val response = remoteApi.searchUsers(_uiState.value.searchQuery, Firebase.auth.currentUser!!.uid)
             Log.d("SearchUsersViewModel", "getAndUpdateUsers: response: $response")
             updateState(
                 _uiState.value.copy(

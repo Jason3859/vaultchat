@@ -7,5 +7,5 @@ import dev.jason.app.compose.core.messaging.domain.model.UserToken
 interface RemoteApi {
     suspend fun sendMessage(body: Message)
     suspend fun updateFcmToken(body: UserToken)
-    suspend fun searchUsers(name: String): List<User>
+    suspend fun searchUsers(name: String, from: String): List<User>
 }
