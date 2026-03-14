@@ -33,7 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import dev.jason.app.compose.core.messaging.domain.model.User
 import dev.jason.app.compose.core.messaging.ui.screen.main.MainHomeScreen
+import dev.jason.app.compose.core.messaging.ui.screen.profile.ProfileScreen
 import dev.jason.app.compose.core.messaging.ui.screen.search.SearchUsersScreen
 import dev.jason.app.compose.core.messaging.ui.screen.search.SearchUsersViewModel
 import dev.jason.app.compose.core.ui.theme.VaultChatTheme
@@ -53,21 +57,38 @@ fun HomeScreen() {
         bottomBar = { BottomBar(bottomBarIndex, { bottomBarIndex = it }) },
         topBar = { TopBar(topAppBarTexts[bottomBarIndex]) }
     ) { innerPadding ->
-        if (bottomBarIndex == 0) {
-            MainHomeScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
-        } else {
-            SearchUsersScreen(
-                uiState = searchUsersUiState,
-                updateState = searchUsersViewModel::updateState,
-                onSearch = { searchUsersViewModel.getAndUpdateUsers() },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
+        when (bottomBarIndex) {
+            0 -> {
+                MainHomeScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            }
+            1 -> {
+                SearchUsersScreen(
+                    uiState = searchUsersUiState,
+                    updateState = searchUsersViewModel::updateState,
+                    onSearch = { searchUsersViewModel.getAndUpdateUsers() },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            }
+            else -> {
+                val firebaseUser = Firebase.auth.currentUser!!
+                val user = User(
+                    firebaseUser.uid,
+                    firebaseUser.displayName!!,
+                    firebaseUser.photoUrl.toString().removeSuffix("=s96-c")
+                )
+
+                ProfileScreen(
+                    user = user,
+                    innerPadding = innerPadding,
+                    onLogOutClick = {}
+                )
+            }
         }
     }
 }

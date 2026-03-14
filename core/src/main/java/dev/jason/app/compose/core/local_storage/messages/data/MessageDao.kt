@@ -1,4 +1,4 @@
-package dev.jason.app.compose.core.local_storage.data
+package dev.jason.app.compose.core.local_storage.messages.data
 
 import androidx.room.Dao
 import androidx.room.Insert

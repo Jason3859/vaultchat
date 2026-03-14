@@ -1,8 +1,8 @@
-package dev.jason.app.compose.core.local_storage.data
+package dev.jason.app.compose.core.local_storage.messages.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import dev.jason.app.compose.core.local_storage.domain.Message
+import dev.jason.app.compose.core.local_storage.messages.domain.Message
 
 @Entity(tableName = "messages")
 data class MessageEntity(

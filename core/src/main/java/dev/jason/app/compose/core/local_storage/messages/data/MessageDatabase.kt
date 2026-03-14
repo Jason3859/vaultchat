@@ -1,9 +1,11 @@
-package dev.jason.app.compose.core.local_storage.data
+package dev.jason.app.compose.core.local_storage.messages.data
 
 import android.content.Context
+import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+@Database(entities = [MessageEntity::class], version = 1)
 abstract class MessageDatabase : RoomDatabase() {
 
     abstract fun messageDao(): MessageDao

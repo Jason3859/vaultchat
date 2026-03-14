@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class MainViewModel(private val repository: RemoteApi) : ViewModel(CoroutineScope(Dispatchers.IO)) {
+class MainViewModel(private val remoteApi: RemoteApi) : ViewModel(CoroutineScope(Dispatchers.IO)) {
 
     private val _currentRoute = MutableStateFlow<Route?>(null)
     val currentRoute = _currentRoute.asStateFlow()
@@ -25,9 +25,13 @@ class MainViewModel(private val repository: RemoteApi) : ViewModel(CoroutineScop
             is Action.SignInComplete -> {
                 viewModelScope.launch {
                     _currentRoute.update { null }
+
                     val uid = Firebase.auth.currentUser!!.uid
                     val fcmToken = Firebase.messaging.token.await()
-                    repository.addUserToServer(User(uid, fcmToken))
+                    val user = User(uid, fcmToken)
+
+                    remoteApi.addUserToServer(user)
+
                     _currentRoute.update { Route.Messaging }
                 }
             }

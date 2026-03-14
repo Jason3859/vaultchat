@@ -1,4 +1,4 @@
-package dev.jason.app.compose.core.local_storage.domain
+package dev.jason.app.compose.core.local_storage.messages.domain
 
 interface MessageRepository {
 
