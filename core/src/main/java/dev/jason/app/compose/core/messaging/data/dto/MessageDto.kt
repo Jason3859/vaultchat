@@ -7,14 +7,7 @@ import kotlinx.serialization.Serializable
 data class MessageDto(
     val from: String,
     val to: String,
-    val notification: NotificationDto
-) {
-    @Serializable
-    data class NotificationDto(
-        val title: String,
-        val body: String
-    )
-}
+    val text: String
+)
 
-fun Message.toDto(): MessageDto = MessageDto(from, to, notification.toDto())
-fun Message.Notification.toDto() = MessageDto.NotificationDto(title, body)
+fun Message.toDto(): MessageDto = MessageDto(from, to, text)

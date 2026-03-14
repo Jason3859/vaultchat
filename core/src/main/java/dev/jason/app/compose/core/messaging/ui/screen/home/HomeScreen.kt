@@ -1,4 +1,4 @@
-package dev.jason.app.compose.core.messaging.ui.screen
+package dev.jason.app.compose.core.messaging.ui.screen.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
