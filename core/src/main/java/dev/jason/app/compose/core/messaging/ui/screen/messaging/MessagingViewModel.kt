@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.core.messaging.domain.model.Message
+import dev.jason.app.compose.core.messaging.domain.model.User
 import dev.jason.app.compose.core.messaging.domain.remote.RemoteApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +18,7 @@ class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(
 
     data class UiState(
         val messageText: String = "",
-        val currentUserUid: String = "",
-        val otherUserUid: String = "",
-        val otherUserDisplayName: String = "",
+        val otherUser: User? = null,
         val sendButtonEnabled: Boolean = false,
         val messages: List<Message> = emptyList()
     )
@@ -32,7 +31,6 @@ class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(
     fun updateState(state: UiState) {
         _uiState.update {
             state.copy(
-                currentUserUid = currentUserUid,
                 sendButtonEnabled = state.messageText.isNotBlank()
             )
         }
@@ -41,8 +39,12 @@ class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(
     fun sendMessage() {
         viewModelScope.launch {
             api.sendMessage(
-                body = Message(currentUserUid, _uiState.value.otherUserUid, _uiState.value.messageText)
+                body = Message(currentUserUid, _uiState.value.otherUser?.uid!!, _uiState.value.messageText)
             )
+
+            _uiState.update {
+                it.copy(messageText = "")
+            }
         }
     }
 }

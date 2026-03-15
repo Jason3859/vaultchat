@@ -1,5 +1,6 @@
-package dev.jason.app.compose.core.messaging.ui.screen.home
+package dev.jason.app.compose.core.messaging
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,16 +19,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -35,6 +41,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.core.messaging.domain.model.User
 import dev.jason.app.compose.core.messaging.ui.screen.main.MainHomeScreen
+import dev.jason.app.compose.core.messaging.ui.screen.messaging.MessagingScreen
+import dev.jason.app.compose.core.messaging.ui.screen.messaging.MessagingViewModel
 import dev.jason.app.compose.core.messaging.ui.screen.nav.Route
 import dev.jason.app.compose.core.messaging.ui.screen.profile.ProfileScreen
 import dev.jason.app.compose.core.messaging.ui.screen.search.SearchUsersScreen
@@ -42,9 +50,49 @@ import dev.jason.app.compose.core.messaging.ui.screen.search.SearchUsersViewMode
 import dev.jason.app.compose.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
 
+    val mainBackStack = rememberNavBackStack(Route.Home)
+
+    val snackbarHostState = SnackbarHostState()
+
+    LaunchedEffect(true) {
+        SnackbarController.flow.collect { string ->
+            snackbarHostState.showSnackbar(string)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) {
+        NavDisplay(
+            backStack = mainBackStack,
+            entryProvider = entryProvider {
+                entry<Route.Home> {
+                    HomeScreenCore(mainBackStack)
+                }
+
+                entry<Route.Messaging> {
+                    val viewModel: MessagingViewModel = koinViewModel()
+                    val uiState by viewModel.uiState.collectAsState()
+
+                    MessagingScreen(
+                        otherUser = User(it.uid, it.displayName, it.profilePictureUrl),
+                        uiState = uiState,
+                        onBackClick = { mainBackStack.removeLastOrNull() },
+                        onSend = viewModel::sendMessage,
+                        updateState = viewModel::updateState
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
     val bottomBarBackStack = rememberNavBackStack(Route.Home.Main)
     val topAppBarTexts = mapOf(
         Route.Home.Main to "Home",
@@ -87,6 +135,7 @@ fun HomeScreen() {
                         uiState = searchUsersUiState,
                         updateState = searchUsersViewModel::updateState,
                         onSearch = { searchUsersViewModel.getAndUpdateUsers() },
+                        onUserClick = { mainBackStack.add(Route.Messaging(it.uid, it.displayName, it.profilePictureUrl)) },
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)

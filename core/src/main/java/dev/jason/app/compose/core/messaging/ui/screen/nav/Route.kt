@@ -20,5 +20,5 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
-    data object Messaging : Route
+    data class Messaging(val uid: String, val displayName: String, val profilePictureUrl: String) : Route
 }

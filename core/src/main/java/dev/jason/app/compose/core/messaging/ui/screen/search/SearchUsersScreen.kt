@@ -2,6 +2,7 @@ package dev.jason.app.compose.core.messaging.ui.screen.search
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.core.messaging.domain.model.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +44,7 @@ fun SearchUsersScreen(
     uiState: SearchUsersViewModel.UiState,
     updateState: (SearchUsersViewModel.UiState) -> Unit,
     onSearch: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -71,7 +74,11 @@ fun SearchUsersScreen(
                 LazyColumn {
                     items(uiState.searchResults) { user ->
                         ListItem(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onUserClick(user)
+                                },
                             headlineContent = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
