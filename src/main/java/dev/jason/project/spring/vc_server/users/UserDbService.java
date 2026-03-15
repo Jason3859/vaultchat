@@ -25,6 +25,9 @@ public class UserDbService {
 
         try {
             List<String> connections = new ArrayList<>(Arrays.asList(user.connections()));
+
+            if (connections.contains(dmUid)) return;
+
             connections.add(dmUid);
             connectionsArray = connections.toArray(new String[0]);
         } catch (NullPointerException ignored) {
@@ -41,6 +44,14 @@ public class UserDbService {
 
     public String getUserFcmTokenByUid(String uid) {
         return repository.findByUid(uid).fcmToken();
+    }
+
+    public UserDbEntity getUserDbEntityByUid(String uid) {
+        return repository.findByUid(uid);
+    }
+
+    public User getUserByUid(String uid) {
+        return repository.findByUid(uid).toDomainUser();
     }
 
     public void updateUserFcmToken(String uid, String fcmToken) {

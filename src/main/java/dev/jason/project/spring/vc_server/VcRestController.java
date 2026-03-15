@@ -3,6 +3,7 @@ package dev.jason.project.spring.vc_server;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import dev.jason.project.spring.vc_server.domain.Message;
+import dev.jason.project.spring.vc_server.domain.User;
 import dev.jason.project.spring.vc_server.dto.AddUserDto;
 import dev.jason.project.spring.vc_server.dto.UserDto;
 import dev.jason.project.spring.vc_server.dto.UserTokenDto;
@@ -10,6 +11,7 @@ import dev.jason.project.spring.vc_server.users.UserDbService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -52,7 +54,11 @@ public class VcRestController {
 
     @PostMapping("/add-user")
     public void addUser(@RequestBody AddUserDto userDto) {
-        userDbService.saveUser(userDto.toDbUser(new String[0]));
+        User user = userDbService.getUserByUid(userDto.uid());
+
+        if (user == null) {
+            userDbService.saveUser(userDto.toDbUser(null));
+        }
     }
 
     @GetMapping("/search-users/{name}")
@@ -65,5 +71,13 @@ public class VcRestController {
                 .forEach(requiredUsers::add);
 
         return requiredUsers;
+    }
+
+    @GetMapping("/get-connections/{uid}")
+    public List<UserDto> getConnections(@PathVariable("uid") String uid) {
+        return Arrays.stream(userDbService.getUserDbEntityByUid(uid).connections())
+                .map(userDbService::getUserDbEntityByUid)
+                .map(user -> new UserDto(user.uid(), user.displayName(), user.profilePictureUrl()))
+                .toList();
     }
 }
