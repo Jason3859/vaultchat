@@ -29,9 +29,17 @@ public class VcRestController {
 
     @PostMapping("/send")
     public void send(@RequestBody Message body) {
+
+        if (body.text().isBlank()) {
+            return;
+        }
+
         try {
             userDbService.addConnection(body.from(), body.to());
-            FirebaseMessaging.getInstance().send(body.toMessage());
+
+            String token = userDbService.getUserFcmTokenByUid(body.to());
+
+            FirebaseMessaging.getInstance().send(body.toMessage(token));
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -44,7 +52,7 @@ public class VcRestController {
 
     @PostMapping("/add-user")
     public void addUser(@RequestBody AddUserDto userDto) {
-        userDbService.saveUser(userDto.toDbUser(null));
+        userDbService.saveUser(userDto.toDbUser(new String[0]));
     }
 
     @GetMapping("/search-users/{name}")

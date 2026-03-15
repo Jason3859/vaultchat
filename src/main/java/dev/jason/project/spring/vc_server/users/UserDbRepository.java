@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface UserDbRepository extends MongoRepository<DBUser, String> {
-    DBUser findByUid(String uid);
-    List<DBUser> findByDisplayNameContainingIgnoreCase(String displayName);
+public interface UserDbRepository extends MongoRepository<UserDbEntity, String> {
+    UserDbEntity findByUid(String uid);
+    List<UserDbEntity> findByDisplayNameContainingIgnoreCase(String displayName);
 }

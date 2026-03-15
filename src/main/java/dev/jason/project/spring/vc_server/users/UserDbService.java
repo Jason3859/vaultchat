@@ -14,23 +14,29 @@ public class UserDbService {
     @Autowired
     UserDbRepository repository;
 
-    public void saveUser(DBUser dbUser) {
-        repository.save(dbUser);
+    public void saveUser(UserDbEntity userDbEntity) {
+        repository.save(userDbEntity);
     }
 
     public void addConnection(String uid, String dmUid) {
-        DBUser user = repository.findByUid(uid);
+        UserDbEntity user = repository.findByUid(uid);
 
-        List<String> connections = new ArrayList<>(Arrays.asList(user.connections()));
-        connections.add(dmUid);
-        String[] connectionsArray = connections.toArray(new String[0]);
+        String[] connectionsArray;
 
-        DBUser updatedUser = new DBUser(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), connectionsArray);
+        try {
+            List<String> connections = new ArrayList<>(Arrays.asList(user.connections()));
+            connections.add(dmUid);
+            connectionsArray = connections.toArray(new String[0]);
+        } catch (NullPointerException ignored) {
+            connectionsArray = new String[] { dmUid };
+        }
+
+        UserDbEntity updatedUser = new UserDbEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), connectionsArray);
         repository.save(updatedUser);
     }
 
     public List<User> getAllUsersByDisplayName(String name) {
-        return repository.findByDisplayNameContainingIgnoreCase(name).stream().map(DBUser::toDomainUser).toList();
+        return repository.findByDisplayNameContainingIgnoreCase(name).stream().map(UserDbEntity::toDomainUser).toList();
     }
 
     public String getUserFcmTokenByUid(String uid) {
@@ -38,7 +44,7 @@ public class UserDbService {
     }
 
     public void updateUserFcmToken(String uid, String fcmToken) {
-        DBUser existingUser = repository.findByUid(uid);
-        repository.save(new DBUser(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken, existingUser.connections()));
+        UserDbEntity existingUser = repository.findByUid(uid);
+        repository.save(new UserDbEntity(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken, existingUser.connections()));
     }
 }
