@@ -1,8 +1,6 @@
 package dev.jason.app.compose.core.messaging
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,7 +123,8 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                     MainHomeScreen(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
+                            .padding(innerPadding),
+                        onUserClick = { mainBackStack.add(Route.Messaging(it.uid, it.displayName, it.profilePictureUrl)) },
                     )
                 }
 
@@ -186,43 +184,37 @@ fun BottomBar(
     BottomAppBar(
         modifier = modifier.fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            listOf(
-                BottomBarIcon(
-                    filled = Icons.Default.Home,
-                    outlined = Icons.Outlined.Home,
-                    text = "Home",
-                    route = Route.Home.Main
-                ),
-                BottomBarIcon(
-                    filled = Icons.Default.Search,
-                    outlined = Icons.Outlined.Search,
-                    text = "Search",
-                    route = Route.Home.Search
-                ),
-                BottomBarIcon(
-                    filled = Icons.Default.AccountCircle,
-                    outlined = Icons.Outlined.AccountCircle,
-                    text = "You",
-                    route = Route.Home.Profile
-                ),
-            ).forEach { icon ->
-                NavigationBarItem(
-                    selected = currentScreen == icon.route,
-                    onClick = { onScreenChange(icon.route) },
-                    label = { Text(icon.text) },
-                    icon = {
-                        Icon(
-                            imageVector = if (currentScreen == icon.route) icon.filled else icon.outlined,
-                            contentDescription = null
-                        )
-                    }
-                )
-            }
+        listOf(
+            BottomBarIcon(
+                filled = Icons.Default.Home,
+                outlined = Icons.Outlined.Home,
+                text = "Home",
+                route = Route.Home.Main
+            ),
+            BottomBarIcon(
+                filled = Icons.Default.Search,
+                outlined = Icons.Outlined.Search,
+                text = "Search",
+                route = Route.Home.Search
+            ),
+            BottomBarIcon(
+                filled = Icons.Default.AccountCircle,
+                outlined = Icons.Outlined.AccountCircle,
+                text = "You",
+                route = Route.Home.Profile
+            ),
+        ).forEach { icon ->
+            NavigationBarItem(
+                selected = currentScreen == icon.route,
+                onClick = { onScreenChange(icon.route) },
+                label = { Text(icon.text) },
+                icon = {
+                    Icon(
+                        imageVector = if (currentScreen == icon.route) icon.filled else icon.outlined,
+                        contentDescription = null
+                    )
+                }
+            )
         }
     }
 }

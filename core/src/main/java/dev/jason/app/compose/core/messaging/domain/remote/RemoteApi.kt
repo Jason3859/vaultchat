@@ -8,4 +8,5 @@ interface RemoteApi {
     suspend fun sendMessage(body: Message)
     suspend fun updateFcmToken(body: UserToken)
     suspend fun searchUsers(name: String, from: String): List<User>
+    suspend fun getConnections(uid: String): List<User>
 }

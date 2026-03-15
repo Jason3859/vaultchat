@@ -38,4 +38,14 @@ class RemoteApiImpl(private val api: FcmApi) : RemoteApi {
             emptyList()
         }
     }
+
+    override suspend fun getConnections(uid: String): List<User> {
+        return try {
+            api.getConnections(uid).map { it.toDomain() }
+        } catch (e: Exception) {
+            SnackbarController.showSnackbar(e.localizedMessage!!)
+            Log.e("RemoteApiImpl", "getConnections: exception", e)
+            emptyList()
+        }
+    }
 }

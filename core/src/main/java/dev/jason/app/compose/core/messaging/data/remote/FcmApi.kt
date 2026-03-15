@@ -19,4 +19,7 @@ interface FcmApi {
 
     @GET("/search-users/{name}")
     suspend fun searchUsers(@Path("name") name: String, @Query("from") from: String): List<UserDto>
+
+    @GET("/get-connections/{uid}")
+    suspend fun getConnections(@Path("uid") uid: String): List<UserDto>
 }
