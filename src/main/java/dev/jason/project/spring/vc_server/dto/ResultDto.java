@@ -1,10 +1,10 @@
 package dev.jason.project.spring.vc_server.dto;
 
-import javax.annotation.Nullable;
-
-public record ResultDto(Result result, @Nullable String message) {
+public record ResultDto(Result result) {
 
     public enum Result {
-        Success, InternalError, UnknownError, ClientSideError
+        Success, InternalServerError, BlockedByUser, AlreadyBlocked,
+        SelfBlock, UserAlreadyExists, SelfUnblock, MessageTextBlank,
+        UserNotFound, UserDoesntExist, UserNotBlocked
     }
 }

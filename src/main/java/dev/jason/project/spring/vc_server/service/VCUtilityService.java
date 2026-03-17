@@ -11,10 +11,10 @@ public class VCUtilityService {
     public static User getUserFromUid(String uid) {
         try {
             UserRecord decoded = FirebaseAuth.getInstance().getUser(uid);
-            return new User(decoded.getUid(), decoded.getDisplayName(), decoded.getPhotoUrl());
+            return new User(decoded.getUid(), decoded.getDisplayName(), decoded.getPhotoUrl(), null, null);
         } catch (FirebaseAuthException e) {
             Logger.write(e);
-            return null;
+            return new User(uid, uid, null, null, null);
         }
     }
 }

@@ -5,9 +5,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public record UserDbEntity(@Id String uid, String displayName, String profilePictureUrl, String fcmToken, String[] connections) {
+public record UserDbEntity(@Id String uid, String displayName, String profilePictureUrl, String fcmToken, String[] connections, String[] blocklist) {
 
     public User toDomainUser() {
-        return new User(uid, displayName, profilePictureUrl);
+        return new User(uid, displayName, profilePictureUrl, connections, blocklist);
     }
 }

@@ -34,8 +34,46 @@ public class UserDbService {
             connectionsArray = new String[] { dmUid };
         }
 
-        UserDbEntity updatedUser = new UserDbEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), connectionsArray);
+        UserDbEntity updatedUser = new UserDbEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), connectionsArray, user.blocklist());
         repository.save(updatedUser);
+    }
+
+    public void addBlocklist(String uid, String dmUid) {
+        UserDbEntity user = repository.findByUid(uid);
+
+        String[] blocklistArray;
+
+        try {
+            List<String> blocklist = new ArrayList<>(Arrays.asList(user.blocklist()));
+
+            if (blocklist.contains(dmUid)) return;
+
+            blocklist.add(dmUid);
+            blocklistArray = blocklist.toArray(new String[0]);
+        } catch (NullPointerException ignored) {
+            blocklistArray = new String[] { dmUid };
+        }
+
+        UserDbEntity updatedUser = new UserDbEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), user.connections(), blocklistArray);
+        repository.save(updatedUser);
+    }
+
+    public void unblock(String uid, String dmUid) throws NullPointerException {
+        UserDbEntity user = repository.findByUid(uid);
+
+        List<String> blocklist = new ArrayList<>(Arrays.asList(user.blocklist()));
+
+        if (blocklist.contains(dmUid)) {
+            blocklist.remove(dmUid);
+
+            String[] blocklistArray = blocklist.toArray(new String[0]);
+            UserDbEntity updatedUser = new UserDbEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), user.connections(), blocklistArray);
+            repository.save(updatedUser);
+        } else throw new NullPointerException();
+    }
+
+    public List<String> getBlockedUserUidsByUserUid(String uid) {
+        return Arrays.stream(repository.findByUid(uid).blocklist()).toList();
     }
 
     public List<User> getAllUsersByDisplayName(String name) {
@@ -46,16 +84,14 @@ public class UserDbService {
         return repository.findByUid(uid).fcmToken();
     }
 
-    public UserDbEntity getUserDbEntityByUid(String uid) {
-        return repository.findByUid(uid);
-    }
-
     public User getUserByUid(String uid) {
-        return repository.findByUid(uid).toDomainUser();
+        UserDbEntity entity = repository.findByUid(uid);
+
+        return entity == null ? null : entity.toDomainUser();
     }
 
     public void updateUserFcmToken(String uid, String fcmToken) {
         UserDbEntity existingUser = repository.findByUid(uid);
-        repository.save(new UserDbEntity(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken, existingUser.connections()));
+        repository.save(new UserDbEntity(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken, existingUser.connections(), existingUser.blocklist()));
     }
 }
