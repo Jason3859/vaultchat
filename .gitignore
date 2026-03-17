@@ -38,3 +38,4 @@ out/
 
 # Firebase Admin Key
 /src/main/resources/vaultchatapp.json
+/logs.txt
