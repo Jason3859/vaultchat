@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-@SuppressWarnings("unused") // For IntelliJ IDEA Community Edition
 @RestController
 public class VcRestController {
 
@@ -149,21 +148,29 @@ public class VcRestController {
     }
 
     @GetMapping("/get-blocked-users")
-    public List<UserDto> getBlockedUsers(@RequestParam("uid") String uid) {
-        try {
-            List<String> blockedUserUids = userDbService.getBlockedUserUidsByUserUid(uid);
+    public ResultDto getBlockedUsers(@RequestParam("uid") String uid) {
+        List<String> blockedUserUids;
 
-            return blockedUserUids.stream()
+        try {
+            blockedUserUids = userDbService.getBlockedUserUidsByUserUid(uid);
+        } catch (NullPointerException ignored) {
+            return new ResultDto(ResultDto.Result.UserDoesntExist);
+        }
+
+        try {
+            Object data =  blockedUserUids.stream()
                 .map(userDbService::getUserByUid)
                 .map(this::getFromDomainUser)
                 .toList();
-        } catch (NullPointerException e) {
-            return new ArrayList<>(List.of());
+
+            return new ResultDto(ResultDto.Result.Success, data);
+        } catch (NullPointerException ignored) {
+            return new ResultDto(ResultDto.Result.NoBlockedUsers);
         }
     }
 
-    @GetMapping("/search-users/{name}")
-    public List<UserDto> searchUsers(@PathVariable("name") String name, @RequestParam("from") String from) {
+    @GetMapping("/search-users/")
+    public ResultDto searchUsers(@RequestParam("name") String name, @RequestParam("from") String from) {
         List<UserDto> requiredUsers = new ArrayList<>(List.of());
 
         userDbService.getAllUsersByDisplayName(name).stream()
@@ -171,18 +178,21 @@ public class VcRestController {
             .filter(user -> !user.uid().equals(from))
             .forEach(requiredUsers::add);
 
-        return requiredUsers;
+        ResultDto.Result result = requiredUsers.isEmpty() ? ResultDto.Result.NoUsersFound : ResultDto.Result.Success;
+        return new ResultDto(result, requiredUsers);
     }
 
-    @GetMapping("/get-connections/{uid}")
-    public List<UserDto> getConnections(@PathVariable("uid") String uid) {
+    @GetMapping("/get-connections/")
+    public ResultDto getConnections(@RequestParam("uid") String uid) {
         try {
-            return Arrays.stream(userDbService.getUserByUid(uid).connections())
+            Object data =  Arrays.stream(userDbService.getUserByUid(uid).connections())
                 .map(userDbService::getUserByUid)
                 .map(this::getFromDomainUser)
                 .toList();
+
+            return new ResultDto(ResultDto.Result.Success, data);
         } catch (NullPointerException e) {
-            return new ArrayList<>(List.of());
+            return new ResultDto(ResultDto.Result.NoUsersFound);
         }
     }
 
