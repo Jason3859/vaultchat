@@ -18,14 +18,17 @@ public class VcServerApplication {
         initFirebase();
     }
 
-    public static void initFirebase() throws IOException {
+    private static void initFirebase() throws IOException {
         InputStream stream = VcServerApplication.class.getClassLoader().getResourceAsStream("vaultchatapp.json");
 
-        assert stream != null;
-        FirebaseOptions options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(stream))
-            .build();
+        if (stream != null) {
+            FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(stream))
+                .build();
 
-        FirebaseApp.initializeApp(options);
+            FirebaseApp.initializeApp(options);
+        } else {
+            throw new RuntimeException("Firebase `vaultchatapp.json` file not found!");
+        }
     }
 }
