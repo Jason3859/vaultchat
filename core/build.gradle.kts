@@ -1,16 +1,14 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
-    namespace = "dev.jason.app.compose.core"
-    compileSdk {
-        version = release(36)
-    }
+    namespace = "dev.jason.app.compose.vaultchat.core"
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -34,7 +32,9 @@ android {
     }
 }
 
-kotlin.compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+room {
+    schemaDirectory("$projectDir/schema")
+}
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
