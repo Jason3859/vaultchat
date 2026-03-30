@@ -1,6 +1,7 @@
 package dev.jason.project.spring.vc_server.domain;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class Logger {
@@ -31,6 +32,7 @@ public class Logger {
 
     public static void write(Throwable throwable) {
         StackTraceElement[] stacktrace = throwable.getStackTrace();
+        stream.println(LocalDateTime.now());
         stream.println(throwable.getMessage());
         Arrays.stream(stacktrace).forEach(e -> stream.printf("\t%s\n", e));
         stream.println();
