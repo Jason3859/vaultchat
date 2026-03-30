@@ -9,6 +9,6 @@ public record ResultDto(Result result, Object data) {
     public enum Result {
         Success, InternalServerError, BlockedByUser, AlreadyBlocked,
         SelfBlock, UserAlreadyExists, SelfUnblock, MessageTextBlank,
-        UserNotFound, UserDoesntExist, NoBlockedUsers, NoUsersFound, UserNotBlocked
+        UserNotFound, NoBlockedUsers, NoUsersFound, UserNotBlocked
     }
 }

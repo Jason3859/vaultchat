@@ -10,12 +10,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
+import static dev.jason.project.spring.vc_server.TestConstants.TEST_USER_1;
+import static dev.jason.project.spring.vc_server.TestConstants.TEST_USER_2;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class VCSpringAppTests {
-
-    private static final String TEST_USER = "test-user-1";
-    private static final String TEST_USER_2 = "test-user-2";
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,7 +26,8 @@ public class VCSpringAppTests {
     @Test
     void getConnectionsForUnknownUser() throws Exception {
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/get-connections/" + TEST_USER)
+            MockMvcRequestBuilders.get("/get-connections")
+                .param("uid", TEST_USER_1)
         )
             .andExpect(
                 MockMvcResultMatchers.content().json(
@@ -38,7 +39,8 @@ public class VCSpringAppTests {
     @Test
     void searchForUnknownUser() throws Exception {
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/search-users/" + TEST_USER)
+            MockMvcRequestBuilders.get("/search-users")
+                .param("name", TEST_USER_1)
                 .param("from", TEST_USER_2)
         )
             .andExpect(
@@ -52,7 +54,7 @@ public class VCSpringAppTests {
     void getBlocklistForUnknownUser() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.get("/get-blocked-users")
-                .param("uid", TEST_USER)
+                .param("uid", TEST_USER_1)
         )
             .andExpect(
                 MockMvcResultMatchers.content().json(

@@ -33,6 +33,7 @@ public class Logger {
     public static void write(Throwable throwable) {
         StackTraceElement[] stacktrace = throwable.getStackTrace();
         stream.println(LocalDateTime.now());
+        stream.println(throwable.getClass().getName());
         stream.println(throwable.getMessage());
         Arrays.stream(stacktrace).forEach(e -> stream.printf("\t%s\n", e));
         stream.println();

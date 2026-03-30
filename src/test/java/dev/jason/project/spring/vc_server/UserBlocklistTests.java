@@ -3,7 +3,7 @@ package dev.jason.project.spring.vc_server;
 import dev.jason.project.spring.vc_server.domain.Message;
 import dev.jason.project.spring.vc_server.dto.AddUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
-import dev.jason.project.spring.vc_server.users.UserDbRepository;
+import dev.jason.project.spring.vc_server.users.UserRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,21 +15,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+import static dev.jason.project.spring.vc_server.TestConstants.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserBlocklistTests {
-
-    private static final String TEST_USER_1 = "test-user-1";
-    private static final String TEST_USER_2 = "test-user-2";
-    private static final String TEST_USER_TOKEN_1 = "token-1";
-    private static final String TEST_USER_TOKEN_2 = "token-2";
 
     @Autowired
     private MockMvc mvc;
@@ -38,7 +32,7 @@ class UserBlocklistTests {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserDbRepository repository;
+    private UserRepository repository;
 
     @Test
     @Order(1)
@@ -46,6 +40,7 @@ class UserBlocklistTests {
         mvc.perform(
             post("/add-user")
                 .contentType("application/json")
+                .param(IS_TEST_USER_PARAM, IS_TEST_USER)
                 .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_1, TEST_USER_TOKEN_1)))
         )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
@@ -57,6 +52,7 @@ class UserBlocklistTests {
         mvc.perform(
                 post("/add-user")
                     .contentType("application/json")
+                    .param(IS_TEST_USER_PARAM, IS_TEST_USER)
                     .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_2, TEST_USER_TOKEN_2)))
             )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
@@ -175,6 +171,6 @@ class UserBlocklistTests {
             MockMvcRequestBuilders.get("/get-blocked-users")
                 .param("uid", TEST_USER_1)
         )
-            .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<>(List.of()))));
+            .andExpect(content().json(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.UserNotFound))));
     }
 }

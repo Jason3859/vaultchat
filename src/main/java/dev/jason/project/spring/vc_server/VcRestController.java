@@ -2,14 +2,13 @@ package dev.jason.project.spring.vc_server;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import dev.jason.project.spring.vc_server.domain.Logger;
-import dev.jason.project.spring.vc_server.domain.Message;
-import dev.jason.project.spring.vc_server.domain.User;
+import dev.jason.project.spring.vc_server.domain.*;
+import dev.jason.project.spring.vc_server.domain.exception.*;
 import dev.jason.project.spring.vc_server.dto.AddUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.dto.UserDto;
 import dev.jason.project.spring.vc_server.dto.UserTokenDto;
-import dev.jason.project.spring.vc_server.users.UserDbService;
+import dev.jason.project.spring.vc_server.users.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -22,10 +21,10 @@ import java.util.Scanner;
 @RestController
 public class VcRestController {
 
-    private final UserDbService userDbService;
+    private final UserService userService;
 
-    public VcRestController(UserDbService userDbService) {
-        this.userDbService = userDbService;
+    public VcRestController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
@@ -33,38 +32,38 @@ public class VcRestController {
         return "Hello, World!";
     }
 
-
     @PostMapping("/send")
     public ResultDto send(@RequestBody Message body) {
 
         ResultDto resultDto;
 
-        if (body.getText().isBlank()) {
+        if (body.text().isBlank()) {
             return new ResultDto(ResultDto.Result.MessageTextBlank);
         }
 
         boolean isUserBlocked = false;
         try {
-            User to = userDbService.getUserByUid(body.getTo());
-            isUserBlocked = Arrays.asList(to.blocklist()).contains(body.getFrom());
-        } catch (NullPointerException ignored) {}
+            User to = userService.getUserByUid(body.to());
+            isUserBlocked = Arrays.asList(to.blocklist()).contains(body.from());
+        } catch (NullPointerException ignored) {
+        }
 
         if (isUserBlocked) {
             return new ResultDto(ResultDto.Result.BlockedByUser);
         }
 
         try {
-            userDbService.addConnection(body.getFrom(), body.getTo());
-            userDbService.addConnection(body.getTo(), body.getFrom());
+            userService.addConnection(body.from(), body.to());
+            userService.addConnection(body.to(), body.from());
 
-            String token = userDbService.getUserFcmTokenByUid(body.getTo());
+            String token = userService.getUserFcmTokenByUid(body.to());
             FirebaseMessaging.getInstance().send(body.toMessage(token));
 
             resultDto = new ResultDto(ResultDto.Result.Success);
-        } catch (FirebaseMessagingException e) {
+        } catch (FirebaseMessagingException | NullPointerException e) {
             Logger.write(e);
             resultDto = new ResultDto(ResultDto.Result.InternalServerError);
-        } catch (NullPointerException e) {
+        } catch (UserNotFoundException e) {
             resultDto = new ResultDto(ResultDto.Result.UserNotFound);
         }
 
@@ -76,9 +75,9 @@ public class VcRestController {
         ResultDto resultDto;
 
         try {
-            userDbService.updateUserFcmToken(userTokenDto.uid(), userTokenDto.fcmToken());
+            userService.updateUserFcmToken(userTokenDto.uid(), userTokenDto.fcmToken());
             resultDto = new ResultDto(ResultDto.Result.Success);
-        } catch (NullPointerException e) {
+        } catch (UserNotFoundException e) {
             resultDto = new ResultDto(ResultDto.Result.UserNotFound);
         }
 
@@ -90,23 +89,21 @@ public class VcRestController {
         @RequestBody AddUserDto userDto,
         @RequestParam(value = "is_test_user", required = false) boolean isTestUser
     ) {
-        User user = userDbService.getUserByUid(userDto.uid());
-
-        if (user == null) {
-            userDbService.saveUser(userDto.toDbUser(isTestUser));
+        try {
+            userService.saveUser(userDto.toDbUser(isTestUser));
             return new ResultDto(ResultDto.Result.Success);
+        } catch (UserAlreadyExistsException e) {
+            return new ResultDto(ResultDto.Result.UserAlreadyExists);
         }
-
-        return new ResultDto(ResultDto.Result.UserAlreadyExists);
     }
 
     @PostMapping("/block-user")
     public ResultDto blockUser(@RequestParam("uid") String uid, @RequestParam("uid_to_block") String uidToBlock) {
-        User user = userDbService.getUserByUid(uid);
-        User userToBlock = userDbService.getUserByUid(uidToBlock);
+        User user = userService.getUserByUid(uid);
+        User userToBlock = userService.getUserByUid(uidToBlock);
 
         if (user == null || userToBlock == null) {
-            return new ResultDto(ResultDto.Result.UserDoesntExist);
+            return new ResultDto(ResultDto.Result.UserNotFound);
         }
 
         if (uid.equals(uidToBlock)) {
@@ -119,31 +116,33 @@ public class VcRestController {
             if (isAlreadyBlocked) {
                 return new ResultDto(ResultDto.Result.AlreadyBlocked);
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+        }
 
-        userDbService.addBlocklist(uid, uidToBlock);
-        userDbService.addBlocklist(uidToBlock, uid);
+        userService.addBlocklist(uid, uidToBlock);
+        userService.addBlocklist(uidToBlock, uid);
         return new ResultDto(ResultDto.Result.Success);
     }
 
     @PostMapping("/unblock-user")
     public ResultDto unblockUser(@RequestParam("uid") String uid, @RequestParam("uid_to_unblock") String uidToUnblock) {
-        User user = userDbService.getUserByUid(uid);
-        User userToUnblock = userDbService.getUserByUid(uidToUnblock);
-
-        if (user == null || userToUnblock == null) {
-            return new ResultDto(ResultDto.Result.UserDoesntExist);
-        }
-
         if (uid.equals(uidToUnblock)) {
             return new ResultDto(ResultDto.Result.SelfUnblock);
         }
 
         try {
-            userDbService.unblock(uid, uidToUnblock);
+            userService.unblock(uid, uidToUnblock);
             return new ResultDto(ResultDto.Result.Success);
-        } catch (NullPointerException e) {
-            return new ResultDto(ResultDto.Result.UserNotBlocked);
+        } catch (VcException e) {
+            return switch (e) {
+                case UserNotFoundException ignored -> new ResultDto(ResultDto.Result.UserNotFound);
+                case UserNotBlockedException ignored -> new ResultDto(ResultDto.Result.UserNotBlocked);
+                case NoUsersBlockedException ignored -> new ResultDto(ResultDto.Result.UserNotBlocked);
+                default -> {
+                    Logger.write(e);
+                    yield new ResultDto(ResultDto.Result.InternalServerError);
+                }
+            };
         }
     }
 
@@ -152,14 +151,14 @@ public class VcRestController {
         List<String> blockedUserUids;
 
         try {
-            blockedUserUids = userDbService.getBlockedUserUidsByUserUid(uid);
+            blockedUserUids = userService.getBlockedUserUidsByUserUid(uid);
         } catch (NullPointerException ignored) {
-            return new ResultDto(ResultDto.Result.UserDoesntExist);
+            return new ResultDto(ResultDto.Result.UserNotFound);
         }
 
         try {
-            Object data =  blockedUserUids.stream()
-                .map(userDbService::getUserByUid)
+            Object data = blockedUserUids.stream()
+                .map(userService::getUserByUid)
                 .map(this::getFromDomainUser)
                 .toList();
 
@@ -169,24 +168,34 @@ public class VcRestController {
         }
     }
 
-    @GetMapping("/search-users/")
+    @GetMapping("/search-users")
     public ResultDto searchUsers(@RequestParam("name") String name, @RequestParam("from") String from) {
         List<UserDto> requiredUsers = new ArrayList<>(List.of());
 
-        userDbService.getAllUsersByDisplayName(name).stream()
+        userService.getAllUsersByDisplayName(name).stream()
             .map(this::getFromDomainUser)
             .filter(user -> !user.uid().equals(from))
             .forEach(requiredUsers::add);
 
-        ResultDto.Result result = requiredUsers.isEmpty() ? ResultDto.Result.NoUsersFound : ResultDto.Result.Success;
-        return new ResultDto(result, requiredUsers);
+        return requiredUsers.isEmpty()
+            ? new ResultDto(ResultDto.Result.NoUsersFound)
+            : new ResultDto(ResultDto.Result.Success, requiredUsers);
+
     }
 
-    @GetMapping("/get-connections/")
+    @GetMapping("/get-connections")
     public ResultDto getConnections(@RequestParam("uid") String uid) {
+        User user;
+
         try {
-            Object data =  Arrays.stream(userDbService.getUserByUid(uid).connections())
-                .map(userDbService::getUserByUid)
+            user = userService.getUserOrThrow(uid);
+        } catch (UserNotFoundException e) {
+            return new ResultDto(ResultDto.Result.UserNotFound);
+        }
+
+        try {
+            Object data = Arrays.stream(user.connections())
+                .map(userService::getUserByUid)
                 .map(this::getFromDomainUser)
                 .toList();
 
