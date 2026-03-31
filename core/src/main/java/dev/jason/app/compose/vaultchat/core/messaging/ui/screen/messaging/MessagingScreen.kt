@@ -1,7 +1,5 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,7 +45,7 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.messaging.domain.model.Message
+import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import java.time.LocalDateTime
@@ -183,7 +181,7 @@ private fun BottomBar(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @PreviewLightDark
 @Composable
 private fun MessagingScreenPreview() {

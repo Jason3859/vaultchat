@@ -1,12 +1,10 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import dev.jason.app.compose.vaultchat.core.messaging.domain.model.Message
+import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.messaging.domain.remote.RemoteApi
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +37,7 @@ class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    
     fun sendMessage() {
         viewModelScope.launch {
             api.sendMessage(

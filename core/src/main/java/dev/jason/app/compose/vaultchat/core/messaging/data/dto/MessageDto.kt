@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.core.messaging.data.dto
 
-import dev.jason.app.compose.vaultchat.core.messaging.domain.model.Message
+import dev.jason.app.compose.vaultchat.core.domain.Message
 import kotlinx.serialization.Serializable
 
 @Serializable

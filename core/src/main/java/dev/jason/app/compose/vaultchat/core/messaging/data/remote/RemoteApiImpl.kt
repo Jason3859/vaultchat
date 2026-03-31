@@ -1,12 +1,12 @@
 package dev.jason.app.compose.vaultchat.core.messaging.data.remote
 
 import android.util.Log
+import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.messaging.SnackbarController
 import dev.jason.app.compose.vaultchat.core.messaging.data.dto.UserDto
 import dev.jason.app.compose.vaultchat.core.messaging.data.dto.toDomain
 import dev.jason.app.compose.vaultchat.core.messaging.data.dto.toDto
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.ApiResult
-import dev.jason.app.compose.vaultchat.core.messaging.domain.model.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.UserToken
 import dev.jason.app.compose.vaultchat.core.messaging.domain.remote.RemoteApi
