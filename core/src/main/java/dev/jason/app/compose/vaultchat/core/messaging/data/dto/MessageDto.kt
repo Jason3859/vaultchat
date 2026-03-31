@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 data class MessageDto(
     val from: String,
     val to: String,
-    val text: String
+    val text: String,
+    val timestamp: String
 )
 
-fun Message.toDto(): MessageDto = MessageDto(from, to, text)
+fun Message.toDto(): MessageDto = MessageDto(from, to, text, timestamp.toString())

@@ -38,7 +38,7 @@ class SearchUsersViewModel(private val remoteApi: RemoteApi) : ViewModel(Corouti
             updateState(
                 _uiState.value.copy(
                     isLoading = false,
-                    searchResults = response
+                    searchResults = response.data ?: emptyList()
                 )
             )
         }

@@ -1,5 +1,7 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(Dispatchers.IO)) {
 
@@ -36,10 +39,16 @@ class MessagingViewModel(private val api: RemoteApi) : ViewModel(CoroutineScope(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage() {
         viewModelScope.launch {
             api.sendMessage(
-                body = Message(currentUserUid, _uiState.value.otherUser?.uid!!, _uiState.value.messageText)
+                body = Message(
+                    currentUserUid,
+                    _uiState.value.otherUser?.uid!!,
+                    _uiState.value.messageText,
+                    LocalDateTime.now()
+                )
             )
 
             _uiState.update {

@@ -1,5 +1,7 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +50,7 @@ import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
+import java.time.LocalDateTime
 
 @Composable
 fun MessagingScreen(
@@ -180,6 +183,7 @@ private fun BottomBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @PreviewLightDark
 @Composable
 private fun MessagingScreenPreview() {
@@ -196,7 +200,8 @@ private fun MessagingScreenPreview() {
                     Message(
                         from = if (index == 3 || index == 7 || index == 0 || index == 9) "me too" else "me",
                         to = "me",
-                        text = "Body: $index"
+                        text = "Body: $index",
+                        timestamp = LocalDateTime.parse("2026-03-30T12:24:48.866729800")
                     )
                 }
             )

@@ -37,7 +37,7 @@ class MainHomeViewModel(private val remoteApi: RemoteApi) : ViewModel(CoroutineS
         viewModelScope.launch {
             val connections = remoteApi.getConnections(currentUserUid)
 
-            _connections.update { connections }
+            _connections.update { connections.data ?: emptyList() }
             _isLoading.update { false }
         }
     }
