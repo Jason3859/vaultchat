@@ -13,7 +13,9 @@ interface RetrofitApi {
 @Serializable
 data class UserDto(
     val uid: String,
+    val displayName: String,
+    val profilePictureUrl: String,
     val fcmToken: String
 )
 
-fun User.toDto(): UserDto = UserDto(uid, fcmToken)
+fun User.toDto(): UserDto = UserDto(uid, displayName, profilePictureUrl, fcmToken)

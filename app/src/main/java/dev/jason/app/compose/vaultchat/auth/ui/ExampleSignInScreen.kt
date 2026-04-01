@@ -35,16 +35,14 @@ fun MainActivity.ExampleSignInScreen(viewModel: MainViewModel = koinViewModel())
 
 fun MainActivity.signInWithGoogle(viewModel: MainViewModel) {
     lifecycleScope.launch {
-        FirebaseGoogleAuthentication.launchCredentialManagerBottomSheet(this@signInWithGoogle) { credential ->
-            FirebaseGoogleAuthentication.signInWithCredential(credential)
-                .addOnSuccessListener {
-                    viewModel.onAction(MainViewModel.Action.SignInComplete)
-                    sharedPrefs.edit { putBoolean(MainActivity.IS_SIGNED_IN_PREF_NAME, true) }
-                }
-                .addOnFailureListener { exception ->
-                    Log.w("SignInScreen", "signInWithGoogle: exception while signing in with google", exception)
-                    SnackbarController.sendEvent(exception.localizedMessage!!)
-                }
-        }
+        FirebaseGoogleAuthentication.beginSignIn(this@signInWithGoogle)
+            ?.addOnSuccessListener {
+                viewModel.onAction(MainViewModel.Action.SignInComplete)
+                sharedPrefs.edit { putBoolean(MainActivity.IS_SIGNED_IN_PREF_NAME, true) }
+            }
+            ?.addOnFailureListener { exception ->
+                Log.w("SignInScreen", "signInWithGoogle: exception while signing in with google", exception)
+                SnackbarController.sendEvent(exception.localizedMessage!!)
+            }
     }
 }

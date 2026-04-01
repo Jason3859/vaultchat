@@ -26,9 +26,14 @@ class MainViewModel(private val remoteApi: RemoteApi) : ViewModel(CoroutineScope
                 viewModelScope.launch {
                     _currentRoute.update { null }
 
-                    val uid = Firebase.auth.currentUser!!.uid
+                    val firebaseUser = Firebase.auth.currentUser!!
                     val fcmToken = Firebase.messaging.token.await()
-                    val user = User(uid, fcmToken)
+                    val user = User(
+                        uid = firebaseUser.uid,
+                        displayName = firebaseUser.displayName!!,
+                        profilePictureUrl = firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
+                        fcmToken = fcmToken
+                    )
 
                     remoteApi.addUserToServer(user)
 
