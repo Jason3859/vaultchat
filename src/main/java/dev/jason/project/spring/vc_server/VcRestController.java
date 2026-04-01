@@ -35,7 +35,14 @@ public class VcRestController {
     @PostMapping("/send")
     public ResultDto send(@RequestBody Message body) {
 
-        ResultDto resultDto;
+        User from, to;
+
+        try {
+            from = userService.getUserOrThrow(body.from());
+            to = userService.getUserOrThrow(body.to());
+        } catch (UserNotFoundException e) {
+            return new ResultDto(ResultDto.Result.UserNotFound);
+        }
 
         if (body.text().isBlank()) {
             return new ResultDto(ResultDto.Result.MessageTextBlank);
@@ -43,7 +50,6 @@ public class VcRestController {
 
         boolean isUserBlocked = false;
         try {
-            User to = userService.getUserByUid(body.to());
             isUserBlocked = Arrays.asList(to.blocklist()).contains(body.from());
         } catch (NullPointerException ignored) {
         }
@@ -53,21 +59,19 @@ public class VcRestController {
         }
 
         try {
-            userService.addConnection(body.from(), body.to());
-            userService.addConnection(body.to(), body.from());
+            userService.addConnection(from, to);
+            userService.addConnection(to, from);
 
             String token = userService.getUserFcmTokenByUid(body.to());
             FirebaseMessaging.getInstance().send(body.toMessage(token));
 
-            resultDto = new ResultDto(ResultDto.Result.Success);
+            return new ResultDto(ResultDto.Result.Success);
         } catch (FirebaseMessagingException | NullPointerException e) {
             Logger.write(e);
-            resultDto = new ResultDto(ResultDto.Result.InternalServerError);
+            return new ResultDto(ResultDto.Result.InternalServerError);
         } catch (UserNotFoundException e) {
-            resultDto = new ResultDto(ResultDto.Result.UserNotFound);
+            return new ResultDto(ResultDto.Result.UserNotFound);
         }
-
-        return resultDto;
     }
 
     @PostMapping("/update-token")
@@ -86,15 +90,10 @@ public class VcRestController {
 
     @PostMapping("/add-user")
     public ResultDto addUser(
-        @RequestBody AddUserDto userDto,
-        @RequestParam(value = "is_test_user", required = false) boolean isTestUser
+        @RequestBody AddUserDto userDto
     ) {
-        try {
-            userService.saveUser(userDto.toDbUser(isTestUser));
-            return new ResultDto(ResultDto.Result.Success);
-        } catch (UserAlreadyExistsException e) {
-            return new ResultDto(ResultDto.Result.UserAlreadyExists);
-        }
+        userService.saveUser(userDto.toDbUser());
+        return new ResultDto(ResultDto.Result.Success);
     }
 
     @PostMapping("/block-user")

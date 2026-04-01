@@ -15,31 +15,34 @@ public class UserService {
     @Autowired
     UserRepository repository;
 
-    public void saveUser(UserEntity userEntity) throws UserAlreadyExistsException {
+    public void saveUser(UserEntity userEntity) {
         UserEntity entity = repository.findByUid(userEntity.uid());
 
         if (entity == null) {
             repository.save(userEntity);
-        } else throw new UserAlreadyExistsException();
+        } else {
+            repository.save(
+                new UserEntity(entity.uid(), entity.displayName(), entity.profilePictureUrl(), userEntity.fcmToken(), entity.connections(), entity.blocklist())
+            );
+        }
     }
 
-    public void addConnection(String uid, String dmUid) {
-        UserEntity user = repository.findByUid(uid);
-
+    public void addConnection(User user, User otherUser) throws UserNotFoundException {
+        UserEntity entity = getUserEntityOrThrow(user.uid());
         String[] connectionsArray;
 
         try {
             List<String> connections = new ArrayList<>(Arrays.asList(user.connections()));
 
-            if (connections.contains(dmUid)) return;
+            if (connections.contains(otherUser.uid())) return;
 
-            connections.add(dmUid);
+            connections.add(otherUser.uid());
             connectionsArray = connections.toArray(new String[0]);
         } catch (NullPointerException ignored) {
-            connectionsArray = new String[] { dmUid };
+            connectionsArray = new String[] { otherUser.uid() };
         }
 
-        UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), connectionsArray, user.blocklist());
+        UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), entity.fcmToken(), connectionsArray, user.blocklist());
         repository.save(updatedUser);
     }
 
@@ -56,7 +59,7 @@ public class UserService {
             blocklist.add(dmUid);
             blocklistArray = blocklist.toArray(new String[0]);
         } catch (NullPointerException ignored) {
-            blocklistArray = new String[] { dmUid };
+            blocklistArray = new String[]{dmUid};
         }
 
         UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), user.connections(), blocklistArray);

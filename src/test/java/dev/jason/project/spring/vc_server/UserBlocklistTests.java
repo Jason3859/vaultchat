@@ -41,7 +41,7 @@ class UserBlocklistTests {
             post("/add-user")
                 .contentType("application/json")
                 .param(IS_TEST_USER_PARAM, IS_TEST_USER)
-                .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_1, TEST_USER_TOKEN_1)))
+                .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_1)))
         )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
     }
@@ -53,7 +53,7 @@ class UserBlocklistTests {
                 post("/add-user")
                     .contentType("application/json")
                     .param(IS_TEST_USER_PARAM, IS_TEST_USER)
-                    .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_2, TEST_USER_TOKEN_2)))
+                    .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_2)))
             )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
     }
