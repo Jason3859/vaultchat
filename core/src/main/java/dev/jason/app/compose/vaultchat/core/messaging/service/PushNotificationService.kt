@@ -42,10 +42,6 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d(
-            "PushNotificationService",
-            "onMessageReceived: message received : ${message.data["text"]}"
-        )
 
         val notification =
             NotificationCompat.Builder(this, getString(R.string.notification_channel_id))

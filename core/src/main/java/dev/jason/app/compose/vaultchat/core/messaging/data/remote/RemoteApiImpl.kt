@@ -44,7 +44,6 @@ class RemoteApiImpl(private val api: FcmApi) : RemoteApi {
     }
 
     override suspend fun getConnections(uid: String): ApiResult<List<User>> {
-        Log.d("RemoteApiImpl", "getConnections: trying to get with uid $uid")
         return try {
             api.getConnections(uid).run {
                 ApiResult(result, data?.map(UserDto::toDomain))

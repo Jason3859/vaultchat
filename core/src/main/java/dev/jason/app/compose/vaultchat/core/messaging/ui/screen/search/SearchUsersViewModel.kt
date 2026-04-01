@@ -1,6 +1,5 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -34,7 +33,6 @@ class SearchUsersViewModel(private val remoteApi: RemoteApi) : ViewModel(Corouti
         viewModelScope.launch {
             updateState(_uiState.value.copy(isLoading = true))
             val response = remoteApi.searchUsers(_uiState.value.searchQuery, Firebase.auth.currentUser!!.uid)
-            Log.d("SearchUsersViewModel", "getAndUpdateUsers: response: $response")
             updateState(
                 _uiState.value.copy(
                     isLoading = false,

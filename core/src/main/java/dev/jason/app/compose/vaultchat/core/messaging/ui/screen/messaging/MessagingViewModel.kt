@@ -92,7 +92,6 @@ class MessagingViewModel(
     }
 
     init {
-        Log.d("MessagingViewModel", "init: started collecting messages")
         viewModelScope.launch {
             messageRepository.getMessages(currentUserUid, otherUser.uid).collect { messages ->
                 if (_messages.isEmpty()) {
