@@ -42,16 +42,20 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d("PushNotificationService", "onMessageReceived: message received : ${message.data["text"]}")
+        Log.d(
+            "PushNotificationService",
+            "onMessageReceived: message received : ${message.data["text"]}"
+        )
 
-        val notification = NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
-            .setContentTitle("New message")
-            .setContentText(message.data["text"])
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
+        val notification =
+            NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+                .setContentTitle("New message")
+                .setContentText(message.data["text"])
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(0, notification)
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
 
         coroutineScope.launch {
             repository.addMessage(

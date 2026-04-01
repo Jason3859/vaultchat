@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,34 +35,39 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
-import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import java.time.LocalDateTime
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MessagingScreen(
     otherUser: User,
-    uiState: MessagingViewModel.UiState,
     onBackClick: () -> Unit,
-    onSend: () -> Unit,
-    updateState: (MessagingViewModel.UiState) -> Unit,
 ) {
+    val viewmodel: MessagingViewModel = koinViewModel {
+        parametersOf(otherUser)
+    }
 
-    LaunchedEffect(true) {
-        updateState(uiState.copy(otherUser = otherUser))
+    val uiState by viewmodel.uiState.collectAsState()
+    val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(viewmodel.messages) {
+        if (viewmodel.messages.isNotEmpty()) {
+            lazyListState.animateScrollToItem(viewmodel.messages.lastIndex)
+        }
     }
 
     Scaffold(
@@ -69,22 +76,30 @@ fun MessagingScreen(
             TopBar(otherUser, onBackClick)
         },
         bottomBar = {
-            BottomBar(uiState, updateState, onSend)
+            BottomBar(uiState, viewmodel::updateState, viewmodel::sendMessage)
         }
     ) { innerPadding ->
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            items(uiState.messages) { msg ->
+            items(viewmodel.messages) { msg ->
                 Column(
                     modifier = Modifier.fillParentMaxWidth(),
                     horizontalAlignment = if (otherUser.uid == msg.from) Alignment.Start else Alignment.End
                 ) {
                     Card(
                         modifier = Modifier
-                            .padding(vertical = 6.dp, horizontal = 12.dp)
+                            .padding(vertical = 6.dp, horizontal = 12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = when {
+                                viewmodel.pendingMessages.contains(msg) -> Color.Cyan
+                                viewmodel.failedMessages.contains(msg) -> MaterialTheme.colorScheme.errorContainer
+                                else -> Color.Unspecified // default color
+                            }
+                        )
                     ) {
                         Box(
                             modifier = Modifier
@@ -178,31 +193,5 @@ private fun BottomBar(
         ) {
             Icon(Icons.AutoMirrored.Default.Send, null)
         }
-    }
-}
-
-
-@PreviewLightDark
-@Composable
-private fun MessagingScreenPreview() {
-    VaultChatTheme {
-        MessagingScreen(
-            onBackClick = {},
-            onSend = {},
-            updateState = {},
-            otherUser = User("", "", ""),
-            uiState = MessagingViewModel.UiState(
-                messageText = "Hello, World!",
-                sendButtonEnabled = true,
-                messages = List(10) { index ->
-                    Message(
-                        from = if (index == 3 || index == 7 || index == 0 || index == 9) "me too" else "me",
-                        to = "me",
-                        text = "Body: $index",
-                        timestamp = LocalDateTime.parse("2026-03-30T12:24:48.866729800")
-                    )
-                }
-            )
-        )
     }
 }

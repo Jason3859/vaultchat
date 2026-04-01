@@ -12,23 +12,23 @@ import dev.jason.app.compose.vaultchat.core.messaging.domain.model.UserToken
 import dev.jason.app.compose.vaultchat.core.messaging.domain.remote.RemoteApi
 
 class RemoteApiImpl(private val api: FcmApi) : RemoteApi {
-    override suspend fun sendMessage(body: Message) {
-        try {
-            api.sendMessage(body.toDto()).also {
-                Log.d("RemoteApiImpl", "sendMessage: response: $it")
-            }
+    override suspend fun sendMessage(body: Message): ApiResult<Void> {
+        return try {
+            api.sendMessage(body.toDto())
         } catch (e: Exception) {
             SnackbarController.showSnackbar(e.localizedMessage!!)
             Log.e("RemoteApiImpl", "sendMessage: exception", e)
+            ApiResult(ApiResult.Result.InternalError)
         }
     }
 
-    override suspend fun updateFcmToken(body: UserToken) {
-        try {
+    override suspend fun updateFcmToken(body: UserToken): ApiResult<Void> {
+        return try {
             api.updateFcmToken(body.toDto())
         } catch (e: Exception) {
             SnackbarController.showSnackbar(e.localizedMessage!!)
             Log.e("RemoteApiImpl", "updateFcmToken: exception", e)
+            ApiResult(ApiResult.Result.InternalError)
         }
     }
 

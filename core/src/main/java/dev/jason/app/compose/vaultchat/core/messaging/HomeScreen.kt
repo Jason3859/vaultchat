@@ -39,14 +39,12 @@ import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.main.MainHomeScreen
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging.MessagingScreen
-import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging.MessagingViewModel
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.nav.Route
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.profile.ProfileScreen
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.search.SearchUsersViewModel
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
-import kotlin.collections.get
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -73,15 +71,9 @@ fun HomeScreen() {
                 }
 
                 entry<Route.Messaging> {
-                    val viewModel: MessagingViewModel = koinViewModel()
-                    val uiState by viewModel.uiState.collectAsState()
-
                     MessagingScreen(
                         otherUser = User(it.uid, it.displayName, it.profilePictureUrl),
-                        uiState = uiState,
                         onBackClick = { mainBackStack.removeLastOrNull() },
-                        onSend = viewModel::sendMessage,
-                        updateState = viewModel::updateState
                     )
                 }
             }

@@ -12,10 +12,10 @@ import retrofit2.http.Query
 interface FcmApi {
 
     @POST("/send")
-    suspend fun sendMessage(@Body body: MessageDto): ApiResult<String> // returns nothing. getting exception when passing `kotlin.Any`
+    suspend fun sendMessage(@Body body: MessageDto): ApiResult<Void> // no data is returned
 
     @POST("/update-token")
-    suspend fun updateFcmToken(@Body body: UserTokenDto): ApiResult<String>
+    suspend fun updateFcmToken(@Body body: UserTokenDto): ApiResult<Void> // no data is returned
 
     @GET("/search-users")
     suspend fun searchUsers(@Query("name") name: String, @Query("from") from: String): ApiResult<List<UserDto>>
