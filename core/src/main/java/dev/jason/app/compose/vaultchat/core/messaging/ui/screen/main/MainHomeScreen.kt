@@ -105,7 +105,7 @@ private fun ConnectionsItem(user: User, onUserClick: (User) -> Unit) {
                     }
                 )
 
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(16.dp))
 
                 Text(user.displayName)
             }

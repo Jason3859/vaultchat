@@ -1,5 +1,6 @@
 package dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,30 +45,56 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
+import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.LocalDateTime
 
 @Composable
 fun MessagingScreen(
     otherUser: User,
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
-    val viewmodel: MessagingViewModel = koinViewModel {
-        parametersOf(otherUser)
-    }
+    val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val uiState by viewmodel.uiState.collectAsState()
+    MessagingScreen(
+        otherUser = otherUser,
+        onBackClick = onBackClick,
+        uiState = uiState,
+        updateState = viewModel::updateState,
+        sendMessage = viewModel::sendMessage,
+        messages = viewModel.messages,
+        pendingMessages = viewModel.pendingMessages,
+        failedMessages = viewModel.failedMessages
+    )
+}
+
+@Composable
+private fun MessagingScreen(
+    otherUser: User,
+    onBackClick: () -> Unit,
+    uiState: MessagingViewModel.UiState,
+    updateState: (MessagingViewModel.UiState) -> Unit,
+    sendMessage: () -> Unit,
+    messages: List<Message>,
+    pendingMessages: List<Message>,
+    failedMessages: List<Message>
+) {
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(viewmodel.messages) {
-        if (viewmodel.messages.isNotEmpty()) {
-            lazyListState.animateScrollToItem(viewmodel.messages.lastIndex)
+    LaunchedEffect(messages) {
+        if (messages.isNotEmpty()) {
+            lazyListState.animateScrollToItem(messages.lastIndex)
         }
     }
 
@@ -76,7 +104,7 @@ fun MessagingScreen(
             TopBar(otherUser, onBackClick)
         },
         bottomBar = {
-            BottomBar(uiState, viewmodel::updateState, viewmodel::sendMessage)
+            BottomBar(uiState, updateState, sendMessage)
         }
     ) { innerPadding ->
         LazyColumn(
@@ -85,18 +113,20 @@ fun MessagingScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            items(viewmodel.messages) { msg ->
+            item { Spacer(Modifier.height(6.dp)) }
+            items(messages) { msg ->
                 Column(
                     modifier = Modifier.fillParentMaxWidth(),
                     horizontalAlignment = if (otherUser.uid == msg.from) Alignment.Start else Alignment.End
                 ) {
                     Card(
                         modifier = Modifier
-                            .padding(vertical = 6.dp, horizontal = 12.dp),
+                            .padding(horizontal = 12.dp)
+                            .padding(top = 6.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = when {
-                                viewmodel.pendingMessages.contains(msg) -> Color.Cyan
-                                viewmodel.failedMessages.contains(msg) -> MaterialTheme.colorScheme.errorContainer
+                                pendingMessages.contains(msg) -> Color.Cyan
+                                failedMessages.contains(msg) -> MaterialTheme.colorScheme.errorContainer
                                 else -> Color.Unspecified // default color
                             }
                         )
@@ -108,11 +138,20 @@ fun MessagingScreen(
                             Text(msg.text)
                         }
                     }
+
+                    Text(
+                        text = if (pendingMessages.contains(msg)) "Sending" else msg.timestamp.display(),
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
                 }
             }
         }
     }
 }
+
+private fun LocalDateTime.display() =
+    "${dayOfMonth}/${month.value}/${year % 100} ${hour}:${if (minute >= 10) minute else minute.toString().padStart(2, '0')}"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,6 +159,8 @@ private fun TopBar(
     otherUser: User,
     onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     TopAppBar(
         title = {
             Row(
@@ -127,7 +168,7 @@ private fun TopBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
+                    model = ImageRequest.Builder(context)
                         .data(otherUser.profilePictureUrl)
                         .crossfade(true)
                         .diskCachePolicy(CachePolicy.ENABLED)
@@ -136,7 +177,11 @@ private fun TopBar(
                     contentDescription = null,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .size(40.dp)
+                        .size(40.dp),
+                    error = {
+                        Icon(Icons.Default.AccountCircle, null)
+                        Toast.makeText(context, "Error loading image", Toast.LENGTH_SHORT).show()
+                    }
                 )
 
                 Spacer(Modifier.width(10.dp))
@@ -193,5 +238,34 @@ private fun BottomBar(
         ) {
             Icon(Icons.AutoMirrored.Default.Send, null)
         }
+    }
+}
+
+@Preview
+@Composable
+private fun MessagingScreenPreview() {
+    val me = "me"
+    val other = "other-user"
+
+    val messages = List(20) { index ->
+        Message(
+            from = if (index % 2 == 0) me else other,
+            to = if (index % 2 == 0) other else me,
+            text = "text-$index",
+            timestamp = LocalDateTime.parse("2026-04-01T11:02:10.692796400")
+        )
+    }
+
+    VaultChatTheme {
+        MessagingScreen(
+            otherUser = User(other, other, other),
+            onBackClick = {},
+            uiState = MessagingViewModel.UiState(),
+            updateState = {},
+            sendMessage = {},
+            messages = messages,
+            pendingMessages = messages.subList(0, 5),
+            failedMessages = messages.subList(10, 15)
+        )
     }
 }
