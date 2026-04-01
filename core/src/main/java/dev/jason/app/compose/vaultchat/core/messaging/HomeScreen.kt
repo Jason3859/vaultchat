@@ -36,6 +36,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import dev.jason.app.compose.vaultchat.core.messaging.domain.CurrentScreen
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.main.MainHomeScreen
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging.MessagingScreen
@@ -71,9 +72,13 @@ fun HomeScreen() {
                 }
 
                 entry<Route.Messaging> {
+                    CurrentScreen.otherUserUid = it.uid
                     MessagingScreen(
                         otherUser = User(it.uid, it.displayName, it.profilePictureUrl),
-                        onBackClick = { mainBackStack.removeLastOrNull() },
+                        onBackClick = {
+                            CurrentScreen.otherUserUid = null
+                            mainBackStack.removeLastOrNull()
+                        },
                     )
                 }
             }
@@ -117,7 +122,15 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        onUserClick = { mainBackStack.add(Route.Messaging(it.uid, it.displayName, it.profilePictureUrl)) },
+                        onUserClick = {
+                            mainBackStack.add(
+                                Route.Messaging(
+                                    it.uid,
+                                    it.displayName,
+                                    it.profilePictureUrl
+                                )
+                            )
+                        },
                     )
                 }
 
@@ -126,7 +139,15 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                         uiState = searchUsersUiState,
                         updateState = searchUsersViewModel::updateState,
                         onSearch = { searchUsersViewModel.getAndUpdateUsers() },
-                        onUserClick = { mainBackStack.add(Route.Messaging(it.uid, it.displayName, it.profilePictureUrl)) },
+                        onUserClick = {
+                            mainBackStack.add(
+                                Route.Messaging(
+                                    it.uid,
+                                    it.displayName,
+                                    it.profilePictureUrl
+                                )
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)

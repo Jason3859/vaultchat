@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.core.messaging.service
+package dev.jason.app.compose.vaultchat.core.messaging.domain.service
 
 import android.app.NotificationManager
 import android.util.Log
@@ -10,6 +10,7 @@ import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.local_storage.messages.domain.MessageRepository
+import dev.jason.app.compose.vaultchat.core.messaging.domain.CurrentScreen
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.UserToken
 import dev.jason.app.compose.vaultchat.core.messaging.domain.remote.RemoteApi
 import kotlinx.coroutines.CoroutineScope
@@ -43,25 +44,25 @@ class PushNotificationService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val notification =
-            NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+        val from = message.data["receivedFrom"]!!
+        val to = message.data["to"]!!
+        val text = message.data["text"]!!
+        val timestamp = message.data["timestamp"]!!.toLocalDateTime()
+
+        val notification = NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
                 .setContentTitle("New message")
-                .setContentText(message.data["text"])
+                .setContentText(text)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+
+        if (CurrentScreen.otherUserUid != from) {
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        }
 
         coroutineScope.launch {
-            repository.addMessage(
-                Message(
-                    from = message.data["receivedFrom"]!!,
-                    to = message.data["to"]!!,
-                    text = message.data["text"]!!,
-                    timestamp = message.data["timestamp"]!!.toLocalDateTime()
-                )
-            )
+            repository.addMessage(Message(from, to, text, timestamp))
         }
     }
 

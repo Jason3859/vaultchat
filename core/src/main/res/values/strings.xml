@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notification_channel_id">Notification</string>
-    <string name="notification_channel_name">Notification</string>
+    <string name="notification_channel_id">Notifications</string>
+    <string name="notification_channel_name">Notifications</string>
     <string name="notification_channel_description">Channel for notifications</string>
 </resources>
