@@ -36,7 +36,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import dev.jason.app.compose.vaultchat.core.messaging.domain.CurrentScreen
+import dev.jason.app.compose.vaultchat.core.messaging.domain.Util
 import dev.jason.app.compose.vaultchat.core.messaging.domain.model.User
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.main.MainHomeScreen
 import dev.jason.app.compose.vaultchat.core.messaging.ui.screen.messaging.MessagingScreen
@@ -72,11 +72,11 @@ fun HomeScreen() {
                 }
 
                 entry<Route.Messaging> {
-                    CurrentScreen.otherUserUid = it.uid
+                    Util.otherUserUid.set(it.uid)
                     MessagingScreen(
                         otherUser = User(it.uid, it.displayName, it.profilePictureUrl),
                         onBackClick = {
-                            CurrentScreen.otherUserUid = null
+                            Util.otherUserUid.reset()
                             mainBackStack.removeLastOrNull()
                         },
                     )
