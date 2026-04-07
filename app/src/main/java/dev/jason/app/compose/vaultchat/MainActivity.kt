@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -9,6 +10,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import dev.jason.app.compose.vaultchat.auth.AuthActivity
+import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 
 class MainActivity : ComponentActivity() {
 
@@ -19,9 +22,10 @@ class MainActivity : ComponentActivity() {
         val isSignedIn = Firebase.auth.currentUser != null
 
         if (isSignedIn) {
-            TODO("start messaging activity")
+            startActivity(Intent(this, MessagingActivity::class.java))
+            finish()
         } else {
-            TODO("start auth activity")
+            startActivity(Intent(this, AuthActivity::class.java))
         }
     }
 

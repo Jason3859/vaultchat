@@ -3,6 +3,7 @@ package dev.jason.app.compose.vaultchat.auth
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,10 @@ class AuthActivity : ComponentActivity() {
                 }
             }
 
+            BackHandler {
+                finishAffinity() // closes app
+            }
+
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -50,7 +55,7 @@ class AuthActivity : ComponentActivity() {
         lifecycleScope.launch {
             FirebaseGoogleAuthentication.beginSignIn(this@AuthActivity)
                 ?.addOnSuccessListener {
-                    // TODO: start main activity.
+                    finish() // takes back to MainActivity which launches MessagingActivity
                 }
                 ?.addOnFailureListener { exception ->
                     Log.w("SignInScreen", "signInWithGoogle: exception while signing in with google", exception)
