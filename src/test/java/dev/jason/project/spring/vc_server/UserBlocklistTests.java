@@ -1,7 +1,7 @@
 package dev.jason.project.spring.vc_server;
 
 import dev.jason.project.spring.vc_server.domain.Message;
-import dev.jason.project.spring.vc_server.dto.AddUserDto;
+import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.users.UserRepository;
 import org.junit.jupiter.api.MethodOrderer;
@@ -38,10 +38,10 @@ class UserBlocklistTests {
     @Order(1)
     void addTestUser1() throws Exception {
         mvc.perform(
-            post("/add-user")
+            post("/user/add")
                 .contentType("application/json")
                 .param(IS_TEST_USER_PARAM, IS_TEST_USER)
-                .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_1)))
+                .content(objectMapper.writeValueAsString(new RegisterUserDto(TEST_USER_1)))
         )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
     }
@@ -50,10 +50,10 @@ class UserBlocklistTests {
     @Order(2)
     void addTestUser2() throws Exception {
         mvc.perform(
-                post("/add-user")
+                post("/user/add")
                     .contentType("application/json")
                     .param(IS_TEST_USER_PARAM, IS_TEST_USER)
-                    .content(objectMapper.writeValueAsString(new AddUserDto(TEST_USER_2)))
+                    .content(objectMapper.writeValueAsString(new RegisterUserDto(TEST_USER_2)))
             )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
     }
@@ -62,7 +62,7 @@ class UserBlocklistTests {
     @Order(3)
     void unblockUser1FromUser2BeforeBlocking() throws Exception {
         mvc.perform(
-            post("/unblock-user")
+            post("/user/unblock")
                 .param("uid", TEST_USER_1)
                 .param("uid_to_unblock", TEST_USER_2)
         )
@@ -73,7 +73,7 @@ class UserBlocklistTests {
     @Order(4)
     void blockUser1FromUser2() throws Exception {
         mvc.perform(
-            post("/block-user")
+            post("/user/block")
                 .param("uid", TEST_USER_2)
                 .param("uid_to_block", TEST_USER_1)
         )
@@ -84,7 +84,7 @@ class UserBlocklistTests {
     @Order(5)
     void blockUser1AgainFromUser2() throws Exception {
         mvc.perform(
-            post("/block-user")
+            post("/user/block")
                 .param("uid", TEST_USER_2)
                 .param("uid_to_block", TEST_USER_1)
         )
@@ -117,7 +117,7 @@ class UserBlocklistTests {
     @Order(8)
     void unblockUser1FromUser2() throws Exception {
         mvc.perform(
-                post("/unblock-user")
+                post("/user/unblock")
                     .param("uid", TEST_USER_2)
                     .param("uid_to_unblock", TEST_USER_1)
             )
@@ -128,7 +128,7 @@ class UserBlocklistTests {
     @Order(9)
     void unblockUser1FromUser2Again() throws Exception {
         mvc.perform(
-                post("/unblock-user")
+                post("/user/unblock")
                     .param("uid", TEST_USER_2)
                     .param("uid_to_unblock", TEST_USER_1)
             )
@@ -139,7 +139,7 @@ class UserBlocklistTests {
     @Order(10)
     void blockUser1FromUser1() throws Exception {
         mvc.perform(
-            post("/block-user")
+            post("/user/block")
                 .param("uid", TEST_USER_1)
                 .param("uid_to_block", TEST_USER_1)
         )
@@ -150,7 +150,7 @@ class UserBlocklistTests {
     @Order(11)
     void unblockUser1FromUser1() throws Exception {
         mvc.perform(
-            post("/unblock-user")
+            post("/user/unblock")
                 .param("uid", TEST_USER_1)
                 .param("uid_to_unblock", TEST_USER_1)
         )

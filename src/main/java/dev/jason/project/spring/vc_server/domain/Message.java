@@ -6,7 +6,7 @@ import java.time.Duration;
 
 public record Message(String from, String to, String text, String timestamp) {
 
-    public com.google.firebase.messaging.Message toMessage(String toFcmToken) {
+    public com.google.firebase.messaging.Message toFirebaseMessage(String toFcmToken) {
 
         AndroidConfig androidConfig = AndroidConfig.builder()
             .setPriority(AndroidConfig.Priority.HIGH)
@@ -15,7 +15,8 @@ public record Message(String from, String to, String text, String timestamp) {
 
         return com.google.firebase.messaging.Message.builder()
             .setToken(toFcmToken)
-            .putData("receivedFrom", from)
+            .putData("is_message", String.valueOf(true))
+            .putData("received_from", from)
             .putData("to", to)
             .putData("title", "New message!")
             .putData("text", text)

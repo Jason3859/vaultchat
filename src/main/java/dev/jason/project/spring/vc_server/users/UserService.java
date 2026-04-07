@@ -1,12 +1,16 @@
 package dev.jason.project.spring.vc_server.users;
 
-import dev.jason.project.spring.vc_server.domain.*;
-import dev.jason.project.spring.vc_server.domain.exception.*;
+import dev.jason.project.spring.vc_server.domain.User;
+import dev.jason.project.spring.vc_server.domain.UserFcmToken;
+import dev.jason.project.spring.vc_server.domain.exception.NoUsersBlockedException;
+import dev.jason.project.spring.vc_server.domain.exception.UserNotBlockedException;
+import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
+import dev.jason.project.spring.vc_server.domain.exception.VcException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -15,97 +19,79 @@ public class UserService {
     @Autowired
     UserRepository repository;
 
-    public void saveUser(UserEntity userEntity) {
-        UserEntity entity = repository.findByUid(userEntity.uid());
-
-        if (entity == null) {
-            repository.save(userEntity);
-        } else {
-            repository.save(
-                new UserEntity(entity.uid(), entity.displayName(), entity.profilePictureUrl(), userEntity.fcmToken(), entity.connections(), entity.blocklist())
-            );
-        }
+    public void saveUser(User user) {
+    	try {
+    		UserEntity entity = getUserEntityOrThrow(user.uid());
+    		entity.fcmTokens().add(user.fcmTokens().getFirst());
+    		repository.save(entity);
+    	} catch (UserNotFoundException e) {
+    		repository.save(UserEntity.fromDomainUser(user));			
+		}
     }
 
     public void addConnection(User user, User otherUser) throws UserNotFoundException {
         UserEntity entity = getUserEntityOrThrow(user.uid());
-        String[] connectionsArray;
+        List<String> connections = new ArrayList<>(List.of());
 
         try {
-            List<String> connections = new ArrayList<>(Arrays.asList(user.connections()));
-
-            if (connections.contains(otherUser.uid())) return;
-
-            connections.add(otherUser.uid());
-            connectionsArray = connections.toArray(new String[0]);
+            if (user.connections().contains(otherUser.uid())) return;
+            user.connections().add(otherUser.uid());
+            connections.addAll(user.connections());
         } catch (NullPointerException ignored) {
-            connectionsArray = new String[] { otherUser.uid() };
+            connections.add(otherUser.uid());
         }
 
-        UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), entity.fcmToken(), connectionsArray, user.blocklist());
-        repository.save(updatedUser);
+        entity.setConnections(connections);
+        repository.save(entity);
     }
 
     public void addBlocklist(String uid, String dmUid) {
-        UserEntity user = repository.findByUid(uid);
+        UserEntity entity = repository.findByUid(uid);
 
-        String[] blocklistArray;
+        List<String> blocklist = new ArrayList<>(List.of());
 
         try {
-            List<String> blocklist = new ArrayList<>(Arrays.asList(user.blocklist()));
-
-            if (blocklist.contains(dmUid)) return;
-
-            blocklist.add(dmUid);
-            blocklistArray = blocklist.toArray(new String[0]);
+            if (entity.blocklist().contains(dmUid)) return;
+            entity.blocklist().add(dmUid);
+            blocklist.addAll(entity.blocklist());
         } catch (NullPointerException ignored) {
-            blocklistArray = new String[]{dmUid};
+            blocklist.add(dmUid);
         }
 
-        UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), user.connections(), blocklistArray);
-        repository.save(updatedUser);
+        entity.setBlocklist(blocklist);
+        repository.save(entity);
     }
 
     public void unblock(String uid, String dmUid) throws VcException {
         UserEntity user = getUserEntityOrThrow(uid);
-        List<String> blocklist;
+        getUserEntityOrThrow(dmUid);
+        List<String> blocklist = user.blocklist();
 
-        try {
-            blocklist = new ArrayList<>(Arrays.asList(user.blocklist()));
-        } catch (NullPointerException ignored) {
+        if (blocklist == null) {
             throw new NoUsersBlockedException();
         }
 
         if (blocklist.contains(dmUid)) {
             blocklist.remove(dmUid);
-
-            String[] blocklistArray = blocklist.toArray(new String[0]);
-            UserEntity updatedUser = new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmToken(), user.connections(), blocklistArray);
-            repository.save(updatedUser);
+            user.setBlocklist(blocklist);
+            repository.save(user);
         } else throw new UserNotBlockedException();
-    }
-
-    public List<String> getBlockedUserUidsByUserUid(String uid) {
-        return Arrays.stream(repository.findByUid(uid).blocklist()).toList();
     }
 
     public List<User> getAllUsersByDisplayName(String name) {
         return repository.findByDisplayNameContainingIgnoreCase(name).stream().map(UserEntity::toDomainUser).toList();
     }
 
-    public String getUserFcmTokenByUid(String uid) throws UserNotFoundException {
-        return getUserEntityOrThrow(uid).fcmToken();
+    public List<UserFcmToken> getUserFcmTokensByUid(String uid) throws UserNotFoundException {
+        return getUserEntityOrThrow(uid).fcmTokens();
     }
 
     public User getUserByUid(String uid) {
-        UserEntity entity = repository.findByUid(uid);
-
-        return entity == null ? null : entity.toDomainUser();
-    }
-
-    public void updateUserFcmToken(String uid, String fcmToken) throws UserNotFoundException {
-        UserEntity existingUser = getUserEntityOrThrow(uid);
-        repository.save(new UserEntity(existingUser.uid(), existingUser.displayName(), existingUser.profilePictureUrl(), fcmToken, existingUser.connections(), existingUser.blocklist()));
+        try {
+            return getUserOrThrow(uid);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public User getUserOrThrow(String uid) throws UserNotFoundException {
@@ -121,4 +107,24 @@ public class UserService {
 
         return entity;
     }
+
+    public void updateTokenLastUsed(String uid, UserFcmToken token) throws UserNotFoundException {
+        UserEntity entity = getUserEntityOrThrow(uid);
+        UserFcmToken newToken = new UserFcmToken(token.token(), LocalDateTime.now());
+
+        entity.fcmTokens().removeIf(it -> it.token().equals(token.token()));
+        entity.fcmTokens().add(newToken);
+
+        repository.save(entity);
+    }
+    
+    public void verifyUserOrThrow(String uid) throws UserNotFoundException {
+    	getUserOrThrow(uid);
+    }
+
+	public List<User> getAllUsers() {
+		return repository.findAll().stream()
+			.map(UserEntity::toDomainUser)
+			.toList();
+	}
 }
