@@ -3,7 +3,6 @@ package dev.jason.app.compose.vaultchat
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import dev.jason.app.compose.vaultchat.auth.AuthKoinModule
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.local_storage.LocalStorageKoinModule
 import dev.jason.app.compose.vaultchat.messaging.MessagingKoinModule
@@ -31,7 +30,7 @@ class MainApplication : Application() {
         createNotificationChannel()
         startKoin {
             androidContext(this@MainApplication)
-            modules(baseModule, AuthKoinModule, MessagingKoinModule, LocalStorageKoinModule)
+            modules(baseModule, MessagingKoinModule, LocalStorageKoinModule)
         }
     }
 

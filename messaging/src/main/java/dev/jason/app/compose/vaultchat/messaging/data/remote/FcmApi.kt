@@ -14,12 +14,12 @@ interface FcmApi {
     @POST("/send")
     suspend fun sendMessage(@Body body: MessageDto): ApiResult<Void> // no data is returned
 
-    @POST("/users/register") // updates fcm token is user already exists
+    @POST("/user/register") // updates fcm token is user already exists
     suspend fun registerUser(body: RegisterUserDto)
 
-    @GET("/users/search")
+    @GET("/user/search")
     suspend fun searchUsers(@Query("name") name: String, @Query("from") from: String): ApiResult<List<UserDto>>
 
-    @GET("/users/get-connections")
+    @GET("/user/get-connections")
     suspend fun getConnections(@Query("uid") uid: String): ApiResult<List<UserDto>>
 }
