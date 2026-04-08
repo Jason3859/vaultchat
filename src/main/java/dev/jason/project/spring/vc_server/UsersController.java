@@ -5,8 +5,6 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import dev.jason.project.spring.vc_server.domain.Logger;
 import dev.jason.project.spring.vc_server.domain.User;
-import dev.jason.project.spring.vc_server.domain.exception.NoUsersBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotBlockedException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
 import dev.jason.project.spring.vc_server.domain.exception.VcException;
 import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
@@ -101,15 +99,7 @@ public class UsersController {
             userService.unblock(uid, uidToUnblock);
             return new ResultDto(ResultDto.Result.Success);
         } catch (VcException e) {
-            return switch (e) {
-                case UserNotFoundException ignored -> new ResultDto(ResultDto.Result.UserNotFound);
-                case UserNotBlockedException ignored -> new ResultDto(ResultDto.Result.UserNotBlocked);
-                case NoUsersBlockedException ignored -> new ResultDto(ResultDto.Result.UserNotBlocked);
-                default -> {
-                    Logger.write(e);
-                    yield new ResultDto(ResultDto.Result.InternalServerError);
-                }
-            };
+            return ResultDto.fromVcException(e);
         }
     }
 
