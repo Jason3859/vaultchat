@@ -11,6 +11,8 @@ data class UserDto(
     val devices: List<DeviceDto> = emptyList(), // empty list for connections
     val status: User.Status
 ) {
+    fun toDomain() = User(uid, displayName, profilePictureUrl, devices.map(DeviceDto::toDomain), status)
+
     @Serializable
     data class DeviceDto(
         val name: String,
@@ -23,5 +25,3 @@ data class UserDto(
         }
     }
 }
-
-fun UserDto.toDomain() = User(uid, displayName, profilePictureUrl, devices.map(UserDto.DeviceDto::toDomain), status)

@@ -2,14 +2,12 @@ package dev.jason.app.compose.vaultchat.messaging.data.repository
 
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.domain.Message
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.SnackbarController
-import dev.jason.app.compose.vaultchat.messaging.data.dto.toDomain
+import dev.jason.app.compose.vaultchat.messaging.data.dto.UserDto
 import dev.jason.app.compose.vaultchat.messaging.data.dto.toDto
 import dev.jason.app.compose.vaultchat.messaging.data.remote.FcmApi
 import dev.jason.app.compose.vaultchat.messaging.domain.model.ApiResult
-import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.messaging.data.dto.UserDto
-import dev.jason.app.compose.vaultchat.messaging.domain.model.RegisterUser
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 
 class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
@@ -43,15 +41,6 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             e.localizedMessage?.let(SnackbarController::showSnackbar)
             Log.e("RemoteApiImpl", "getConnections: exception", e)
             ApiResult(ApiResult.Result.InternalError)
-        }
-    }
-
-    override suspend fun registerUser(body: RegisterUser) {
-        return try {
-            api.registerUser(body.toDto())
-        } catch (e: Exception) {
-            Log.e("RemoteApiImpl", "registerUser: exception", e)
-            SnackbarController.showSnackbar(e.localizedMessage ?: return)
         }
     }
 
