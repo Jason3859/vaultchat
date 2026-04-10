@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 
 @SpringBootApplication
 @EnableMongoRepositories
+@EnableScheduling
 public class VcServerApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(VcServerApplication.class);

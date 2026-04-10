@@ -6,8 +6,10 @@ public record User(
     String uid,
     String displayName,
     String profilePictureUrl,
-    List<UserFcmToken> fcmTokens,
+    List<Device> devices,
     List<String> connections,
-    List<String> blocklist
+    List<String> blocklist,
+    UserStatus status,
+    long lastHeartbeat
 ) {
 }
