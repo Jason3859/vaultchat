@@ -3,7 +3,7 @@ package dev.jason.project.spring.vc_server;
 import dev.jason.project.spring.vc_server.domain.Device;
 import dev.jason.project.spring.vc_server.domain.User;
 import dev.jason.project.spring.vc_server.domain.UserStatus;
-import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyExistsException;
+import dev.jason.project.spring.vc_server.domain.exception.DeviceAlreadyExistsException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
 import dev.jason.project.spring.vc_server.domain.exception.VcException;
 import dev.jason.project.spring.vc_server.dto.DeviceDto;
@@ -31,7 +31,7 @@ public class UsersController {
         try {
             userService.saveUser(userDto.toDomainUser());
             return new ResultDto(Result.Success);
-        } catch (UserAlreadyExistsException e) {
+        } catch (DeviceAlreadyExistsException e) {
             return new ResultDto(Result.UserAlreadyExists);
         }
     }

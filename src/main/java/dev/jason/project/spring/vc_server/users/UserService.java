@@ -44,13 +44,17 @@ public class UserService {
             });
     }
 
-    public void saveUser(User user) throws UserAlreadyExistsException {
+    public void saveUser(User user) throws DeviceAlreadyExistsException {
         UserEntity entity = repository.findByUid(user.uid());
 
         if (entity == null) {
             repository.save(UserEntity.fromDomainUser(user));
         } else {
-            throw new UserAlreadyExistsException();
+            Device device = user.devices().getFirst();
+            if (!entity.devices().contains(device)) {
+                entity.devices().add(device);
+                repository.save(entity);
+            } else throw new DeviceAlreadyExistsException();
         }
     }
 

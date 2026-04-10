@@ -9,10 +9,11 @@ public record ResultDto(Result result, Object data) {
     }
 
     public enum Result {
-        Success, InternalServerError, BlockedByUser, AlreadyBlocked,
-        SelfBlock, UserAlreadyExists, SelfUnblock, MessageTextBlank,
-        UserNotFound, NoBlockedUsers, NoUsersFound, UserNotBlocked,
-        DeviceNotFound, DeviceWithThisFcmTokenAlreadyExists, UserAlreadyOnline, UserNotActive, NotOnline
+        AlreadyBlocked, BlockedByUser, DeviceNotFound,
+        DeviceWithThisFcmTokenAlreadyExists, InternalServerError,
+        MessageTextBlank, NoBlockedUsers, NoUsersFound,
+        SelfBlock, SelfUnblock, Success, UserAlreadyExists,
+        UserNotBlocked, UserNotFound
     }
 
     public static ResultDto fromVcException(VcException exception) {
