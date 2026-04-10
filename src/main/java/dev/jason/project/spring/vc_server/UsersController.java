@@ -52,11 +52,11 @@ public class UsersController {
                 }
             }
 
-            userService.addBlocklist(uid, uidToBlock);
-            userService.addBlocklist(uidToBlock, uid);
+            userService.block(uid, uidToBlock);
+            userService.block(uidToBlock, uid);
             return new ResultDto(ResultDto.Result.Success);
-        } catch (UserNotFoundException e) {
-            return new ResultDto(ResultDto.Result.UserNotFound);
+        } catch (VcException e) {
+            return ResultDto.fromVcException(e);
         }
     }
 

@@ -16,8 +16,8 @@ public final class UserEntity {
     private final String displayName;
     private final String profilePictureUrl;
     private final List<Device> devices;
-    private List<String> connections;
-    private List<String> blocklist;
+    private final List<String> connections;
+    private final List<String> blocklist;
     private UserStatus status;
     private long lastHeartbeat;
 
@@ -62,16 +62,12 @@ public final class UserEntity {
         return status;
     }
 
+    public List<String> connections() {
+        return connections;
+    }
+
     public void setStatus(UserStatus status) {
         this.status = status;
-    }
-
-    public void setConnections(List<String> connections) {
-        this.connections = connections;
-    }
-
-    public void setBlocklist(List<String> blocklist) {
-        this.blocklist = blocklist;
     }
 
     public long lastHeartbeat() {

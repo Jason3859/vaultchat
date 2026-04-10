@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,51 +55,39 @@ public class UserService {
     }
 
     public void addConnection(User user, User otherUser) throws UserNotFoundException {
-        UserEntity entity = getUserEntityOrThrow(user.uid());
-        List<String> connections = new ArrayList<>(List.of());
+        UserEntity entity = getUserEntityOrThrow(user.uid()); getUserEntityOrThrow(otherUser.uid()); // to check if other user exists
 
-        try {
-            if (user.connections().contains(otherUser.uid())) return;
-            user.connections().add(otherUser.uid());
-            connections.addAll(user.connections());
-        } catch (NullPointerException ignored) {
-            connections.add(otherUser.uid());
+        if (entity.connections().contains(otherUser.uid())) {
+            return;
         }
 
-        entity.setConnections(connections);
+        entity.connections().add(otherUser.uid());
+
         repository.save(entity);
     }
 
-    public void addBlocklist(String uid, String dmUid) {
-        UserEntity entity = repository.findByUid(uid);
+    public void block(String uid, String dmUid) throws UserNotFoundException, UserAlreadyBlockedException {
+        UserEntity entity = getUserEntityOrThrow(uid); getUserEntityOrThrow(dmUid); // to check of other user exists
 
-        List<String> blocklist = new ArrayList<>(List.of());
-
-        try {
-            if (entity.blocklist().contains(dmUid)) return;
-            entity.blocklist().add(dmUid);
-            blocklist.addAll(entity.blocklist());
-        } catch (NullPointerException ignored) {
-            blocklist.add(dmUid);
+        if (entity.blocklist().contains(dmUid)) {
+            throw new UserAlreadyBlockedException();
         }
 
-        entity.setBlocklist(blocklist);
+        entity.blocklist().add(dmUid);
         repository.save(entity);
     }
 
-    public void unblock(String uid, String dmUid) throws VcException {
-        UserEntity user = getUserEntityOrThrow(uid);
-        getUserEntityOrThrow(dmUid);
-        List<String> blocklist = user.blocklist();
+    public void unblock(String uid, String dmUid) throws UserNotFoundException, UserNotBlockedException, NoUsersBlockedException {
+        UserEntity entity = getUserEntityOrThrow(uid); getUserEntityOrThrow(dmUid);
+        List<String> blocklist = entity.blocklist();
 
-        if (blocklist == null) {
+        if (blocklist.isEmpty()) {
             throw new NoUsersBlockedException();
         }
 
         if (blocklist.contains(dmUid)) {
             blocklist.remove(dmUid);
-            user.setBlocklist(blocklist);
-            repository.save(user);
+            repository.save(entity);
         } else throw new UserNotBlockedException();
     }
 
