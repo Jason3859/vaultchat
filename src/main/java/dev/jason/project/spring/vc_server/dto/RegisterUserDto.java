@@ -18,7 +18,7 @@ public record RegisterUserDto(String uid, String displayName, String profilePict
         return new User(uid,
             displayName,
             profilePictureUrl,
-            new ArrayList<>(List.of(device.toDomainModel(LocalDateTime.now()))),
+            device == null ? new ArrayList<>(List.of()) : new ArrayList<>(List.of(device.toDomainModel(LocalDateTime.now()))),
             new ArrayList<>(List.of()),
             new ArrayList<>(List.of()),
             UserStatus.Online,
