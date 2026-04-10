@@ -38,9 +38,8 @@ class UserBlocklistTests {
     @Order(1)
     void addTestUser1() throws Exception {
         mvc.perform(
-            post("/user/add")
+            post("/user/register")
                 .contentType("application/json")
-                .param(IS_TEST_USER_PARAM, IS_TEST_USER)
                 .content(objectMapper.writeValueAsString(new RegisterUserDto(TEST_USER_1)))
         )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
@@ -50,9 +49,8 @@ class UserBlocklistTests {
     @Order(2)
     void addTestUser2() throws Exception {
         mvc.perform(
-                post("/user/add")
+                post("/user/register")
                     .contentType("application/json")
-                    .param(IS_TEST_USER_PARAM, IS_TEST_USER)
                     .content(objectMapper.writeValueAsString(new RegisterUserDto(TEST_USER_2)))
             )
             .andExpect(content().string(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.Success))));
@@ -168,7 +166,7 @@ class UserBlocklistTests {
     @Order(13)
     void getBlockedUsers() throws Exception {
         mvc.perform(
-            MockMvcRequestBuilders.get("/get-blocked-users")
+            MockMvcRequestBuilders.get("/user/get-blocked-users")
                 .param("uid", TEST_USER_1)
         )
             .andExpect(content().json(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.UserNotFound))));

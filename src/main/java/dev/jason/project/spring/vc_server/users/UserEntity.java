@@ -1,13 +1,13 @@
 package dev.jason.project.spring.vc_server.users;
 
-import java.util.List;
-import java.util.Objects;
-
+import dev.jason.project.spring.vc_server.domain.Device;
+import dev.jason.project.spring.vc_server.domain.User;
+import dev.jason.project.spring.vc_server.domain.UserStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import dev.jason.project.spring.vc_server.domain.User;
-import dev.jason.project.spring.vc_server.domain.UserFcmToken;
+import java.util.List;
+import java.util.Objects;
 
 @Document(collection = "users")
 public final class UserEntity {
@@ -15,44 +15,55 @@ public final class UserEntity {
     private final String uid;
     private final String displayName;
     private final String profilePictureUrl;
-    private final List<UserFcmToken> fcmTokens;
+    private final List<Device> devices;
     private List<String> connections;
     private List<String> blocklist;
+    private UserStatus status;
+    private long lastHeartbeat;
 
     public UserEntity(
         String uid,
         String displayName,
         String profilePictureUrl,
-        List<UserFcmToken> fcmTokens,
+        List<Device> devices,
         List<String> connections,
-        List<String> blocklist
+        List<String> blocklist,
+        UserStatus status,
+        long lastHeartbeat
     ) {
         this.uid = uid;
         this.displayName = displayName;
         this.profilePictureUrl = profilePictureUrl;
-        this.fcmTokens = fcmTokens;
+        this.devices = devices;
         this.connections = connections;
         this.blocklist = blocklist;
+        this.status = status;
+        this.lastHeartbeat = lastHeartbeat;
     }
     
     public static UserEntity fromDomainUser(User user) {
-    	return new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.fcmTokens(), user.connections(), user.blocklist());
+    	return new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.devices(), user.connections(), user.blocklist(), user.status(), user.lastHeartbeat());
     }
 
     public User toDomainUser() {
-        return new User(uid, displayName, profilePictureUrl, fcmTokens, connections, blocklist);
+        return new User(uid, displayName, profilePictureUrl, devices, connections, blocklist, status, lastHeartbeat);
     }
 
-    public String uid() {
-        return uid;
-    }
 
-    public List<UserFcmToken> fcmTokens() {
-        return fcmTokens;
+    public List<Device> devices() {
+        return devices;
     }
 
     public List<String> blocklist() {
         return blocklist;
+    }
+
+    public UserStatus status() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public void setConnections(List<String> connections) {
@@ -63,6 +74,14 @@ public final class UserEntity {
         this.blocklist = blocklist;
     }
 
+    public long lastHeartbeat() {
+        return lastHeartbeat;
+    }
+
+    public void setLastHeartbeat(long lastHeartbeat) {
+        this.lastHeartbeat = lastHeartbeat;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -71,14 +90,16 @@ public final class UserEntity {
         return Objects.equals(this.uid, that.uid) &&
             Objects.equals(this.displayName, that.displayName) &&
             Objects.equals(this.profilePictureUrl, that.profilePictureUrl) &&
-            Objects.equals(this.fcmTokens, that.fcmTokens) &&
+            Objects.equals(this.devices, that.devices) &&
             Objects.equals(this.connections, that.connections) &&
-            Objects.equals(this.blocklist, that.blocklist);
+            Objects.equals(this.blocklist, that.blocklist) &&
+            Objects.equals(this.status, that.status) &&
+            this.lastHeartbeat == that.lastHeartbeat;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, displayName, profilePictureUrl, fcmTokens, connections, blocklist);
+        return Objects.hash(uid, displayName, profilePictureUrl, devices, connections, blocklist, status, lastHeartbeat);
     }
 
     @Override
@@ -87,9 +108,11 @@ public final class UserEntity {
             "uid=" + uid + ", " +
             "displayName=" + displayName + ", " +
             "profilePictureUrl=" + profilePictureUrl + ", " +
-            "fcmTokens=" + fcmTokens + ", " +
+            "fcmTokens=" + devices + ", " +
             "connections=" + connections + ", " +
-            "blocklist=" + blocklist + ']';
+            "blocklist=" + blocklist + ", " +
+            "status=" + status + ", " +
+            "lastHeartbeat=" + lastHeartbeat + ']';
     }
 
 }

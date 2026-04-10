@@ -32,7 +32,7 @@ public class VCSpringAppTests {
     @Test
     void getConnectionsForUnknownUser() throws Exception {
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/get-connections")
+            MockMvcRequestBuilders.get("/user/get-connections")
                 .param("uid", TEST_USER_1)
         )
             .andExpect(
@@ -45,7 +45,7 @@ public class VCSpringAppTests {
     @Test
     void searchForUnknownUser() throws Exception {
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/search-users")
+            MockMvcRequestBuilders.get("/user/search")
                 .param("name", TEST_USER_1)
                 .param("from", TEST_USER_2)
         )
@@ -59,7 +59,7 @@ public class VCSpringAppTests {
     @Test
     void getBlocklistForUnknownUser() throws Exception {
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/get-blocked-users")
+            MockMvcRequestBuilders.get("/user/get-blocked-users")
                 .param("uid", TEST_USER_1)
         )
             .andExpect(

@@ -15,7 +15,7 @@ public record Message(String from, String to, String text, String timestamp) {
 
         return com.google.firebase.messaging.Message.builder()
             .setToken(toFcmToken)
-            .putData("is_message", String.valueOf(true))
+            .putData("type", "notification")
             .putData("received_from", from)
             .putData("to", to)
             .putData("title", "New message!")

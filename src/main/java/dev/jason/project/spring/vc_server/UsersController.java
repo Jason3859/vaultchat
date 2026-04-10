@@ -1,12 +1,12 @@
 package dev.jason.project.spring.vc_server;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import dev.jason.project.spring.vc_server.domain.Logger;
+import dev.jason.project.spring.vc_server.domain.Device;
 import dev.jason.project.spring.vc_server.domain.User;
+import dev.jason.project.spring.vc_server.domain.UserStatus;
+import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
 import dev.jason.project.spring.vc_server.domain.exception.VcException;
+import dev.jason.project.spring.vc_server.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto.Result;
@@ -14,8 +14,8 @@ import dev.jason.project.spring.vc_server.dto.UserDto;
 import dev.jason.project.spring.vc_server.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,42 +26,13 @@ public class UsersController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private final List<String> usersOnline = new ArrayList<>(List.of());
-
     @PostMapping("/register")
     public ResultDto registerUser(@RequestBody RegisterUserDto userDto) {
-        userService.saveUser(userDto.toDomainUser());
-        return new ResultDto(ResultDto.Result.Success);
-    }
-
-    @PostMapping("/mark-online")
-    public ResultDto markOnline(@RequestParam String uid) {
         try {
-            userService.verifyUserOrThrow(uid);
-            usersOnline.add(uid);
-            notifyUsersAboutOnlineUsers();
+            userService.saveUser(userDto.toDomainUser());
             return new ResultDto(Result.Success);
-        } catch (Exception e) {
-            return new ResultDto(Result.UserNotFound);
-        }
-    }
-
-    @PostMapping("/mark-offline")
-    public ResultDto markOffline(@RequestParam String uid) {
-        try {
-            userService.verifyUserOrThrow(uid);
-            if (usersOnline.contains(uid)) {
-                usersOnline.remove(uid);
-                notifyUsersAboutOnlineUsers();
-                return new ResultDto(Result.Success);
-            } else {
-                return new ResultDto(Result.NotOnline);
-            }
-        } catch (UserNotFoundException e) {
-            return new ResultDto(Result.UserNotFound);
+        } catch (UserAlreadyExistsException e) {
+            return new ResultDto(Result.UserAlreadyExists);
         }
     }
 
@@ -135,29 +106,81 @@ public class UsersController {
         }
     }
 
-    private void notifyUsersAboutOnlineUsers() {
-        List<User> users = userService.getAllUsers();
+    @GetMapping("/get-blocked-users")
+    public ResultDto getBlockedUsers(@RequestParam String uid) {
+        try {
+            User user = userService.getUserOrThrow(uid);
 
-        users.forEach(user -> {
-            List<String> list = new ArrayList<>(List.of());
+            if (user.blocklist() == null || user.blocklist().isEmpty()) {
+                return new ResultDto(Result.NoBlockedUsers);
+            }
 
-            user.connections().stream()
-                .filter(usersOnline::contains)
-                .forEach(list::add);
+            Object data = user.blocklist().stream()
+                .map(userService::getUserByUid)
+                .map(UserDto::fromDomainUser)
+                .toList();
 
-            user.fcmTokens().forEach(fcmToken -> {
-                try {
-                    Message message = Message.builder()
-                        .setToken(fcmToken.token())
-                        .putData("online_users", String.valueOf(true))
-                        .putData("users_online", objectMapper.writeValueAsString(list))
-                        .build();
+            return new ResultDto(Result.Success, data);
+        } catch (UserNotFoundException e) {
+            return new ResultDto(Result.UserNotFound);
+        }
+    }
 
-                    FirebaseMessaging.getInstance().send(message);
-                } catch (FirebaseMessagingException e) {
-                    Logger.write(e);
-                }
-            });
-        });
+    @PutMapping("/update-status")
+    public ResultDto updateUserStatus(@RequestParam String uid, @RequestParam UserStatus status) {
+        try {
+            userService.updateUserStatusAndNotify(uid, status);
+            return new ResultDto(Result.Success);
+        } catch (UserNotFoundException e) {
+            return ResultDto.fromVcException(e);
+        }
+    }
+
+    @PutMapping("/heartbeat")
+    public ResultDto heartbeat(@RequestParam String uid) {
+        try {
+            userService.updateHeartbeat(uid);
+            return new ResultDto(Result.Success);
+        } catch (UserNotFoundException e) {
+            return ResultDto.fromVcException(e);
+        }
+    }
+
+    @RestController
+    @RequestMapping("/devices")
+    public static class DeviceController {
+
+        @Autowired
+        private UserService userService;
+
+        @PostMapping("/add")
+        public ResultDto addDevice(@RequestParam String uid, @RequestBody DeviceDto device) {
+            try {
+                userService.addDevice(uid, device.toDomainModel(LocalDateTime.now()));
+                return new ResultDto(Result.Success);
+            } catch (VcException e) {
+                return ResultDto.fromVcException(e);
+            }
+        }
+
+        @GetMapping("/my-devices")
+        public ResultDto getMyDevices(@RequestParam String uid) {
+            try {
+                List<Device> devices = userService.getUserDevicesByUid(uid);
+                return new ResultDto(Result.Success, devices);
+            } catch (VcException e) {
+                return ResultDto.fromVcException(e);
+            }
+        }
+
+        @DeleteMapping("/delete")
+        public ResultDto deleteDevice(@RequestParam String uid, @RequestBody DeviceDto device) {
+            try {
+                userService.deleteDevice(uid, device.toDomainModel(null));
+                return new ResultDto(Result.Success);
+            } catch (VcException e) {
+                return ResultDto.fromVcException(e);
+            }
+        }
     }
 }
