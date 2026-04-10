@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.domain.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +44,7 @@ fun SearchUsersScreen(
     uiState: SearchUsersViewModel.UiState,
     updateState: (SearchUsersViewModel.UiState) -> Unit,
     onSearch: (String) -> Unit,
-    onUserClick: (dev.jason.app.compose.vaultchat.messaging.domain.model.User) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(

@@ -6,6 +6,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -40,8 +41,12 @@ object FirebaseGoogleAuthentication {
             throw IllegalStateException("Credential is not type of Google")
 
         } catch (e: GetCredentialException) {
-            SnackbarController.sendEvent(e.message!!)
             Log.e("FirebaseGoogleAuth", "launchCredentialManagerBottomSheet: exception", e)
+            if (e is NoCredentialException) {
+                SnackbarController.sendEvent("No Internet")
+                return null
+            }
+            SnackbarController.sendEvent(e.message!!)
             return null
         }
     }

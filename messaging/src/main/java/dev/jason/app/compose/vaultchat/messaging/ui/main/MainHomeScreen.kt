@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,28 +22,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainHomeScreen(
     viewModel: MainHomeViewModel = koinViewModel(),
-    onUserClick: (dev.jason.app.compose.vaultchat.messaging.domain.model.User) -> Unit,
+    onUserClick: (User) -> Unit,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
-    val connections by viewModel.connections.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val connections by viewModel.connections.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     if (isLoading) {
         Box(
@@ -75,7 +79,7 @@ fun MainHomeScreen(
 }
 
 @Composable
-private fun ConnectionsItem(user: dev.jason.app.compose.vaultchat.messaging.domain.model.User, onUserClick: (dev.jason.app.compose.vaultchat.messaging.domain.model.User) -> Unit) {
+private fun ConnectionsItem(user: User, onUserClick: (User) -> Unit) {
     ListItem(
         headlineContent = {
             Row(
@@ -106,7 +110,10 @@ private fun ConnectionsItem(user: dev.jason.app.compose.vaultchat.messaging.doma
 
                 Spacer(Modifier.width(16.dp))
 
-                Text(user.displayName)
+                Column {
+                    Text(user.displayName)
+                    Text("Currently ${user.status}", fontSize = 12.sp)
+                }
             }
         },
         modifier = Modifier
@@ -114,4 +121,15 @@ private fun ConnectionsItem(user: dev.jason.app.compose.vaultchat.messaging.doma
             .padding(vertical = 4.dp, horizontal = 8.dp)
             .clickable { onUserClick(user) }
     )
+}
+
+@Preview
+@Composable
+private fun ConnectionsItemPreview() {
+    VaultChatTheme {
+        ConnectionsItem(
+            user = User("uid", "display name", "url", emptyList(), User.Status.Online),
+            onUserClick = {  }
+        )
+    }
 }

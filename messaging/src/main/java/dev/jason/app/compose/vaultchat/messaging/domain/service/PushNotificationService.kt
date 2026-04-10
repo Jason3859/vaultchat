@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat.messaging.domain.service
 
 import android.app.NotificationManager
+import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.Firebase
@@ -8,38 +9,28 @@ import com.google.firebase.auth.auth
 import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.domain.Message
-import dev.jason.app.compose.vaultchat.messaging.domain.Util
+import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
+import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
 
 class PushNotificationService : com.google.firebase.messaging.FirebaseMessagingService() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val apiRepository: dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository by inject()
-    private val repository: LocalStorageRepository by inject()
+    private val apiRepository: RemoteApiRepository by inject()
+    private val storageRepository: LocalStorageRepository by inject()
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
         try {
-            val user = Firebase.auth.currentUser!!
-
             coroutineScope.launch {
-                // updates fcm token if user already exists
-                apiRepository.registerUser(
-                    _root_ide_package_.dev.jason.app.compose.vaultchat.messaging.domain.model.RegisterUser(
-                        user.uid,
-                        user.displayName!!,
-                        user.photoUrl!!.toString(),
-                        token
-                    )
-                )
-                Log.d("PushNotificationService", "onNewToken: sent new token to server")
+                // TODO: update token
             }
         } catch (e: NullPointerException) {
             Log.w("PushNotificationService", "onNewToken: exception", e)
@@ -49,31 +40,50 @@ class PushNotificationService : com.google.firebase.messaging.FirebaseMessagingS
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        if (message.data["is_message"]?.toBooleanStrictOrNull() == true) {
-            val from = message.data["received_from"]!!
-            val to = message.data["to"]!!
-            val text = message.data["text"]!!
-            val timestamp = message.data["timestamp"]!!.toLocalDateTime()
+        val type = message.data["type"]
 
-            val notification = NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
-                .setContentTitle("New message")
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .build()
+        when (type) {
+            "notification" -> {
+                val from = message.data["received_from"]!!
+                val to = message.data["to"]!!
+                val text = message.data["text"]!!
+                val timestamp = message.data["timestamp"]!!.toLocalDateTime()
 
-            val notificationManager = getSystemService(NotificationManager::class.java)
+                val notification =
+                    NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+                        .setContentTitle("New message")
+                        .setContentText(text)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .build()
 
-            if (Util.otherUserUid.get() != from) {
-                notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+                val notificationManager = getSystemService(NotificationManager::class.java)
+
+                if (MessagingState.otherUserUid.value != from) {
+                    notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+                }
+
+                coroutineScope.launch {
+                    storageRepository.addMessage(Message(from, to, text, timestamp))
+                }
             }
 
+            "status_update" -> {
+                val uid = message.data["uid"]!!
+                val status = message.data["status"]!!
+
+                MessagingState.updateConnectionsStatus(uid, User.Status.valueOf(status))
+                Log.d("PushNotificationService", "onMessageReceived: updated status of users")
+            }
+        }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        Firebase.auth.currentUser?.let { firebaseUser ->
             coroutineScope.launch {
-                repository.addMessage(Message(from, to, text, timestamp))
+                apiRepository.updateStatus(firebaseUser.uid, User.Status.Offline)
             }
-        } else if (message.data["online_users"]?.toBooleanStrictOrNull() == true) {
-            val onlineUsers = message.data["users_online"]!!
-            val serializedOnlineUsers = Json.decodeFromString<List<String>>(onlineUsers)
-            Util.usersOnline.set(serializedOnlineUsers)
         }
     }
 

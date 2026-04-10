@@ -24,7 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,8 +38,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.SnackbarController
-import dev.jason.app.compose.vaultchat.messaging.domain.Util
-import dev.jason.app.compose.vaultchat.messaging.domain.model.User
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
+import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.messaging.data.dto.UserDto
 import dev.jason.app.compose.vaultchat.messaging.ui.main.MainHomeScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.messaging.MessagingScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.nav.Route
@@ -73,11 +74,17 @@ fun HomeScreen() {
                 }
 
                 entry<Route.Messaging> {
-                    Util.otherUserUid.set(it.uid)
+                    MessagingState.updateOtherUserId(it.uid)
                     MessagingScreen(
-                        otherUser = User(it.uid, it.displayName, it.profilePictureUrl),
+                        otherUser = User(
+                            it.uid,
+                            it.displayName,
+                            it.profilePictureUrl,
+                            it.devices.map(UserDto.DeviceDto::toDomain),
+                            it.status
+                        ),
                         onBackClick = {
-                            Util.otherUserUid.reset()
+                            MessagingState.updateOtherUserId(null)
                             mainBackStack.removeLastOrNull()
                         },
                     )
@@ -97,7 +104,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
     )
 
     val searchUsersViewModel: SearchUsersViewModel = koinViewModel()
-    val searchUsersUiState by searchUsersViewModel.uiState.collectAsState()
+    val searchUsersUiState by searchUsersViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -128,7 +135,9 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                                 Route.Messaging(
                                     it.uid,
                                     it.displayName,
-                                    it.profilePictureUrl
+                                    it.profilePictureUrl,
+                                    it.devices.map(UserDto.DeviceDto::fromDomain),
+                                    it.status
                                 )
                             )
                         },
@@ -145,7 +154,9 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                                 Route.Messaging(
                                     it.uid,
                                     it.displayName,
-                                    it.profilePictureUrl
+                                    it.profilePictureUrl,
+                                    it.devices.map(UserDto.DeviceDto::fromDomain),
+                                    it.status
                                 )
                             )
                         },
@@ -160,7 +171,9 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
                     val user = User(
                         firebaseUser.uid,
                         firebaseUser.displayName!!,
-                        firebaseUser.photoUrl.toString().removeSuffix("=s96-c")
+                        firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
+                        emptyList(),
+                        User.Status.Online
                     )
 
                     ProfileScreen(

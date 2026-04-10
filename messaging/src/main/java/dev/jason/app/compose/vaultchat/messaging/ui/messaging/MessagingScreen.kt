@@ -37,7 +37,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,13 +47,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.domain.Message
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.messaging.domain.model.User
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime
@@ -65,7 +65,7 @@ fun MessagingScreen(
     onBackClick: () -> Unit
 ) {
     val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MessagingScreen(
         otherUser = otherUser,
@@ -186,7 +186,10 @@ private fun TopBar(
 
                 Spacer(Modifier.width(10.dp))
 
-                Text(otherUser.displayName)
+                Column {
+                    Text(otherUser.displayName)
+                    Text("Currently ${otherUser.status}", fontSize = 12.sp)
+                }
             }
         },
         navigationIcon = {
@@ -258,11 +261,7 @@ private fun MessagingScreenPreview() {
 
     VaultChatTheme {
         MessagingScreen(
-            otherUser = User(
-                other,
-                other,
-                other
-            ),
+            otherUser = User(other, other, other, emptyList(), User.Status.Online),
             onBackClick = {},
             uiState = MessagingViewModel.UiState(),
             updateState = {},

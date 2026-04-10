@@ -39,11 +39,12 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 
 @Composable
 fun ProfileScreen(
-    user: dev.jason.app.compose.vaultchat.messaging.domain.model.User,
+    user: User,
     onLogOutClick: () -> Unit,
     innerPadding: PaddingValues
 ) {
@@ -136,11 +137,7 @@ fun ProfileScreen(
 private fun ProfileScreenPreview() {
     VaultChatTheme {
         ProfileScreen(
-            user = _root_ide_package_.dev.jason.app.compose.vaultchat.messaging.domain.model.User(
-                "name",
-                "name",
-                "url"
-            ),
+            user = User("name", "name", "url", emptyList(), User.Status.Online),
             innerPadding = PaddingValues(),
             onLogOutClick = {}
         )
