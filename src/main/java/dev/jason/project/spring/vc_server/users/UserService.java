@@ -55,7 +55,8 @@ public class UserService {
     }
 
     public void addConnection(User user, User otherUser) throws UserNotFoundException {
-        UserEntity entity = getUserEntityOrThrow(user.uid()); getUserEntityOrThrow(otherUser.uid()); // to check if other user exists
+        UserEntity entity = getUserEntityOrThrow(user.uid());
+        getUserEntityOrThrow(otherUser.uid()); // to check if other user exists
 
         if (entity.connections().contains(otherUser.uid())) {
             return;
@@ -67,7 +68,8 @@ public class UserService {
     }
 
     public void block(String uid, String dmUid) throws UserNotFoundException, UserAlreadyBlockedException {
-        UserEntity entity = getUserEntityOrThrow(uid); getUserEntityOrThrow(dmUid); // to check of other user exists
+        UserEntity entity = getUserEntityOrThrow(uid);
+        getUserEntityOrThrow(dmUid); // to check of other user exists
 
         if (entity.blocklist().contains(dmUid)) {
             throw new UserAlreadyBlockedException();
@@ -78,7 +80,8 @@ public class UserService {
     }
 
     public void unblock(String uid, String dmUid) throws UserNotFoundException, UserNotBlockedException, NoUsersBlockedException {
-        UserEntity entity = getUserEntityOrThrow(uid); getUserEntityOrThrow(dmUid);
+        UserEntity entity = getUserEntityOrThrow(uid);
+        getUserEntityOrThrow(dmUid);
         List<String> blocklist = entity.blocklist();
 
         if (blocklist.isEmpty()) {
@@ -89,6 +92,21 @@ public class UserService {
             blocklist.remove(dmUid);
             repository.save(entity);
         } else throw new UserNotBlockedException();
+    }
+
+    public void updateToken(String uid, String token, Device device) throws UserNotFoundException, DeviceNotFoundException {
+        UserEntity entity = getUserEntityOrThrow(uid);
+        List<Device> devices = entity.devices();
+
+        for (Device d : devices) {
+            if (d.equals(device)) {
+                d.setFcmToken(token);
+                repository.save(entity);
+                return;
+            }
+        }
+
+        throw new DeviceNotFoundException();
     }
 
     public List<User> getAllUsersByDisplayName(String name) {

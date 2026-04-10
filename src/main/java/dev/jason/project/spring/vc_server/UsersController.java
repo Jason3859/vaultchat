@@ -146,6 +146,16 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/update-token")
+    public ResultDto updateToken(@RequestParam String uid, @RequestParam String token, @RequestBody DeviceDto device) {
+        try {
+            userService.updateToken(uid, token, device.toDomainModel(LocalDateTime.now()));
+            return new ResultDto(Result.Success);
+        } catch (VcException e) {
+            return ResultDto.fromVcException(e);
+        }
+    }
+
     @RestController
     @RequestMapping("/devices")
     public static class DeviceController {
