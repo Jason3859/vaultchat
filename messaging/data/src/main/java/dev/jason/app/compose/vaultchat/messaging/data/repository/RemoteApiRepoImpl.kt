@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat.messaging.data.repository
 
 import android.util.Log
+import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.data.dto.UserDto
@@ -54,7 +55,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
         }
     }
 
-    override suspend fun updateToken(uid: String, token: String, device: User.Device) {
+    override suspend fun updateToken(uid: String, token: String, device: Device) {
         try {
             api.updateToken(uid, token, UserDto.DeviceDto.fromDomain(device))
         } catch (e: Exception) {

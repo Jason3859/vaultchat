@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
 import kotlinx.coroutines.delay
@@ -25,7 +25,7 @@ class MessagingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        MessagingState.updateCurrentDevice(User.Device.getCurrentDevice(this, "not needed"))
+        MessagingState.updateCurrentDevice(Device.getCurrentDevice(this, "not needed"))
 
         lifecycleScope.launch {
             Firebase.auth.currentUser?.let { firebaseUser ->

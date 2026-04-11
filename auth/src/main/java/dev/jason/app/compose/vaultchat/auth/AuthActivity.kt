@@ -36,7 +36,7 @@ import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
 import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.SnackbarController
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,7 +120,7 @@ class AuthActivity : ComponentActivity() {
                                 it?.user?.uid!!,
                                 it.user?.displayName!!,
                                 it.user?.photoUrl.toString().removeSuffix("=s96-c"),
-                                User.Device.getCurrentDevice(this@AuthActivity, token).let { device ->
+                                Device.getCurrentDevice(this@AuthActivity, token).let { device ->
                                     RegisterUserDto.DeviceDto(
                                         name = device.name,
                                         type = RegisterUserDto.DeviceDto.Type.valueOf(device.type.name),

@@ -407,7 +407,7 @@ Details: kotlinx.serialization compiler plugin internal error: unable to transfo
 	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtension.generate(SerializationLoweringExtension.kt:207)
 	at org.jetbrains.kotlin.fir.pipeline.Fir2IrPipeline.applyIrGenerationExtensions(convertToIr.kt:578)
 	... 43 more
-Caused by: java.lang.IllegalStateException: Serializer for element of type dev.jason.app.compose.vaultchat.core.domain.User.Device has not been found
+Caused by: java.lang.IllegalStateException: Serializer for element of type dev.jason.app.compose.vaultchat.core.domain.Device has not been found
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.SerializerSearchUtilKt.findTypeSerializerOrContext(SerializerSearchUtil.kt:81)
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.Instantiator.regularArgs(Instantiator.kt:273)
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.Instantiator.serializerInstance(Instantiator.kt:95)
@@ -829,7 +829,7 @@ Details: kotlinx.serialization compiler plugin internal error: unable to transfo
 	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtension.generate(SerializationLoweringExtension.kt:207)
 	at org.jetbrains.kotlin.fir.pipeline.Fir2IrPipeline.applyIrGenerationExtensions(convertToIr.kt:578)
 	... 36 more
-Caused by: java.lang.IllegalStateException: Serializer for element of type dev.jason.app.compose.vaultchat.core.domain.User.Device has not been found
+Caused by: java.lang.IllegalStateException: Serializer for element of type dev.jason.app.compose.vaultchat.core.domain.Device has not been found
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.SerializerSearchUtilKt.findTypeSerializerOrContext(SerializerSearchUtil.kt:81)
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.Instantiator.regularArgs(Instantiator.kt:273)
 	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.Instantiator.serializerInstance(Instantiator.kt:95)

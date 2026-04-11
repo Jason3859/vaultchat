@@ -1,5 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging.data.dto
 
+import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
 import kotlinx.serialization.Serializable
 
@@ -17,13 +18,13 @@ data class UserDto(
     data class DeviceDto(
         val name: String,
         val os: String,
-        val type: User.Device.Type,
+        val type: Device.Type,
         val version: String,
         val fcmToken: String,
     ) {
-        fun toDomain() = User.Device(name, type, version, fcmToken)
+        fun toDomain() = Device(name, type, version, fcmToken)
         companion object {
-            fun fromDomain(device: User.Device) = DeviceDto(device.name, "Android", device.type, device.version, device.fcmToken)
+            fun fromDomain(device: Device) = DeviceDto(device.name, "Android", device.type, device.version, device.fcmToken)
         }
     }
 }
