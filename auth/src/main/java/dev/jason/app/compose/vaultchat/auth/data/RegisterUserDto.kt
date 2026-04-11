@@ -13,7 +13,12 @@ data class RegisterUserDto(
     data class DeviceDto(
         val name: String,
         val os: String = "Android",
+        val type: Type,
         val version: String,
         val fcmToken: String,
-    )
+    ) {
+        enum class Type {
+            Mobile, Tablet
+        }
+    }
 }

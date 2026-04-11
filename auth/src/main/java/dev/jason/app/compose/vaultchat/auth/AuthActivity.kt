@@ -3,6 +3,7 @@ package dev.jason.app.compose.vaultchat.auth
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -41,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
+
 
 class AuthActivity : ComponentActivity() {
 
@@ -119,9 +121,10 @@ class AuthActivity : ComponentActivity() {
                                 it.user?.displayName!!,
                                 it.user?.photoUrl.toString(),
                                 RegisterUserDto.DeviceDto(
-                                    Build.MODEL,
-                                    version = "Android ${Build.VERSION.RELEASE}",
-                                    fcmToken = token
+                                    "${Build.MANUFACTURER} ${Build.MODEL}",
+                                    version = "${Build.VERSION.RELEASE}",
+                                    fcmToken = token,
+                                    type = getDeviceType()
                                 )
                             )
                         )
@@ -130,7 +133,7 @@ class AuthActivity : ComponentActivity() {
                     }
                 }
                 ?.addOnFailureListener { exception ->
-                    Log.w(
+                    Log.e(
                         "SignInScreen",
                         "signInWithGoogle: exception while signing in with google",
                         exception
@@ -155,6 +158,17 @@ class AuthActivity : ComponentActivity() {
                     0
                 )
             }
+        }
+    }
+
+    private fun getDeviceType(): RegisterUserDto.DeviceDto.Type {
+        val screenLayout = resources.configuration.screenLayout
+        val mask = Configuration.SCREENLAYOUT_SIZE_MASK
+        val isTablet = (screenLayout and mask) >= Configuration.SCREENLAYOUT_SIZE_LARGE
+        return if (isTablet) {
+            RegisterUserDto.DeviceDto.Type.Tablet
+        } else {
+            RegisterUserDto.DeviceDto.Type.Mobile
         }
     }
 }

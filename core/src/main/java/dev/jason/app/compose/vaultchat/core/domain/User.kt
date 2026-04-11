@@ -13,7 +13,12 @@ data class User(
 
     data class Device(
         val name: String,
+        val type: Type,
         val version: String,
         val fcmToken: String,
-    )
+    ) {
+        enum class Type {
+            Mobile, Tablet
+        }
+    }
 }
