@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 android {
-    namespace = "dev.jason.app.compose.vaultchat.messaging"
+    namespace = "dev.jason.app.compose.vaultchat.messaging.ui"
     compileSdk {
         version = release(36)
     }
@@ -33,11 +34,7 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.localStorage)
-
-    implementation(projects.messaging.data)
     implementation(projects.messaging.domain)
-    implementation(projects.messaging.ui)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
@@ -46,16 +43,19 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui.tooling.preview)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
+
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter)
-    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)

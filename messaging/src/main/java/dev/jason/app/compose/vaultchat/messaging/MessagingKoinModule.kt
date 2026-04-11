@@ -22,7 +22,6 @@ val MessagingKoinModule = module {
     viewModelOf(::MessagingViewModel)
     viewModelOf(::MainHomeViewModel)
 
-    single<FcmApi> {
-        get<Retrofit>().create()
-    }
+    single<FcmApi> { get<Retrofit>().create() }
+    single<RemoteApi> { get<Retrofit>().create() }
 }

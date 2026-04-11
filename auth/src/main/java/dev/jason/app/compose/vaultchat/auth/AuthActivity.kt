@@ -3,7 +3,6 @@ package dev.jason.app.compose.vaultchat.auth
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +36,7 @@ import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
 import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.SnackbarController
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,13 +55,13 @@ class AuthActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         requestNotificationPermission()
 
-        lifecycleScope.launch {
-            token = Firebase.messaging.token.await()
-        }
-
         Firebase.auth.currentUser?.let {
             startActivity(Intent(this, MessagingActivity::class.java))
             finish()
+        }
+
+        lifecycleScope.launch {
+            token = Firebase.messaging.token.await()
         }
 
         setContent {
@@ -119,13 +119,15 @@ class AuthActivity : ComponentActivity() {
                             RegisterUserDto(
                                 it?.user?.uid!!,
                                 it.user?.displayName!!,
-                                it.user?.photoUrl.toString(),
-                                RegisterUserDto.DeviceDto(
-                                    "${Build.MANUFACTURER} ${Build.MODEL}",
-                                    version = "${Build.VERSION.RELEASE}",
-                                    fcmToken = token,
-                                    type = getDeviceType()
-                                )
+                                it.user?.photoUrl.toString().removeSuffix("=s96-c"),
+                                User.Device.getCurrentDevice(this@AuthActivity, token).let { device ->
+                                    RegisterUserDto.DeviceDto(
+                                        name = device.name,
+                                        type = RegisterUserDto.DeviceDto.Type.valueOf(device.type.name),
+                                        version = device.version,
+                                        fcmToken = token
+                                    )
+                                }
                             )
                         )
                         startActivity(Intent(this@AuthActivity, MessagingActivity::class.java))
@@ -158,17 +160,6 @@ class AuthActivity : ComponentActivity() {
                     0
                 )
             }
-        }
-    }
-
-    private fun getDeviceType(): RegisterUserDto.DeviceDto.Type {
-        val screenLayout = resources.configuration.screenLayout
-        val mask = Configuration.SCREENLAYOUT_SIZE_MASK
-        val isTablet = (screenLayout and mask) >= Configuration.SCREENLAYOUT_SIZE_LARGE
-        return if (isTablet) {
-            RegisterUserDto.DeviceDto.Type.Tablet
-        } else {
-            RegisterUserDto.DeviceDto.Type.Mobile
         }
     }
 }
