@@ -10,8 +10,6 @@ import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,7 +20,7 @@ class MessagingViewModel(
     private val otherUser: User,
     private val api: RemoteApiRepository,
     private val localStorageRepository: LocalStorageRepository
-) : ViewModel(CoroutineScope(Dispatchers.IO)) {
+) : ViewModel() {
 
     data class UiState(
         val messageText: String = "",

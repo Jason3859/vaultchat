@@ -76,10 +76,12 @@ class PushNotificationService : FirebaseMessagingService() {
 
             "status_update" -> {
                 val uid = message.data["uid"]!!
-                val status = message.data["status"]!!
+                val statusString = message.data["status"]!!
 
-                MessagingState.updateConnectionsStatus(uid, User.Status.valueOf(status))
-                Log.d("PushNotificationService", "onMessageReceived: updated status of users")
+                val status = User.Status.entries.find { it.name.equals(statusString, ignoreCase = true) }
+                    ?: User.Status.Online
+
+                MessagingState.updateConnectionsStatus(uid, status)
             }
         }
     }

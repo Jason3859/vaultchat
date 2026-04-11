@@ -25,13 +25,17 @@ object MessagingState {
         _currentDevice.update { device }
     }
 
+    fun updateConnections(list: List<User>) {
+        _connectionsStatus.update { list }
+    }
+
     fun updateConnectionsStatus(uid: String, status: User.Status) {
         _connectionsStatus.update { list ->
-            list.map {
-                if (it.uid == uid) {
-                    it.copy(status = status)
+            list.map { user ->
+                if (user.uid == uid) {
+                    user.copy(status = status)
                 } else {
-                    it
+                    user
                 }
             }
         }

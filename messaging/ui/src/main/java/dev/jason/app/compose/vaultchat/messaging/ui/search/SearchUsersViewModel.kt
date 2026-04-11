@@ -6,14 +6,12 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SearchUsersViewModel(private val apiRepository: RemoteApiRepository) : ViewModel(CoroutineScope(Dispatchers.IO)) {
+class SearchUsersViewModel(private val apiRepository: RemoteApiRepository) : ViewModel() {
 
     data class UiState(
         val expanded: Boolean = false,
