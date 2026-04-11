@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
@@ -27,7 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -37,7 +38,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.ui.main.MainHomeScreen
@@ -50,7 +50,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen() {
+fun HomeScreen(isOffline: Boolean) {
 
     val mainBackStack = rememberNavBackStack(Route.Home)
 
@@ -69,7 +69,7 @@ fun HomeScreen() {
             backStack = mainBackStack,
             entryProvider = entryProvider {
                 entry<Route.Home> {
-                    HomeScreenCore(mainBackStack)
+                    HomeScreenCore(mainBackStack, isOffline)
                 }
 
                 entry<Route.Messaging> {
@@ -86,6 +86,7 @@ fun HomeScreen() {
                             MessagingState.updateOtherUserId(null)
                             mainBackStack.removeLastOrNull()
                         },
+                        isOffline = isOffline
                     )
                 }
             }
@@ -94,7 +95,7 @@ fun HomeScreen() {
 }
 
 @Composable
-private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
+private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boolean) {
     val bottomBarBackStack = rememberNavBackStack(Route.Home.Main)
     val topAppBarTexts = mapOf(
         Route.Home.Main to "Home",
@@ -107,7 +108,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopBar(topAppBarTexts[bottomBarBackStack.last()]!!) },
+        topBar = { TopBar(topAppBarTexts[bottomBarBackStack.last()]!!, isOffline) },
         bottomBar = {
             BottomBar(
                 currentScreen = bottomBarBackStack.last() as Route,
@@ -186,9 +187,18 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(text: String) {
+fun TopBar(text: String, isOffline: Boolean) {
     TopAppBar(
         title = { Text(text) },
+        actions = {
+            if (isOffline) {
+                Icon(
+                    imageVector = Icons.Default.WifiOff,
+                    contentDescription = null,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     )
 }
@@ -241,13 +251,5 @@ fun BottomBar(
                 }
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun HomeScreenPreview() {
-    VaultChatTheme {
-        HomeScreen()
     }
 }

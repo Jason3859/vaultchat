@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -62,7 +63,8 @@ import java.time.LocalDateTime
 @Composable
 fun MessagingScreen(
     otherUser: User,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isOffline: Boolean
 ) {
     val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,7 +77,8 @@ fun MessagingScreen(
         sendMessage = viewModel::sendMessage,
         messages = viewModel.messages,
         pendingMessages = viewModel.pendingMessages,
-        failedMessages = viewModel.failedMessages
+        failedMessages = viewModel.failedMessages,
+        isOffline = isOffline
     )
 }
 
@@ -88,7 +91,8 @@ private fun MessagingScreen(
     sendMessage: () -> Unit,
     messages: List<Message>,
     pendingMessages: List<Message>,
-    failedMessages: List<Message>
+    failedMessages: List<Message>,
+    isOffline: Boolean
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -101,7 +105,7 @@ private fun MessagingScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopBar(otherUser, onBackClick)
+            TopBar(otherUser, onBackClick, isOffline)
         },
         bottomBar = {
             BottomBar(uiState, updateState, sendMessage)
@@ -157,7 +161,8 @@ private fun LocalDateTime.display() =
 @Composable
 private fun TopBar(
     otherUser: User,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isOffline: Boolean
 ) {
     val context = LocalContext.current
 
@@ -195,6 +200,15 @@ private fun TopBar(
         navigationIcon = {
             IconButton(onBackClick) {
                 Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+            }
+        },
+        actions = {
+            if (isOffline) {
+                Icon(
+                    imageVector = Icons.Default.WifiOff,
+                    contentDescription = null,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
@@ -268,7 +282,8 @@ private fun MessagingScreenPreview() {
             sendMessage = {},
             messages = messages,
             pendingMessages = messages.subList(0, 5),
-            failedMessages = messages.subList(10, 15)
+            failedMessages = messages.subList(10, 15),
+            isOffline = false
         )
     }
 }
