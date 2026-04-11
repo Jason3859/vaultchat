@@ -23,10 +23,9 @@ public class UserService {
     public void updateHeartbeat(String uid) throws UserNotFoundException {
         UserEntity entity = getUserEntityOrThrow(uid);
         entity.setLastHeartbeat(System.currentTimeMillis());
+        repository.save(entity);
         if (entity.status() == UserStatus.Offline) {
             updateUserStatusAndNotify(uid, UserStatus.Online);
-        } else {
-            repository.save(entity);
         }
     }
 
