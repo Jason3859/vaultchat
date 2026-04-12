@@ -34,7 +34,7 @@ public class UserService {
         long now = System.currentTimeMillis();
         repository.findAll().stream()
             .filter(user -> user.status() != UserStatus.Offline)
-            .filter(user -> (now - user.lastHeartbeat()) > 60000)
+            .filter(user -> (now - user.lastHeartbeat()) > 30000)
             .forEach(user -> {
                 try {
                     updateUserStatusAndNotify(user.toDomainUser().uid(), UserStatus.Offline);
