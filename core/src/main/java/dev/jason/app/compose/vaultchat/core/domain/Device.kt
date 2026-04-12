@@ -7,9 +7,14 @@ import android.os.Build
 data class Device(
     val name: String,
     val type: Type,
+    val os: Os,
     val version: String,
     val fcmToken: String,
 ) {
+    enum class Os {
+        Android // currently only android is supported
+    }
+
     enum class Type {
         Mobile, Tablet
     }
@@ -17,7 +22,8 @@ data class Device(
     companion object {
         fun getCurrentDevice(context: Context, token: String): Device {
             return Device(
-                "${Build.MANUFACTURER} ${Build.MODEL}",
+                name = "${Build.MANUFACTURER} ${Build.MODEL}",
+                os = Os.Android,
                 version = "${Build.VERSION.RELEASE}",
                 fcmToken = token,
                 type = getDeviceType(context)

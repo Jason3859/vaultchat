@@ -178,7 +178,10 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
                     ProfileScreen(
                         user = user,
                         innerPadding = innerPadding,
-                        onLogOutClick = {}
+                        devices = ProfileScreen.defaultDeviceList, // TODO: fetch from server
+                        blocklist = ProfileScreen.defaultUserList, // TODO: fetch from server
+                        onLogOutClick = {}, // TODO: logout user
+                        onUnblockClick = {} // TODO: unblock required user
                     )
                 }
             }

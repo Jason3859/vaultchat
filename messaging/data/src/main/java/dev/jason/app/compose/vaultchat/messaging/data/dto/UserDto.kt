@@ -12,7 +12,8 @@ data class UserDto(
     val devices: List<DeviceDto> = emptyList(), // empty list for connections
     val status: User.Status
 ) {
-    fun toDomain() = User(uid, displayName, profilePictureUrl, devices.map(DeviceDto::toDomain), status)
+    fun toDomain() =
+        User(uid, displayName, profilePictureUrl, devices.map(DeviceDto::toDomain), status)
 
     @Serializable
     data class DeviceDto(
@@ -22,9 +23,11 @@ data class UserDto(
         val version: String,
         val fcmToken: String,
     ) {
-        fun toDomain() = Device(name, type, version, fcmToken)
+        fun toDomain() = Device(name, type, Device.Os.valueOf(os), version, fcmToken)
+
         companion object {
-            fun fromDomain(device: Device) = DeviceDto(device.name, "Android", device.type, device.version, device.fcmToken)
+            fun fromDomain(device: Device) =
+                DeviceDto(device.name, "Android", device.type, device.version, device.fcmToken)
         }
     }
 }
