@@ -43,6 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 fun MainHomeScreen(
     viewModel: MainHomeViewModel = koinViewModel(),
     onUserClick: (User) -> Unit,
+    isOffline: Boolean,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val connections by viewModel.connections.collectAsStateWithLifecycle()
@@ -71,7 +72,7 @@ fun MainHomeScreen(
         } else {
             LazyColumn(modifier = modifier.padding(vertical = 8.dp)) {
                 items(connections) { user ->
-                    ConnectionsItem(user, onUserClick)
+                    ConnectionsItem(user, onUserClick, isOffline)
                 }
             }
         }
@@ -79,7 +80,7 @@ fun MainHomeScreen(
 }
 
 @Composable
-private fun ConnectionsItem(user: User, onUserClick: (User) -> Unit) {
+private fun ConnectionsItem(user: User, onUserClick: (User) -> Unit, isOffline: Boolean) {
     ListItem(
         headlineContent = {
             Row(
@@ -112,7 +113,10 @@ private fun ConnectionsItem(user: User, onUserClick: (User) -> Unit) {
 
                 Column {
                     Text(user.displayName)
-                    Text("Currently ${user.status}", fontSize = 12.sp)
+                    Text(
+                        text = if (isOffline) "You are offline" else "Currently ${user.status}",
+                        fontSize = 12.sp
+                    )
                 }
             }
         },
@@ -129,7 +133,8 @@ private fun ConnectionsItemPreview() {
     VaultChatTheme {
         ConnectionsItem(
             user = User("uid", "display name", "url", emptyList(), User.Status.Online),
-            onUserClick = {  }
+            onUserClick = {  },
+            isOffline = false
         )
     }
 }

@@ -16,6 +16,7 @@ import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -52,11 +53,13 @@ class MessagingActivity : ComponentActivity() {
 
         MessagingState.updateCurrentDevice(Device.getCurrentDevice(this, "not needed"))
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             Firebase.auth.currentUser?.let { firebaseUser ->
                 while (true) {
-                    remoteApi.heartbeat(firebaseUser.uid)
-                    delay(30.seconds)
+                    if (!isOffline.value) { // if device is online
+                        remoteApi.heartbeat(firebaseUser.uid)
+                    }
+                    delay(15.seconds)
                 }
             }
         }

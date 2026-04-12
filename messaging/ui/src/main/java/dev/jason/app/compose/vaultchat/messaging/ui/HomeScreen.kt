@@ -127,9 +127,6 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
             entryProvider = entryProvider {
                 entry<Route.Home.Main> {
                     MainHomeScreen(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
                         onUserClick = {
                             mainBackStack.add(
                                 Route.Messaging(
@@ -140,6 +137,10 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
                                 )
                             )
                         },
+                        isOffline = isOffline,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     )
                 }
 

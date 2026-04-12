@@ -193,7 +193,10 @@ private fun TopBar(
 
                 Column {
                     Text(otherUser.displayName)
-                    Text("Currently ${otherUser.status}", fontSize = 12.sp)
+                    Text(
+                        text = if (isOffline) "You are offline" else "Currently ${otherUser.status}",
+                        fontSize = 12.sp
+                    )
                 }
             }
         },
