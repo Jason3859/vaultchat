@@ -33,7 +33,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
         }
     }
 
-    override suspend fun getConnections(uid: String): ApiResult<List<User>> {
+    override suspend fun fetchConnections(uid: String): ApiResult<List<User>> {
         return try {
             api.getConnections(uid).run {
                 ApiResult(result, data?.map(UserDto::toDomain))
@@ -60,6 +60,48 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.updateToken(uid, token, UserDto.DeviceDto.fromDomain(device))
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "updateToken: exception", e)
+        }
+    }
+
+    override suspend fun fetchDevices(uid: String): ApiResult<List<Device>> {
+        return try {
+            api.fetchDevices(uid).let {
+                ApiResult(it.result, it.data?.map(UserDto.DeviceDto::toDomain))
+            }
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "getDevices: exception", e)
+            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            ApiResult(ApiResult.Result.InternalError)
+        }
+    }
+
+    override suspend fun block(uid: String, uidToBlock: String): ApiResult<Void> {
+        return try {
+            api.block(uid, uidToBlock)
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "block: exception", e)
+            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            ApiResult(ApiResult.Result.InternalError)
+        }
+    }
+
+    override suspend fun unblock(uid: String, uidToUnblock: String): ApiResult<Void> {
+        return try {
+            api.unblock(uid, uidToUnblock)
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "unblock: exception", e)
+            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            ApiResult(ApiResult.Result.InternalError)
+        }
+    }
+
+    override suspend fun fetchBlocklist(uid: String): ApiResult<List<User>> {
+        return try {
+            api.fetchBlocklist(uid).let { ApiResult(it.result, it.data?.map(UserDto::toDomain)) }
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "fetchBlocklist: exception", e)
+            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            ApiResult(ApiResult.Result.InternalError)
         }
     }
 }

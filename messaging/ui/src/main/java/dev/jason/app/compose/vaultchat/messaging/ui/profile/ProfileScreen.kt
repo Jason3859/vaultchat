@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
@@ -55,6 +56,7 @@ import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
+import org.koin.androidx.compose.koinViewModel
 
 data class ProfileScreenRowItem(
     val id: ProfileScreenRowItemId,
@@ -65,6 +67,25 @@ data class ProfileScreenRowItem(
 
 enum class ProfileScreenRowItemId {
     Devices, Blocklist, Logout
+}
+
+@Composable
+fun ProfileScreen(
+    user: User,
+    innerPadding: PaddingValues,
+    viewModel: ProfileScreenViewModel = koinViewModel()
+) {
+    val devices by viewModel.devices.collectAsStateWithLifecycle()
+    val blocklist by viewModel.blocklist.collectAsStateWithLifecycle()
+
+    ProfileScreen(
+        user = user,
+        devices = devices,
+        blocklist = blocklist,
+        onUnblockClick = viewModel::unblockUser,
+        onLogOutClick = viewModel::logout,
+        innerPadding = innerPadding
+    )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

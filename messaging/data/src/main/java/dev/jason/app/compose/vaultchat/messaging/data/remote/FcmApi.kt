@@ -26,4 +26,16 @@ interface FcmApi {
 
     @POST("/user/update-token")
     suspend fun updateToken(@Query("uid") uid: String, @Query("token") token: String, @Body deviceDto: UserDto.DeviceDto): ApiResult<Void>
+
+    @GET("/devices/my-devices")
+    suspend fun fetchDevices(@Query("uid") uid: String): ApiResult<List<UserDto.DeviceDto>>
+
+    @GET("/user/get-blocked-users")
+    suspend fun fetchBlocklist(@Query("uid") uid: String): ApiResult<List<UserDto>>
+
+    @POST("/user/block")
+    suspend fun block(@Query("uid") uid: String, @Query("uid_to_block") uidToBlock: String): ApiResult<Void>
+
+    @POST("/user/unblock")
+    suspend fun unblock(@Query("uid") uid: String, @Query("uid_to_unblock") uidToUnblock: String): ApiResult<Void>
 }
