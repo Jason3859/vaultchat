@@ -35,25 +35,30 @@ public class VcServerApplication {
 
         try {
             assert stream != null;
+            logger.info("`vaultchatapp.json` file found. Initializing Firebase app now");
+
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(stream))
                 .build();
 
             FirebaseApp.initializeApp(options);
         } catch (NullPointerException ignored) {
-            logger.info("vaultchatapp.json file not found. trying to fetch from env");
+            logger.info("`vaultchatapp.json` file not found. trying to fetch from env");
 
-            try {
-                String firebaseAdminSdkFileContent = System.getenv("FIREBASE_ADMIN_SDK_FILE_CONTENT");
+            String firebaseAdminSdkFileContent = System.getenv("FIREBASE_ADMIN_SDK_FILE_CONTENT");
 
-                FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(firebaseAdminSdkFileContent.getBytes())))
-                    .build();
-
-                FirebaseApp.initializeApp(options);
-            } catch (NullPointerException e) {
+            if (firebaseAdminSdkFileContent == null) {
                 throw new AdminSdkNotFoundException();
             }
+
+            logger.info("Found admin sdk in environment variables. Initializing Firebase app");
+            FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(firebaseAdminSdkFileContent.getBytes())))
+                .build();
+
+            FirebaseApp.initializeApp(options);
         }
+
+        logger.info("Initialized Firebase app");
     }
 }
