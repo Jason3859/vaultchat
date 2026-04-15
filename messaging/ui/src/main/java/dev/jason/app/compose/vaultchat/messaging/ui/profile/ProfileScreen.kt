@@ -154,13 +154,17 @@ fun ProfileScreen(
                                 id = ProfileScreenRowItemId.Devices,
                                 label = "Your Devices",
                                 icon = Icons.Default.Devices,
-                                action = { /* Do nothing */ }
+                                action = {
+                                    currentProfileScreenRowItemId = ProfileScreenRowItemId.Devices
+                                }
                             ),
                             ProfileScreenRowItem(
                                 id = ProfileScreenRowItemId.Blocklist,
                                 label = "Blocklist",
                                 icon = Icons.Default.Block,
-                                action = { onUnblockClick(user) }
+                                action = {
+                                    currentProfileScreenRowItemId = ProfileScreenRowItemId.Blocklist
+                                }
                             ),
                             ProfileScreenRowItem(
                                 id = ProfileScreenRowItemId.Logout,
@@ -171,9 +175,6 @@ fun ProfileScreen(
                         ).forEach { item ->
                             OutlinedButton(
                                 onClick = {
-                                    if (item.id != ProfileScreenRowItemId.Logout) {
-                                        currentProfileScreenRowItemId = item.id
-                                    }
                                     item.action()
                                 },
                                 shape = RoundedCornerShape(15.dp),
@@ -204,9 +205,25 @@ fun ProfileScreen(
                     }
 
                     ProfileScreenRowItemId.Blocklist -> {
-                        items(blocklist) { blocklistUser ->
-                            BlocklistItem(blocklistUser)
+                        if (blocklist.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillParentMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "No blocked users",
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
+                        } else {
+                            items(blocklist) { blocklistUser ->
+                                BlocklistItem(blocklistUser, onUnblockClick)
+                            }
                         }
+
                     }
 
                     else -> {}
@@ -292,7 +309,7 @@ private fun DeviceItem(device: Device) {
 }
 
 @Composable
-fun BlocklistItem(user: User) {
+fun BlocklistItem(user: User, onUnblockClick: (User) -> Unit) {
     ProfileScreenItemContainer {
         SubcomposeAsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -324,7 +341,7 @@ fun BlocklistItem(user: User) {
             contentAlignment = Alignment.Center
         ) {
             OutlinedButton(
-                onClick = {},
+                onClick = { onUnblockClick(user) },
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer
                 ),
@@ -405,7 +422,8 @@ private fun BlocklistItemPreview() {
                 profilePictureUrl = "",
                 devices = emptyList(),
                 status = User.Status.Online
-            )
+            ),
+            onUnblockClick = {}
         )
     }
 }

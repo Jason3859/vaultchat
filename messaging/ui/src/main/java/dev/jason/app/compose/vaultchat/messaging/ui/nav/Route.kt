@@ -27,4 +27,11 @@ sealed interface Route : NavKey {
         val profilePictureUrl: String,
         val status: User.Status
     ) : Route
+
+    @Serializable
+    data class UserInfo(
+        val uid: String,
+        val displayName: String,
+        val profilePictureUrl: String
+    ) : Route
 }

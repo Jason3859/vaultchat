@@ -46,6 +46,7 @@ import dev.jason.app.compose.vaultchat.messaging.ui.nav.Route
 import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
+import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -86,7 +87,33 @@ fun HomeScreen(isOffline: Boolean) {
                             MessagingState.updateOtherUserId(null)
                             mainBackStack.removeLastOrNull()
                         },
-                        isOffline = isOffline
+                        isOffline = isOffline,
+                        onUserInfoClick = {
+                            mainBackStack.add(
+                                Route.UserInfo(
+                                    it.uid,
+                                    it.displayName,
+                                    it.profilePictureUrl
+                                )
+                            )
+                        }
+                    )
+                }
+
+                entry<Route.UserInfo> {
+                    UserInfoScreen(
+                        user = User(
+                            it.uid,
+                            it.displayName,
+                            it.profilePictureUrl,
+                            emptyList(),
+                            User.Status.Online
+                        ),
+                        onBackClick = mainBackStack::removeLastOrNull,
+                        navigateBackToHomeScreen = {
+                            mainBackStack.removeLastOrNull()
+                            mainBackStack.removeLastOrNull()
+                        }
                     )
                 }
             }

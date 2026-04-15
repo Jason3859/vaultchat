@@ -6,7 +6,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,11 +57,17 @@ class ProfileScreenViewModel(private val repository: RemoteApiRepository) : View
         viewModelScope.launch {
             repository.unblock(currentUser.uid, user.uid)
                 .onSuccess { fetchBlocklist() }
-                .onError { SnackbarController.showSnackbar(it.toString()) }
         }
     }
 
     fun logout() {
         // TODO: implement this
+    }
+
+    fun blockUser(user: User, navigateBack: () -> Unit) {
+        viewModelScope.launch {
+            repository.block(currentUser.uid, user.uid)
+                .onSuccess { navigateBack() }
+        }
     }
 }

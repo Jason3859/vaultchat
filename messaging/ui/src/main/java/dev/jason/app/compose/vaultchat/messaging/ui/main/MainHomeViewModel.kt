@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class MainHomeViewModel(private val apiRepository: RemoteApiRepository) : ViewModel() {
 
-    val connections = MessagingState.connectionsStatus
+    val connections = MessagingState.connections
         .onStart {
             updateConnections()
         }

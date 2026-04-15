@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.messaging
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,6 +65,7 @@ import java.time.LocalDateTime
 fun MessagingScreen(
     otherUser: User,
     onBackClick: () -> Unit,
+    onUserInfoClick: () -> Unit,
     isOffline: Boolean
 ) {
     val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
@@ -78,7 +80,8 @@ fun MessagingScreen(
         messages = viewModel.messages,
         pendingMessages = viewModel.pendingMessages,
         failedMessages = viewModel.failedMessages,
-        isOffline = isOffline
+        isOffline = isOffline,
+        onUserInfoClick = onUserInfoClick
     )
 }
 
@@ -89,6 +92,7 @@ private fun MessagingScreen(
     uiState: MessagingViewModel.UiState,
     updateState: (MessagingViewModel.UiState) -> Unit,
     sendMessage: () -> Unit,
+    onUserInfoClick: () -> Unit,
     messages: List<Message>,
     pendingMessages: List<Message>,
     failedMessages: List<Message>,
@@ -105,7 +109,7 @@ private fun MessagingScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopBar(otherUser, onBackClick, isOffline)
+            TopBar(otherUser, onBackClick, onUserInfoClick, isOffline)
         },
         bottomBar = {
             BottomBar(uiState, updateState, sendMessage)
@@ -162,6 +166,7 @@ private fun LocalDateTime.display() =
 private fun TopBar(
     otherUser: User,
     onBackClick: () -> Unit,
+    onUserInfoClick: () -> Unit,
     isOffline: Boolean
 ) {
     val context = LocalContext.current
@@ -169,8 +174,10 @@ private fun TopBar(
     TopAppBar(
         title = {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onUserInfoClick() }
             ) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(context)
@@ -286,7 +293,8 @@ private fun MessagingScreenPreview() {
             messages = messages,
             pendingMessages = messages.subList(0, 5),
             failedMessages = messages.subList(10, 15),
-            isOffline = false
+            isOffline = false,
+            onUserInfoClick = {}
         )
     }
 }

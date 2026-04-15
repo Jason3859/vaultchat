@@ -7,6 +7,7 @@ import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageR
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import dev.jason.app.compose.vaultchat.messaging.ui.main.MainHomeViewModel
 import dev.jason.app.compose.vaultchat.messaging.ui.messaging.MessagingViewModel
+import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreenViewModel
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -21,6 +22,7 @@ val MessagingKoinModule = module {
     viewModelOf(::SearchUsersViewModel)
     viewModelOf(::MessagingViewModel)
     viewModelOf(::MainHomeViewModel)
+    viewModelOf(::ProfileScreenViewModel)
 
     single<FcmApi> { get<Retrofit>().create() }
     single<RemoteApi> { get<Retrofit>().create() }

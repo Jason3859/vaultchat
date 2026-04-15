@@ -18,8 +18,8 @@ data class UserDto(
     @Serializable
     data class DeviceDto(
         val name: String,
-        val os: String,
         val type: Device.Type,
+        val os: String,
         val version: String,
         val fcmToken: String,
     ) {
@@ -27,7 +27,7 @@ data class UserDto(
 
         companion object {
             fun fromDomain(device: Device) =
-                DeviceDto(device.name, "Android", device.type, device.version, device.fcmToken)
+                DeviceDto(device.name, device.type, "Android", device.version, device.fcmToken)
         }
     }
 }

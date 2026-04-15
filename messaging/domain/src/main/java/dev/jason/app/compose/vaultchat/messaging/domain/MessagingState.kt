@@ -12,7 +12,7 @@ object MessagingState {
     val otherUserUid = _otherUserUid.asStateFlow()
 
     private val _connectionsStatus = MutableStateFlow<List<User>>(emptyList())
-    val connectionsStatus = _connectionsStatus.asStateFlow()
+    val connections = _connectionsStatus.asStateFlow()
 
     private val _currentDevice = MutableStateFlow<Device?>(null)
     val currentDevice = _currentDevice.asStateFlow()
