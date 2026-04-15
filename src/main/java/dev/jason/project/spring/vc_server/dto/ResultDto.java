@@ -12,21 +12,20 @@ public record ResultDto(Result result, Object data) {
         AlreadyBlocked, BlockedByUser, DeviceNotFound,
         DeviceWithThisFcmTokenAlreadyExists, InternalServerError,
         MessageTextBlank, NoBlockedUsers, NoUsersFound,
-        SelfBlock, SelfUnblock, Success, UserAlreadyExists,
-        UserNotBlocked, UserNotFound
+        SelfBlock, SelfUnblock, Success, UserAlreadyExists, UserNotBlocked, UserNotFound
     }
 
     public static ResultDto fromVcException(VcException exception) {
         return switch (exception) {
-            case UserNotFoundException ignored -> new ResultDto(Result.UserNotFound);
-            case UserNotBlockedException ignored -> new ResultDto(Result.UserNotBlocked);
-            case NoUsersBlockedException ignored -> new ResultDto(Result.UserNotBlocked);
-            case DeviceNotFoundException ignored -> new ResultDto(Result.DeviceNotFound);
+            case AdminSdkNotFoundException ignored -> throw new RuntimeException("this method should not be called in case of AdminSdkNotFoundException");
             case DeviceAlreadyExistsException ignored -> new ResultDto(Result.DeviceWithThisFcmTokenAlreadyExists);
+            case DeviceNotFoundException ignored -> new ResultDto(Result.DeviceNotFound);
+            case NoUsersBlockedException ignored -> new ResultDto(Result.UserNotBlocked);
+            case UserAlreadyBlockedException ignored -> new ResultDto(Result.AlreadyBlocked);
             case UserAlreadyExistsException ignored -> new ResultDto(Result.UserAlreadyExists);
-            case AdminSdkNotFoundException ignored ->
-                throw new RuntimeException("this method should not be called in case of AdminSdkNotFoundException");
-            default -> throw new IllegalStateException("Unexpected value: " + exception);
+            case UserNotBlockedException ignored -> new ResultDto(Result.UserNotBlocked);
+            case UserNotFoundException ignored -> new ResultDto(Result.UserNotFound);
+            default -> throw new IllegalStateException();
         };
     }
 }

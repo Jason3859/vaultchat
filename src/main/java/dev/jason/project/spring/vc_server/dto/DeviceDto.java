@@ -9,4 +9,8 @@ public record DeviceDto(String name, Device.Type type, Device.OS os, String vers
     public Device toDomainModel(LocalDateTime lastTimeUsed) {
         return new Device(name, type, os, version, fcmToken, lastTimeUsed);
     }
+    
+    public static DeviceDto fromDomain(Device device) {
+    	return new DeviceDto(device.name(), device.type(), device.os(), device.version(), device.fcmToken());
+    }
 }

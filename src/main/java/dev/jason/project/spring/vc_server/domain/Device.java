@@ -31,6 +31,18 @@ public final class Device {
     public String name() {
         return name;
     }
+    
+    public Type type() {
+    	return type;
+    }
+    
+    public OS os() {
+    	return os;
+    }
+    
+    public String version() {
+    	return version;
+    }
 
     public String fcmToken() {
         return fcmToken;

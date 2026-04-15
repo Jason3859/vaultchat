@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 @Document(collection = "users")
 public final class UserEntity {
     @Id
@@ -41,6 +43,7 @@ public final class UserEntity {
         this.lastHeartbeat = lastHeartbeat;
     }
     
+    @Nonnull
     public static UserEntity fromDomainUser(User user) {
     	return new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.devices(), user.connections(), user.blocklist(), user.status(), user.lastHeartbeat());
     }
@@ -49,6 +52,9 @@ public final class UserEntity {
         return new User(uid, displayName, profilePictureUrl, devices, connections, blocklist, status, lastHeartbeat);
     }
 
+    public String uid() {
+        return uid;
+    }
 
     public List<Device> devices() {
         return devices;
@@ -83,14 +89,7 @@ public final class UserEntity {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (UserEntity) obj;
-        return Objects.equals(this.uid, that.uid) &&
-            Objects.equals(this.displayName, that.displayName) &&
-            Objects.equals(this.profilePictureUrl, that.profilePictureUrl) &&
-            Objects.equals(this.devices, that.devices) &&
-            Objects.equals(this.connections, that.connections) &&
-            Objects.equals(this.blocklist, that.blocklist) &&
-            Objects.equals(this.status, that.status) &&
-            this.lastHeartbeat == that.lastHeartbeat;
+        return Objects.equals(this.uid, that.uid);
     }
 
     @Override

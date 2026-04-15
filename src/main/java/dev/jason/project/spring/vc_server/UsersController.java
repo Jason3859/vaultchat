@@ -52,10 +52,8 @@ public class UsersController {
                 return new ResultDto(ResultDto.Result.SelfBlock);
             }
 
-            if (user.blocklist() != null) {
-                if (user.blocklist().contains(userToBlock.uid())) {
-                    return new ResultDto(ResultDto.Result.AlreadyBlocked);
-                }
+            if (user.blocklist().contains(userToBlock.uid())) {
+            	return new ResultDto(ResultDto.Result.AlreadyBlocked);
             }
 
             userService.block(uid, uidToBlock);

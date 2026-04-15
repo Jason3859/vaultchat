@@ -16,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
+
 @SpringBootApplication
 @EnableMongoRepositories
 @EnableScheduling
@@ -23,7 +25,7 @@ public class VcServerApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(VcServerApplication.class);
 
-    public static void main(String[] args) throws IOException, VcException {
+    public static void main(@Nonnull String[] args) throws IOException, VcException {
         SpringApplication.run(VcServerApplication.class, args);
         initFirebase();
     }

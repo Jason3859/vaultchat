@@ -48,7 +48,8 @@ public class SendControllerTests {
         repository.deleteById(TEST_USER_2);
     }
 
-    private void registerUser(String uid) throws Exception {
+    @SuppressWarnings("null")
+	private void registerUser(String uid) throws Exception {
         RegisterUserDto dto = new RegisterUserDto(uid);
         mockMvc.perform(post("/user/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -56,7 +57,8 @@ public class SendControllerTests {
             .andExpect(status().isOk());
     }
 
-    @Test
+    @SuppressWarnings("null")
+	@Test
     void send_Success() throws Exception {
         FirebaseMessaging firebaseMessaging = mock(FirebaseMessaging.class);
         try (MockedStatic<FirebaseMessaging> mocked = mockStatic(FirebaseMessaging.class)) {
@@ -71,7 +73,8 @@ public class SendControllerTests {
         }
     }
 
-    @Test
+    @SuppressWarnings("null")
+	@Test
     void send_MessageTextBlank() throws Exception {
         Message message = new Message(TEST_USER_1, TEST_USER_2, " ", "now");
         mockMvc.perform(post("/send")
@@ -81,7 +84,8 @@ public class SendControllerTests {
             .andExpect(content().json(objectMapper.writeValueAsString(new ResultDto(ResultDto.Result.MessageTextBlank))));
     }
 
-    @Test
+    @SuppressWarnings("null")
+	@Test
     void send_UserNotFound() throws Exception {
         Message message = new Message(TEST_USER_1, "unknown", "Hello", "now");
         mockMvc.perform(post("/send")
