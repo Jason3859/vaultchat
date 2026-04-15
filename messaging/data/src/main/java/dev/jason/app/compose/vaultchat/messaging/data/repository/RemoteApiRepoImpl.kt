@@ -16,7 +16,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
         return try {
             api.sendMessage(body.toDto())
         } catch (e: Exception) {
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             Log.e("RemoteApiImpl", "sendMessage: exception", e)
             ApiResult(ApiResult.Result.InternalError)
         }
@@ -27,7 +27,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             val response = api.searchUsers(name, from)
             ApiResult(response.result, response.data?.map(UserDto::toDomain))
         } catch (e: Exception) {
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             Log.e("RemoteApiImpl", "searchUsers: exception", e)
             ApiResult(ApiResult.Result.InternalError)
         }
@@ -39,7 +39,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
                 ApiResult(result, data?.map(UserDto::toDomain))
             }
         } catch (e: Exception) {
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             Log.e("RemoteApiImpl", "getConnections: exception", e)
             ApiResult(ApiResult.Result.InternalError)
         }
@@ -50,7 +50,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.updateStatus(uid, status)
         } catch (e: Exception) {
             Log.e("RemoteApiImpl", "updateStatus: exception", e)
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
     }
@@ -70,7 +70,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             }
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "getDevices: exception", e)
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
     }
@@ -80,7 +80,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.block(uid, uidToBlock)
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "block: exception", e)
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
     }
@@ -90,7 +90,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.unblock(uid, uidToUnblock)
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "unblock: exception", e)
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
     }
@@ -100,7 +100,7 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.fetchBlocklist(uid).let { ApiResult(it.result, it.data?.map(UserDto::toDomain)) }
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "fetchBlocklist: exception", e)
-            e.localizedMessage?.let(SnackbarController::showSnackbar)
+            SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
     }
