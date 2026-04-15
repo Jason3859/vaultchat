@@ -8,7 +8,7 @@ import dev.jason.project.spring.vc_server.domain.Message;
 import dev.jason.project.spring.vc_server.domain.User;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
-import dev.jason.project.spring.vc_server.users.UserService;
+import dev.jason.project.spring.vc_server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

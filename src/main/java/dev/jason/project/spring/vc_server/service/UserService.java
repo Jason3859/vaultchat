@@ -1,8 +1,10 @@
-package dev.jason.project.spring.vc_server.users;
+package dev.jason.project.spring.vc_server.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.jason.project.spring.vc_server.data.db.user.UserEntity;
+import dev.jason.project.spring.vc_server.data.db.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

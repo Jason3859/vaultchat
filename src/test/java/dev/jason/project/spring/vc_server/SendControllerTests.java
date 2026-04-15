@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import dev.jason.project.spring.vc_server.domain.Message;
 import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
-import dev.jason.project.spring.vc_server.users.UserRepository;
+import dev.jason.project.spring.vc_server.data.db.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

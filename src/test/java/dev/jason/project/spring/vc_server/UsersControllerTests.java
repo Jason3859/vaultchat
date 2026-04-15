@@ -26,7 +26,7 @@ import dev.jason.project.spring.vc_server.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.dto.UserDto;
-import dev.jason.project.spring.vc_server.users.UserRepository;
+import dev.jason.project.spring.vc_server.data.db.user.UserRepository;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest

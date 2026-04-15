@@ -16,7 +16,7 @@ import dev.jason.project.spring.vc_server.domain.exception.VcException;
 import dev.jason.project.spring.vc_server.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto.Result;
-import dev.jason.project.spring.vc_server.users.UserService;
+import dev.jason.project.spring.vc_server.service.UserService;
 
 @RestController
 @RequestMapping("/devices")

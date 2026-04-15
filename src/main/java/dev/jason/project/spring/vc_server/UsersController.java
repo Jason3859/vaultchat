@@ -23,7 +23,7 @@ import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto;
 import dev.jason.project.spring.vc_server.dto.ResultDto.Result;
 import dev.jason.project.spring.vc_server.dto.UserDto;
-import dev.jason.project.spring.vc_server.users.UserService;
+import dev.jason.project.spring.vc_server.service.UserService;
 
 @RestController
 @RequestMapping("/user")
