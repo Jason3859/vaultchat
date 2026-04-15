@@ -1,28 +1,20 @@
 package dev.jason.project.spring.vc_server.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import dev.jason.project.spring.vc_server.data.db.user.UserEntity;
-import dev.jason.project.spring.vc_server.data.db.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-
+import dev.jason.project.spring.vc_server.data.db.user.UserEntity;
+import dev.jason.project.spring.vc_server.data.db.user.UserRepository;
 import dev.jason.project.spring.vc_server.domain.Device;
 import dev.jason.project.spring.vc_server.domain.Logger;
 import dev.jason.project.spring.vc_server.domain.User;
 import dev.jason.project.spring.vc_server.domain.UserStatus;
-import dev.jason.project.spring.vc_server.domain.exception.DeviceAlreadyExistsException;
-import dev.jason.project.spring.vc_server.domain.exception.DeviceNotFoundException;
-import dev.jason.project.spring.vc_server.domain.exception.NoUsersBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
+import dev.jason.project.spring.vc_server.domain.exception.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -43,11 +35,11 @@ public class UserService {
     public void checkStaleHeartbeats() {
         long now = System.currentTimeMillis();
         repository.findAll().stream()
-            .filter(user -> user.status() != UserStatus.Offline)
-            .filter(user -> (now - user.lastHeartbeat()) > 30000)
+            .filter(user -> user.status() != UserStatus.Offline) // takes online users
+            .filter(user -> (now - user.lastHeartbeat()) >= 30000) // users of last heart beat less than 30 seconds
             .forEach(user -> {
                 try {
-                    updateUserStatusAndNotify(user.toDomainUser().uid(), UserStatus.Offline);
+                	updateUserStatusAndNotify(user.uid(), UserStatus.Offline);
                 } catch (UserNotFoundException ignored) {
                 }
             });
@@ -67,48 +59,56 @@ public class UserService {
         }
     }
 
+    @SuppressWarnings("null")
     public void addConnection(User user, User otherUser) throws UserNotFoundException {
-        UserEntity entity = getUserEntityOrThrow(user.uid());
-        getUserEntityOrThrow(otherUser.uid()); // to check if other user exists
+        UserEntity entity1 = getUserEntityOrThrow(user.uid());
+        UserEntity entity2 =  getUserEntityOrThrow(otherUser.uid());
 
-        if (entity.connections().contains(otherUser.uid())) {
+        if (entity1.connections().contains(otherUser.uid())) {
             return;
         }
 
-        entity.connections().add(otherUser.uid());
+        entity1.connections().add(otherUser.uid());
+        entity2.connections().add(user.uid());
 
-        repository.save(entity);
+        repository.saveAll(List.of(entity1, entity2));
     }
 
-    public void block(String uid, String dmUid) throws UserNotFoundException, UserAlreadyBlockedException {
-        UserEntity entity = getUserEntityOrThrow(uid);
-        getUserEntityOrThrow(dmUid); // to check of other user exists
+    @SuppressWarnings("null")
+	public void block(String uid1, String uid2) throws UserNotFoundException, UserAlreadyBlockedException {
+        UserEntity entity1 = getUserEntityOrThrow(uid1);
+        UserEntity entity2 = getUserEntityOrThrow(uid2);
 
-        if (entity.blocklist().contains(dmUid)) {
+        if (entity1.blocklist().contains(uid2)) {
             throw new UserAlreadyBlockedException();
         }
 
-        entity.blocklist().add(dmUid);
-        entity.connections().remove(dmUid);
-        repository.save(entity);
+        entity1.blocklist().add(uid2);
+        entity1.connections().remove(uid2);
+
+        entity2.blocklist().add(uid1);
+        entity2.connections().remove(uid1);
+
+        repository.saveAll(List.of(entity1, entity2));
     }
 
-    public void unblock(String uid, String dmUid) throws UserNotFoundException, UserNotBlockedException, NoUsersBlockedException {
-        UserEntity entity1 = getUserEntityOrThrow(uid);
-        UserEntity entity2 = getUserEntityOrThrow(dmUid);
+    @SuppressWarnings("null")
+	public void unblock(String uid1, String uid2) throws UserNotFoundException, UserNotBlockedException, NoUsersBlockedException {
+        UserEntity entity1 = getUserEntityOrThrow(uid1);
+        UserEntity entity2 = getUserEntityOrThrow(uid2);
 
         if (entity1.blocklist().isEmpty()) {
             throw new NoUsersBlockedException();
         }
 
-        if (entity1.blocklist().contains(dmUid)) {
-            entity1.blocklist().remove(dmUid);
-            entity2.blocklist().remove(uid);
+        if (entity1.blocklist().contains(uid2)) {
+            entity1.blocklist().remove(uid2);
+            entity2.blocklist().remove(uid1);
 
             entity1.connections().add(entity2.uid());
             entity2.connections().add(entity1.uid());
 
-            repository.saveAll(new ArrayList<>(List.of(entity1, entity2)));
+            repository.saveAll(List.of(entity1, entity2));
         } else throw new UserNotBlockedException();
     }
 

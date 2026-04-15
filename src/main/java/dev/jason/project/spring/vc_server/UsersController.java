@@ -57,7 +57,6 @@ public class UsersController {
             }
 
             userService.block(uid, uidToBlock);
-            userService.block(uidToBlock, uid);
             return new ResultDto(ResultDto.Result.Success);
         } catch (VcException e) {
             return ResultDto.fromVcException(e);
