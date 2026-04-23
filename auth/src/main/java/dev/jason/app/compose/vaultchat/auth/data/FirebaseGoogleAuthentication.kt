@@ -43,7 +43,7 @@ object FirebaseGoogleAuthentication {
         } catch (e: GetCredentialException) {
             Log.e("FirebaseGoogleAuth", "launchCredentialManagerBottomSheet: exception", e)
             if (e is NoCredentialException) {
-                SnackbarController.sendEvent("No Internet")
+                SnackbarController.sendEvent("No Internet or no google account exists on device")
                 return null
             }
             SnackbarController.sendEvent(e.message!!)

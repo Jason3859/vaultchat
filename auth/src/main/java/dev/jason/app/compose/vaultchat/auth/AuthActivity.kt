@@ -124,6 +124,7 @@ class AuthActivity : ComponentActivity() {
                                     RegisterUserDto.DeviceDto(
                                         name = device.name,
                                         type = RegisterUserDto.DeviceDto.Type.valueOf(device.type.name),
+                                        os = "Android",
                                         version = device.version,
                                         fcmToken = token
                                     )
