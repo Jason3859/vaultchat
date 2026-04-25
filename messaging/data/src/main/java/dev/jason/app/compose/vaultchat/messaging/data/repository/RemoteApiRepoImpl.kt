@@ -12,6 +12,7 @@ import dev.jason.app.compose.vaultchat.messaging.domain.model.ApiResult
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 
 class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
+
     override suspend fun sendMessage(body: Message): ApiResult<Void> {
         return try {
             api.sendMessage(body.toDto())
@@ -75,6 +76,16 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
         }
     }
 
+    override suspend fun fetchBlocklist(uid: String): ApiResult<List<User>> {
+        return try {
+            api.fetchBlocklist(uid).let { ApiResult(it.result, it.data?.map(UserDto::toDomain)) }
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "fetchBlocklist: exception", e)
+            SnackbarController.showSnackbar("An Internal error occurred")
+            ApiResult(ApiResult.Result.InternalError)
+        }
+    }
+
     override suspend fun block(uid: String, uidToBlock: String): ApiResult<Void> {
         return try {
             api.block(uid, uidToBlock)
@@ -90,16 +101,6 @@ class RemoteApiRepoImpl(private val api: FcmApi) : RemoteApiRepository {
             api.unblock(uid, uidToUnblock)
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "unblock: exception", e)
-            SnackbarController.showSnackbar("An Internal error occurred")
-            ApiResult(ApiResult.Result.InternalError)
-        }
-    }
-
-    override suspend fun fetchBlocklist(uid: String): ApiResult<List<User>> {
-        return try {
-            api.fetchBlocklist(uid).let { ApiResult(it.result, it.data?.map(UserDto::toDomain)) }
-        } catch (e: Exception) {
-            Log.e("RemoteApiRepoImpl", "fetchBlocklist: exception", e)
             SnackbarController.showSnackbar("An Internal error occurred")
             ApiResult(ApiResult.Result.InternalError)
         }
