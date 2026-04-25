@@ -37,6 +37,7 @@ import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.SnackbarController
 import dev.jason.app.compose.vaultchat.core.domain.Device
+import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,43 +66,45 @@ class AuthActivity : ComponentActivity() {
         }
 
         setContent {
-            val snackbarHostState = SnackbarHostState()
-            val currentScreen by viewModel.currentScreen.collectAsState()
+            VaultChatTheme {
+                val snackbarHostState = SnackbarHostState()
+                val currentScreen by viewModel.currentScreen.collectAsState()
 
-            LaunchedEffect(true) {
-                SnackbarController.events.collect { event ->
-                    event?.let {
-                        snackbarHostState.showSnackbar(it)
-                    }
-                }
-            }
-
-            when (currentScreen) {
-                AuthViewModel.Screen.Auth -> {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        snackbarHost = { SnackbarHost(snackbarHostState) }
-                    ) { innerPadding ->
-                        ExampleSignInScreen(
-                            onSignInClick = { signInWithGoogle() },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
-                        )
+                LaunchedEffect(true) {
+                    SnackbarController.events.collect { event ->
+                        event?.let {
+                            snackbarHostState.showSnackbar(it)
+                        }
                     }
                 }
 
-                AuthViewModel.Screen.Loading -> {
-                    Surface(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Box(
+                when (currentScreen) {
+                    AuthViewModel.Screen.Auth -> {
+                        Scaffold(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator(
-                                modifier = Modifier.size(100.dp)
+                            snackbarHost = { SnackbarHost(snackbarHostState) }
+                        ) { innerPadding ->
+                            ExampleSignInScreen(
+                                onSignInClick = { signInWithGoogle() },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding)
                             )
+                        }
+                    }
+
+                    AuthViewModel.Screen.Loading -> {
+                        Surface(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                LoadingIndicator(
+                                    modifier = Modifier.size(100.dp)
+                                )
+                            }
                         }
                     }
                 }

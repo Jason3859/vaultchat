@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Device
+import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +67,9 @@ class MessagingActivity : ComponentActivity() {
 
         setContent {
             val isOfflineState by isOffline.collectAsState()
-            HomeScreen(isOfflineState)
+            VaultChatTheme {
+                HomeScreen(isOfflineState)
+            }
         }
     }
 
