@@ -331,7 +331,9 @@ fun BlocklistItem(user: User, onUnblockClick: (User) -> Unit) {
             loading = {
                 Image(Icons.Default.AccountCircle, null)
             },
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
         )
 
         Text(user.displayName, fontSize = 20.sp)
