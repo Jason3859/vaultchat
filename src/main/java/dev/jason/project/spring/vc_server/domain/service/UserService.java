@@ -36,10 +36,14 @@ public class UserService {
             userRepository.save(UserEntity.fromDomainUser(user));
         } else {
             Device device = user.devices().getFirst();
-            if (!entity.devices().contains(device)) {
+            boolean doesDeviceExist = entity.devices().contains(device);
+            
+			if (!doesDeviceExist) {
                 entity.devices().add(device);
                 userRepository.save(entity);
-            } else throw new DeviceAlreadyExistsException();
+            } else {
+            	throw new DeviceAlreadyExistsException();
+            }
         }
     }
 

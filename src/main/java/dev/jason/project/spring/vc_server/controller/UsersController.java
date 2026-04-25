@@ -44,11 +44,20 @@ public class UsersController {
 
     @GetMapping("/search")
     public ResultDto searchUsers(@RequestParam String name, @RequestParam String from) {
+        User user;
         List<UserDto> requiredUsers = new ArrayList<>(List.of());
 
+        try {
+            user = userService.getUserOrThrow(from);
+        } catch (UserNotFoundException e) {
+            return new ResultDto(Result.UserNotFound);
+        }
+
         userService.getAllUsersByDisplayName(name).stream()
+            .filter(u -> !u.uid().equals(from))
+            .filter(u -> !user.blocklist().contains(u.uid()))
+            .filter(u -> !user.connections().contains(u.uid()))
             .map(UserDto::fromDomainUser)
-            .filter(user -> !user.uid().equals(from))
             .forEach(requiredUsers::add);
 
         return requiredUsers.isEmpty() ? new ResultDto(Result.NoUsersFound)
