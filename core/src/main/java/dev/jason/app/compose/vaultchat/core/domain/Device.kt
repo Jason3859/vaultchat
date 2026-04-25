@@ -9,7 +9,7 @@ data class Device(
     val type: Type,
     val os: Os,
     val version: String,
-    val fcmToken: String,
+    val token: String,
 ) {
     enum class Os {
         Android // currently only android is supported
@@ -25,7 +25,7 @@ data class Device(
                 name = "${Build.MANUFACTURER} ${Build.MODEL}",
                 os = Os.Android,
                 version = "${Build.VERSION.RELEASE}",
-                fcmToken = token,
+                token = token,
                 type = getDeviceType(context)
             )
         }

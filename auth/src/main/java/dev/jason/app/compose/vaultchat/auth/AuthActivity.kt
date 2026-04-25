@@ -124,9 +124,9 @@ class AuthActivity : ComponentActivity() {
                                     RegisterUserDto.DeviceDto(
                                         name = device.name,
                                         type = RegisterUserDto.DeviceDto.Type.valueOf(device.type.name),
-                                        os = "Android",
+                                        os = device.os.toString(),
                                         version = device.version,
-                                        fcmToken = token
+                                        token = token
                                     )
                                 }
                             )
@@ -137,8 +137,8 @@ class AuthActivity : ComponentActivity() {
                 }
                 ?.addOnFailureListener { exception ->
                     Log.e(
-                        "SignInScreen",
-                        "signInWithGoogle: exception while signing in with google",
+                        "AuthActivity",
+                        "signInWithGoogle: exception while signing in to google",
                         exception
                     )
                     SnackbarController.sendEvent(exception.localizedMessage!!)

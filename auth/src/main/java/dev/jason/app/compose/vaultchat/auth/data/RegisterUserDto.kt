@@ -12,10 +12,10 @@ data class RegisterUserDto(
     @Serializable
     data class DeviceDto(
         val name: String,
-        val os: String = "Android",
         val type: Type,
+        val os: String,
         val version: String,
-        val fcmToken: String,
+        val token: String,
     ) {
         enum class Type {
             Mobile, Tablet

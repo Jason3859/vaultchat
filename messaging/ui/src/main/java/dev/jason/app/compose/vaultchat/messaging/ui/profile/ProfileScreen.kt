@@ -361,7 +361,7 @@ object ProfileScreen {
             type = Device.Type.Mobile,
             os = Device.Os.Android,
             version = "13",
-            fcmToken = "not required"
+            token = "not required"
         )
     }
 

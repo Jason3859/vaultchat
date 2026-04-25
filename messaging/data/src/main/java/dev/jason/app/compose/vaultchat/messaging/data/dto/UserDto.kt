@@ -21,13 +21,13 @@ data class UserDto(
         val type: Device.Type,
         val os: String,
         val version: String,
-        val fcmToken: String,
+        val token: String,
     ) {
-        fun toDomain() = Device(name, type, Device.Os.valueOf(os), version, fcmToken)
+        fun toDomain() = Device(name, type, Device.Os.valueOf(os), version, token)
 
         companion object {
             fun fromDomain(device: Device) =
-                DeviceDto(device.name, device.type, "Android", device.version, device.fcmToken)
+                DeviceDto(device.name, device.type, "Android", device.version, device.token)
         }
     }
 }
