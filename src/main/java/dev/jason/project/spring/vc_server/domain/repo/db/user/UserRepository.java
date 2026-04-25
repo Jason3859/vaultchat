@@ -1,4 +1,4 @@
-package dev.jason.project.spring.vc_server.data.db.user;
+package dev.jason.project.spring.vc_server.domain.repo.db.user;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

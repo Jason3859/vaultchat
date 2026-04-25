@@ -1,15 +1,14 @@
-package dev.jason.project.spring.vc_server.data.db.user;
+package dev.jason.project.spring.vc_server.domain.repo.db.user;
 
-import dev.jason.project.spring.vc_server.domain.Device;
-import dev.jason.project.spring.vc_server.domain.User;
-import dev.jason.project.spring.vc_server.domain.UserStatus;
+import dev.jason.project.spring.vc_server.domain.model.Device;
+import dev.jason.project.spring.vc_server.domain.model.Message;
+import dev.jason.project.spring.vc_server.domain.model.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nonnull;
 
 @Document(collection = "users")
 public final class UserEntity {
@@ -20,7 +19,8 @@ public final class UserEntity {
     private final List<Device> devices;
     private final List<String> connections;
     private final List<String> blocklist;
-    private UserStatus status;
+    private final List<Message> queuedMessages;
+    private User.Status status;
     private long lastHeartbeat;
 
     public UserEntity(
@@ -30,7 +30,8 @@ public final class UserEntity {
         List<Device> devices,
         List<String> connections,
         List<String> blocklist,
-        UserStatus status,
+        List<Message> queuedMessages,
+        User.Status status,
         long lastHeartbeat
     ) {
         this.uid = uid;
@@ -39,13 +40,14 @@ public final class UserEntity {
         this.devices = devices;
         this.connections = connections;
         this.blocklist = blocklist;
+        this.queuedMessages = queuedMessages;
         this.status = status;
         this.lastHeartbeat = lastHeartbeat;
     }
-    
+
     @Nonnull
     public static UserEntity fromDomainUser(User user) {
-    	return new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.devices(), user.connections(), user.blocklist(), user.status(), user.lastHeartbeat());
+        return new UserEntity(user.uid(), user.displayName(), user.profilePictureUrl(), user.devices(), user.connections(), user.blocklist(), List.of(), user.status(), user.lastHeartbeat());
     }
 
     public User toDomainUser() {
@@ -64,7 +66,7 @@ public final class UserEntity {
         return blocklist;
     }
 
-    public UserStatus status() {
+    public User.Status status() {
         return status;
     }
 
@@ -72,7 +74,11 @@ public final class UserEntity {
         return connections;
     }
 
-    public void setStatus(UserStatus status) {
+    public List<Message> queuedMessages() {
+        return queuedMessages;
+    }
+
+    public void setStatus(User.Status status) {
         this.status = status;
     }
 
@@ -106,6 +112,7 @@ public final class UserEntity {
             "fcmTokens=" + devices + ", " +
             "connections=" + connections + ", " +
             "blocklist=" + blocklist + ", " +
+            "queuedMessages=" + queuedMessages +
             "status=" + status + ", " +
             "lastHeartbeat=" + lastHeartbeat + ']';
     }

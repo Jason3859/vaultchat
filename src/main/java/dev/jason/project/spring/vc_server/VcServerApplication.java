@@ -30,7 +30,7 @@ public class VcServerApplication {
         initFirebase();
     }
 
-    private static void initFirebase() throws IOException, VcException {
+    private static void initFirebase() throws IOException, AdminSdkNotFoundException {
         InputStream stream = VcServerApplication.class.getClassLoader().getResourceAsStream("vaultchatapp.json");
 
         try {

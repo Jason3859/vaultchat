@@ -1,4 +1,4 @@
-package dev.jason.project.spring.vc_server.domain;
+package dev.jason.project.spring.vc_server.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -44,7 +44,7 @@ public final class Device {
     	return version;
     }
 
-    public String fcmToken() {
+    public String token() {
         return fcmToken;
     }
 
@@ -64,7 +64,7 @@ public final class Device {
             "type=" + type + ", " +
             "os=" + os + ", " +
             "version=" + version + ", " +
-            "fcmToken=" + fcmToken + ", " +
+            "token=" + fcmToken + ", " +
             "lastUsed=" + lastUsed + ']';
     }
 

@@ -1,4 +1,4 @@
-package dev.jason.project.spring.vc_server.domain;
+package dev.jason.project.spring.vc_server.domain.model;
 
 import java.util.List;
 
@@ -9,7 +9,10 @@ public record User(
     List<Device> devices,
     List<String> connections,
     List<String> blocklist,
-    UserStatus status,
+    Status status,
     long lastHeartbeat
 ) {
+    public enum Status {
+        Online, Away, Offline
+    }
 }

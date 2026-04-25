@@ -1,7 +1,6 @@
-package dev.jason.project.spring.vc_server.dto;
+package dev.jason.project.spring.vc_server.data.dto;
 
-import dev.jason.project.spring.vc_server.domain.User;
-import dev.jason.project.spring.vc_server.domain.UserStatus;
+import dev.jason.project.spring.vc_server.domain.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,21 +8,16 @@ import java.util.List;
 
 public record RegisterUserDto(String uid, String displayName, String profilePictureUrl, DeviceDto device) {
 
-    // only for testing
-    public RegisterUserDto(String uid) {
-        this(uid, uid, null, null);
-    }
-
     public User toDomainUser() {
-        return new User(uid,
+        return new User(
+            uid,
             displayName,
             profilePictureUrl,
             device == null ? new ArrayList<>(List.of()) : new ArrayList<>(List.of(device.toDomainModel(LocalDateTime.now()))),
             new ArrayList<>(List.of()),
             new ArrayList<>(List.of()),
-            UserStatus.Online,
+            User.Status.Online,
             System.currentTimeMillis()
         );
     }
-
 }
