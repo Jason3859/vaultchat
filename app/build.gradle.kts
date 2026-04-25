@@ -56,8 +56,10 @@ dependencies {
 
     implementation(projects.core)
     implementation(projects.auth)
-    implementation(projects.messaging)
     implementation(projects.localStorage)
+    implementation(projects.messaging)
+    implementation(projects.messaging.data)
+    implementation(projects.messaging.ui)
 
     testImplementation(libs.junit)
 

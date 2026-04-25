@@ -7,6 +7,8 @@ import dev.jason.app.compose.vaultchat.auth.AuthKoinModule
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.local_storage.LocalStorageKoinModule
 import dev.jason.app.compose.vaultchat.messaging.MessagingKoinModule
+import dev.jason.app.compose.vaultchat.messaging.data.MessagingDataKoinModule
+import dev.jason.app.compose.vaultchat.messaging.ui.MessagingUiKoinModule
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
@@ -31,7 +33,7 @@ class MainApplication : Application() {
         createNotificationChannel()
         startKoin {
             androidContext(this@MainApplication)
-            modules(baseModule, AuthKoinModule, MessagingKoinModule, LocalStorageKoinModule)
+            modules(baseModule, AuthKoinModule, LocalStorageKoinModule, MessagingKoinModule, MessagingDataKoinModule, MessagingUiKoinModule)
         }
     }
 

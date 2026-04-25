@@ -38,7 +38,6 @@ dependencies {
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
