@@ -17,7 +17,8 @@ class SearchUsersViewModel(private val apiRepository: RemoteApiRepository) : Vie
         val expanded: Boolean = false,
         val searchQuery: String = "",
         val searchResults: List<User> = emptyList(),
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val hasRequested: Boolean = false,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -34,6 +35,7 @@ class SearchUsersViewModel(private val apiRepository: RemoteApiRepository) : Vie
             updateState(
                 _uiState.value.copy(
                     isLoading = false,
+                    hasRequested = true,
                     searchResults = response.data ?: emptyList()
                 )
             )

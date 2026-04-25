@@ -20,7 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -38,7 +40,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.domain.User
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SearchUsersScreen(
     uiState: SearchUsersViewModel.UiState,
@@ -70,60 +72,84 @@ fun SearchUsersScreen(
             expanded = uiState.expanded,
             onExpandedChange = { updateState(uiState.copy(expanded = it)) },
         ) {
-            if (!uiState.isLoading) {
-                LazyColumn {
-                    items(uiState.searchResults) { user ->
-                        ListItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUserClick(user)
-                                },
-                            headlineContent = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
-                                ) {
-                                    SubcomposeAsyncImage(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .clip(CircleShape),
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data(user.profilePictureUrl)
-                                            .crossfade(true)
-                                            .build(),
-                                        loading = {
-                                            CircularProgressIndicator()
-                                        },
-                                        error = {
-                                            Image(Icons.Default.AccountCircle, null)
-                                            Log.w(
-                                                "SearchUsersScreen",
-                                                "SearchUsersScreen: error while loading image",
-                                                it.result.throwable
-                                            )
-                                        },
-                                        contentDescription = null,
-                                    )
-
-                                    Spacer(Modifier.width(16.dp))
-
-                                    Text(
-                                        text = user.displayName
-                                    )
-                                }
-                            }
-                        )
+            if (!uiState.isLoading) { // if not loading
+                if (uiState.searchResults.isNotEmpty()) { // if list is not empty, display list
+                    LazyColumn {
+                        items(uiState.searchResults) { user ->
+                            SearchResultItem(user, onUserClick)
+                        }
+                    }
+                } else { // if list is empty
+                    if (uiState.hasRequested) { // if request is sent at least once
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No users found")
+                        }
                     }
                 }
             } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(100.dp)
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingIndicator(
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun SearchResultItem(
+    user: User,
+    onUserClick: (User) -> Unit
+) {
+    ListItem(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onUserClick(user)
+            },
+        headlineContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                SubcomposeAsyncImage(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(user.profilePictureUrl)
+                        .crossfade(true)
+                        .build(),
+                    loading = {
+                        CircularProgressIndicator()
+                    },
+                    error = {
+                        Image(Icons.Default.AccountCircle, null)
+                        Log.w(
+                            "SearchUsersScreen",
+                            "SearchUsersScreen: error while loading image",
+                            it.result.throwable
+                        )
+                    },
+                    contentDescription = null,
+                )
+
+                Spacer(Modifier.width(16.dp))
+
+                Text(
+                    text = user.displayName
+                )
+            }
+        }
+    )
 }
