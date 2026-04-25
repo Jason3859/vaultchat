@@ -11,6 +11,10 @@ class LocalStorageRepoImpl(private val messageRepository: MessageRepository) : L
         messageRepository.addMessage(message)
     }
 
+    override suspend fun deleteMessageHistory(currentUserId: String, otherUserId: String) {
+        messageRepository.deleteChatHistory(currentUserId, otherUserId)
+    }
+
     override fun getMessages(currentUserId: String, otherUserId: String): Flow<List<Message>> {
         return messageRepository.getMessages(currentUserId, otherUserId)
     }

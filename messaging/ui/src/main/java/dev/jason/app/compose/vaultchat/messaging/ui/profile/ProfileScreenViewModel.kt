@@ -6,6 +6,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
+import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +17,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ProfileScreenViewModel(private val repository: RemoteApiRepository) : ViewModel() {
+class ProfileScreenViewModel(
+    private val repository: RemoteApiRepository,
+    private val localStorageRepository: LocalStorageRepository
+) : ViewModel() {
 
     private val currentUser by lazy { Firebase.auth.currentUser!! }
 
@@ -68,6 +73,13 @@ class ProfileScreenViewModel(private val repository: RemoteApiRepository) : View
         viewModelScope.launch {
             repository.block(currentUser.uid, user.uid)
                 .onSuccess { navigateBack() }
+                .onError { SnackbarController.showSnackbar("An internal error occurred") }
+        }
+    }
+
+    fun deleteMessageHistory(otherUser: User) {
+        viewModelScope.launch {
+            localStorageRepository.deleteMessageHistory(currentUser.uid, otherUser.uid)
         }
     }
 }

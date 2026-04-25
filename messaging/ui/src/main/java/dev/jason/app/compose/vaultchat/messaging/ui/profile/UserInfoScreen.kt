@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,13 +26,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,25 +52,95 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun UserInfoScreen(
     user: User,
-    onBackClick: () -> Unit,
-    navigateBackToHomeScreen: () -> Unit
+    onBackClick: () -> Unit, // for icon button. goes back to MessagingScreen
+    navigateBackToHomeScreen: () -> Unit // goes back to HomeScreen instead of MessagingScreen
 ) {
     val viewModel: ProfileScreenViewModel = koinViewModel()
 
-    UserInfoScreen(
-        user = user,
-        onBackClick = onBackClick,
-        onBlockClick = {
-            viewModel.blockUser(it, navigateBackToHomeScreen)
+    val showClearChatHistoryWarning = retain { mutableStateOf(false) }
+    val showBlockUserWarning = retain { mutableStateOf(false) }
+
+    Box {
+        UserInfoScreen(
+            user = user,
+            onBackClick = onBackClick,
+            onBlockClick = {
+                showBlockUserWarning.value = true
+            },
+            onClearHistoryClick = {
+                showClearChatHistoryWarning.value = true
+            }
+        )
+
+        if (showBlockUserWarning.value) {
+            AlertDialog(
+                onDismissRequest = { showBlockUserWarning.value = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.blockUser(user, navigateBackToHomeScreen)
+                        }
+                    ) {
+                        Text("Conform")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            showBlockUserWarning.value = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                },
+                title = {
+                    Text("Block user?")
+                },
+                text = {
+                    Text("You can unblock user from your profile screen.")
+                }
+            )
         }
-    )
+
+        if (showClearChatHistoryWarning.value) {
+            AlertDialog(
+                onDismissRequest = { showClearChatHistoryWarning.value = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.deleteMessageHistory(user)
+                            onBackClick()
+                        }
+                    ) {
+                        Text("Conform")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            showClearChatHistoryWarning.value = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                },
+                title = {
+                    Text("Clear chat history with ${user.displayName}?")
+                },
+                text = {
+                    Text("This action cannot be undone.")
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun UserInfoScreen(
+private fun UserInfoScreen(
     user: User,
     onBackClick: () -> Unit,
-    onBlockClick: (User) -> Unit
+    onBlockClick: () -> Unit,
+    onClearHistoryClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -121,22 +200,45 @@ fun UserInfoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = { onBlockClick(user) },
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                    border = ButtonDefaults.outlinedButtonBorder(),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(Icons.Default.Block, null)
-                        Text("Block")
-                    }
-                }
+                ActionButton(
+                    icon = Icons.Default.Block,
+                    text = "Block",
+                    onClick = onBlockClick,
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+
+                ActionButton(
+                    icon = Icons.Default.DeleteForever,
+                    text = "Clear chat history",
+                    onClick = onClearHistoryClick,
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun ActionButton(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer
+) {
+    OutlinedButton(
+        onClick = onClick,
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = containerColor),
+        border = ButtonDefaults.outlinedButtonBorder(),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(icon, null)
+            Text(text, textAlign = TextAlign.Center)
         }
     }
 }
@@ -148,7 +250,8 @@ private fun UserInfoScreenPreview() {
         UserInfoScreen(
             user = User("uid", "Display Name", "url", emptyList(), User.Status.Online),
             onBackClick = {},
-            onBlockClick = {}
+            onBlockClick = {},
+            onClearHistoryClick = {}
         )
     }
 }

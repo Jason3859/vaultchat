@@ -92,14 +92,18 @@ class MessagingViewModel(
     init {
         viewModelScope.launch {
             localStorageRepository.getMessages(currentUserUid, otherUser.uid).collect { messages ->
-                if (_messages.isEmpty()) {
-                    _messages.addAll(messages) // initial state
-                } else {
-                    val msg = messages.last()
+                if (!_messages.isEmpty()) {
+                    try {
+                        val msg = messages.last()
 
-                    if (msg.from != currentUserUid) {
-                        _messages.add(msg) // new message from other user
+                        if (msg.from != currentUserUid) {
+                            _messages.add(msg) // new message from other user
+                        }
+                    } catch (_: NoSuchElementException) { // only thrown when user deletes chat history.
+                        _messages.clear()
                     }
+                } else {
+                    _messages.addAll(messages) // initial state
                 }
             }
         }

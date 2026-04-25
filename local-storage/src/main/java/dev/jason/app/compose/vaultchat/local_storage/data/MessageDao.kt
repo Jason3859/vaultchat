@@ -12,7 +12,17 @@ interface MessageDao {
     suspend fun addMessage(message: MessageEntity)
 
     @Query(
-        "SELECT * FROM messages WHERE (`from` = :currentUserUid AND `to` = :otherUserUid) OR (`from` = :otherUserUid AND `to` = :currentUserUid)"
+        "DELETE FROM messages WHERE " +
+        "(`from` = :currentUserUid AND `to` = :otherUserUid) OR " +
+        "(`from` = :otherUserUid AND `to` = :currentUserUid)"
+    )
+    suspend fun deleteMessageHistory(currentUserUid: String, otherUserUid: String)
+
+    @Query(
+        "SELECT * FROM messages WHERE " +
+        "(`from` = :currentUserUid AND `to` = :otherUserUid) OR " +
+        "(`from` = :otherUserUid AND `to` = :currentUserUid) " +
+        "ORDER BY `at` ASC"
     )
     fun getMessages(currentUserUid: String, otherUserUid: String): Flow<List<MessageEntity>>
 }
