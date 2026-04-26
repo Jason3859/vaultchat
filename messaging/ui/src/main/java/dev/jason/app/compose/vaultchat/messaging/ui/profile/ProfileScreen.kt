@@ -58,14 +58,41 @@ import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import org.koin.androidx.compose.koinViewModel
 
-data class ProfileScreenRowItem(
+private object ProfileScreen {
+
+    val IMAGE_SIZE = 35.dp
+
+    val defaultUser = User("name", "name", "url", emptyList(), User.Status.Online)
+
+    val defaultDeviceList = List(10) {
+        Device(
+            name = "device",
+            type = Device.Type.Mobile,
+            os = Device.Os.Android,
+            version = "13",
+            token = "not required"
+        )
+    }
+
+    val defaultUserList = List(10) { index ->
+        User(
+            uid = "uid",
+            displayName = "display name @$index",
+            profilePictureUrl = "",
+            devices = emptyList(),
+            status = User.Status.Online
+        )
+    }
+}
+
+private data class ProfileScreenRowItem(
     val id: ProfileScreenRowItemId,
     val label: String,
     val icon: ImageVector,
     val action: () -> Unit
 )
 
-enum class ProfileScreenRowItemId {
+private enum class ProfileScreenRowItemId {
     Devices, Blocklist, Logout
 }
 
@@ -78,28 +105,33 @@ fun ProfileScreen(
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val blocklist by viewModel.blocklist.collectAsStateWithLifecycle()
 
+    val currentProfileScreenRowItemId = retain { mutableStateOf<ProfileScreenRowItemId?>(null) }
+
     ProfileScreen(
         user = user,
         devices = devices,
         blocklist = blocklist,
         onUnblockClick = viewModel::unblockUser,
         onLogOutClick = viewModel::logout,
-        innerPadding = innerPadding
+        innerPadding = innerPadding,
+        currentProfileScreenRowItemId = currentProfileScreenRowItemId.value,
+        onProfileScreenRowItemIdChange = { currentProfileScreenRowItemId.value = it }
     )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ProfileScreen(
+private fun ProfileScreen(
     user: User,
     devices: List<Device>,
     blocklist: List<User>,
     onUnblockClick: (User) -> Unit,
     onLogOutClick: () -> Unit,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    currentProfileScreenRowItemId: ProfileScreenRowItemId?,
+    onProfileScreenRowItemIdChange: (ProfileScreenRowItemId?) -> Unit
 ) {
     var showLogoutDialog by retain { mutableStateOf(false) }
-    var currentProfileScreenRowItemId by retain { mutableStateOf<ProfileScreenRowItemId?>(null) }
 
     Surface(
         modifier = Modifier
@@ -109,7 +141,7 @@ fun ProfileScreen(
         Box {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
@@ -155,7 +187,7 @@ fun ProfileScreen(
                                 label = "Your Devices",
                                 icon = Icons.Default.Devices,
                                 action = {
-                                    currentProfileScreenRowItemId = ProfileScreenRowItemId.Devices
+                                    onProfileScreenRowItemIdChange(ProfileScreenRowItemId.Devices)
                                 }
                             ),
                             ProfileScreenRowItem(
@@ -163,7 +195,7 @@ fun ProfileScreen(
                                 label = "Blocklist",
                                 icon = Icons.Default.Block,
                                 action = {
-                                    currentProfileScreenRowItemId = ProfileScreenRowItemId.Blocklist
+                                    onProfileScreenRowItemIdChange(ProfileScreenRowItemId.Blocklist)
                                 }
                             ),
                             ProfileScreenRowItem(
@@ -270,7 +302,7 @@ private fun ProfileScreenItemContainer(content: @Composable RowScope.() -> Unit)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             content = content
@@ -292,7 +324,7 @@ private fun DeviceItem(device: Device) {
                 }
             },
             contentDescription = null,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(ProfileScreen.IMAGE_SIZE)
         )
 
         Column {
@@ -300,10 +332,12 @@ private fun DeviceItem(device: Device) {
                 text = if (device == Device.getCurrentDevice(
                         LocalContext.current, "not required"
                     )
-                ) "${device.name} (current)" else device.name,
-                fontSize = 18.sp
+                ) "${device.name} (current)" else device.name
             )
-            Text("${device.os} ${device.version}")
+            Text(
+                text = "${device.os} ${device.version}",
+                fontSize = 12.sp
+            )
         }
     }
 }
@@ -332,11 +366,11 @@ fun BlocklistItem(user: User, onUnblockClick: (User) -> Unit) {
                 Image(Icons.Default.AccountCircle, null)
             },
             modifier = Modifier
-                .size(40.dp)
+                .size(ProfileScreen.IMAGE_SIZE)
                 .clip(CircleShape)
         )
 
-        Text(user.displayName, fontSize = 20.sp)
+        Text(user.displayName)
 
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -356,44 +390,58 @@ fun BlocklistItem(user: User, onUnblockClick: (User) -> Unit) {
 
 }
 
-object ProfileScreen {
-    val defaultDeviceList = List(10) {
-        Device(
-            name = "device",
-            type = Device.Type.Mobile,
-            os = Device.Os.Android,
-            version = "13",
-            token = "not required"
-        )
-    }
-
-    val defaultUserList = List(10) { index ->
-        User(
-            uid = "uid",
-            displayName = "display name @$index",
-            profilePictureUrl = "",
-            devices = emptyList(),
-            status = User.Status.Online
-        )
-    }
-}
-
-@Preview
+@Preview(device = "id:pixel_9a")
 @Composable
 private fun ProfileScreenPreview() {
     VaultChatTheme {
         ProfileScreen(
-            user = User("name", "name", "url", emptyList(), User.Status.Online),
+            user = ProfileScreen.defaultUser,
             innerPadding = PaddingValues(),
             onLogOutClick = {},
             devices = ProfileScreen.defaultDeviceList,
             blocklist = ProfileScreen.defaultUserList,
-            onUnblockClick = {}
+            onUnblockClick = {},
+            currentProfileScreenRowItemId = null,
+            onProfileScreenRowItemIdChange = {}
         )
     }
 }
 
-@Preview
+@Preview(device = "id:pixel_9a")
+@Composable
+private fun ProfileScreenWithDevicesPreview() {
+    VaultChatTheme {
+        ProfileScreen(
+            user = ProfileScreen.defaultUser,
+            innerPadding = PaddingValues(),
+            onLogOutClick = {},
+            devices = ProfileScreen.defaultDeviceList,
+            blocklist = ProfileScreen.defaultUserList,
+            onUnblockClick = {},
+            currentProfileScreenRowItemId = ProfileScreenRowItemId.Devices,
+            onProfileScreenRowItemIdChange = {}
+        )
+    }
+}
+
+@Preview(device = "id:pixel_9a")
+@Composable
+private fun ProfileScreenWithBlocklistPreview() {
+    VaultChatTheme {
+        ProfileScreen(
+            user = ProfileScreen.defaultUser,
+            innerPadding = PaddingValues(),
+            onLogOutClick = {},
+            devices = ProfileScreen.defaultDeviceList,
+            blocklist = ProfileScreen.defaultUserList,
+            onUnblockClick = {},
+            currentProfileScreenRowItemId = ProfileScreenRowItemId.Blocklist,
+            onProfileScreenRowItemIdChange = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 private fun MobileDeviceItemPreview() {
     VaultChatTheme {
@@ -403,7 +451,7 @@ private fun MobileDeviceItemPreview() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TabletDeviceItemPreview() {
     VaultChatTheme {
@@ -413,18 +461,12 @@ private fun TabletDeviceItemPreview() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun BlocklistItemPreview() {
     VaultChatTheme {
         BlocklistItem(
-            user = User(
-                uid = "uid",
-                displayName = "display name",
-                profilePictureUrl = "",
-                devices = emptyList(),
-                status = User.Status.Online
-            ),
+            user = ProfileScreen.defaultUser,
             onUnblockClick = {}
         )
     }
