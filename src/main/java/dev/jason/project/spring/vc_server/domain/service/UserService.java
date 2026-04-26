@@ -2,13 +2,12 @@ package dev.jason.project.spring.vc_server.domain.service;
 
 import java.util.List;
 
+import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyExistsException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import dev.jason.project.spring.vc_server.domain.exception.DeviceAlreadyExistsException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
-import dev.jason.project.spring.vc_server.domain.model.Device;
 import dev.jason.project.spring.vc_server.domain.model.Message;
 import dev.jason.project.spring.vc_server.domain.model.Result;
 import dev.jason.project.spring.vc_server.domain.model.User;
@@ -29,21 +28,13 @@ public class UserService {
 
     // --- User Management ---
 
-    public void saveUser(User user) throws DeviceAlreadyExistsException {
+    public void saveUserOrThrow(User user) throws UserAlreadyExistsException {
         UserEntity entity = userRepository.findByUid(user.uid());
 
         if (entity == null) {
             userRepository.save(UserEntity.fromDomainUser(user));
         } else {
-            Device device = user.devices().getFirst();
-            boolean doesDeviceExist = entity.devices().contains(device);
-            
-			if (!doesDeviceExist) {
-                entity.devices().add(device);
-                userRepository.save(entity);
-            } else {
-            	throw new DeviceAlreadyExistsException();
-            }
+            throw new UserAlreadyExistsException();
         }
     }
 
@@ -69,7 +60,6 @@ public class UserService {
         UserEntity entity = getUserEntityOrThrow(uid);
         List<Message> queuedMessages = entity.queuedMessages();
 
-        if (queuedMessages.isEmpty()) return;
         if (queuedMessages.contains(message)) return;
 
         queuedMessages.add(message);
