@@ -71,7 +71,8 @@ public final class Device {
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Device)) return false;
-        return ((Device) other).fcmToken.equals(fcmToken); // returns true if fcm token is same as it will be different for each device
+        return Objects.equals(((Device) other).name, name) &&
+            Objects.equals(((Device) other).fcmToken , fcmToken); // returns true if fcm token and name are same
     }
 
 }

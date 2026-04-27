@@ -10,7 +10,6 @@ import dev.jason.project.spring.vc_server.domain.model.Device.Type;
 
 import java.time.LocalDateTime;
 
-@SuppressWarnings("unused")
 public class TestConstants {
 	public static final Device TEST_DEVICE_1 =
 		new Device("test_device_1", Type.Mobile, OS.Android, "10", "token", LocalDateTime.now());
