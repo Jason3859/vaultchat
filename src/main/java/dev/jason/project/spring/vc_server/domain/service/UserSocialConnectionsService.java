@@ -4,23 +4,29 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.domain.exception.BlockedByUserException;
 import dev.jason.project.spring.vc_server.domain.exception.NoUsersBlockedException;
 import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyBlockedException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotBlockedException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
+import dev.jason.project.spring.vc_server.domain.exception.UsersAlreadyConnectedException;
 import dev.jason.project.spring.vc_server.domain.model.User;
 import dev.jason.project.spring.vc_server.domain.repo.db.user.UserEntity;
 
 @Service
 public class UserSocialConnectionsService extends UserService {
 	
-    @SuppressWarnings("null")
-    public void addConnection(User user, User otherUser) throws UserNotFoundException {
+    public void addConnection(User user, User otherUser) throws UserNotFoundException, UsersAlreadyConnectedException, BlockedByUserException {
         UserEntity entity1 = getUserEntityOrThrow(user.uid());
         UserEntity entity2 =  getUserEntityOrThrow(otherUser.uid());
 
         if (entity1.connections().contains(otherUser.uid())) {
-            return;
+            throw new UsersAlreadyConnectedException();
+        }
+        
+        // if user is blocked
+        if (entity1.blocklist().contains(otherUser.uid()) || entity2.blocklist().contains(user.uid())) {
+        	throw new BlockedByUserException();
         }
 
         entity1.connections().add(otherUser.uid());
@@ -29,7 +35,6 @@ public class UserSocialConnectionsService extends UserService {
         userRepository.saveAll(List.of(entity1, entity2));
     }
 
-    @SuppressWarnings("null")
     public void block(String uid1, String uid2) throws UserNotFoundException, UserAlreadyBlockedException {
         UserEntity entity1 = getUserEntityOrThrow(uid1);
         UserEntity entity2 = getUserEntityOrThrow(uid2);
@@ -47,7 +52,6 @@ public class UserSocialConnectionsService extends UserService {
         userRepository.saveAll(List.of(entity1, entity2));
     }
 
-    @SuppressWarnings("null")
     public void unblock(String uid1, String uid2) throws UserNotFoundException, UserNotBlockedException, NoUsersBlockedException {
         UserEntity entity1 = getUserEntityOrThrow(uid1);
         UserEntity entity2 = getUserEntityOrThrow(uid2);

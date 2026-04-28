@@ -5,5 +5,5 @@ public enum Result {
     DeviceWithThisFcmTokenAlreadyExists, Error,
     MessageTextBlank, NoBlockedUsers, NoUsersFound,
     SelfBlock, SelfUnblock, Success, UserAlreadyBlocked,
-    UserAlreadyExists, UserNotBlocked, UserNotFound
+    UserAlreadyExists, UserNotBlocked, UserNotFound, UsersAlreadyConnected
 }

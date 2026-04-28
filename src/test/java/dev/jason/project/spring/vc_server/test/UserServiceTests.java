@@ -32,8 +32,7 @@ public class UserServiceTests {
 		repository.save(UserEntity.fromDomainUser(TestConstants.TEST_USER_1));
 		repository.save(UserEntity.fromDomainUser(TestConstants.TEST_USER_2));
 	}
-	
-	@SuppressWarnings("null")
+
 	@AfterEach
 	void delete_test_users() {
 		repository.deleteAll(
@@ -43,7 +42,6 @@ public class UserServiceTests {
 	}
 	
 	@Test
-	@SuppressWarnings("all") // for intellij idea complaining about lambda
 	void adding_existing_user_with_same_device_throws_exception() {
 		Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
             service.saveUserOrThrow(TestConstants.TEST_USER_1);
@@ -64,7 +62,6 @@ public class UserServiceTests {
     }
 
 	@Test
-	@SuppressWarnings("all") // for intellij idea complaining about lambda
 	void adding_a_message_to_queue_of_unknown_user_throws_exception() {
 		Assertions.assertThrows(UserNotFoundException.class, () -> {
 			service.addMessageToQueue("unknown", TestConstants.DEFAULT_MESSAGE);

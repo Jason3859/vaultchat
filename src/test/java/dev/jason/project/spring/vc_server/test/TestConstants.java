@@ -24,6 +24,22 @@ public class TestConstants {
 
 	public static final User TEST_USER_2 = getTestUser2(TEST_DEVICE_2);
 
+	public static final User UNKNOWN_USER_1 =
+		new RegisterUserDto(
+			"unknown_user_1",
+			"UNKNOWN_USER_1",
+			"url",
+			DeviceDto.fromDomain(TEST_DEVICE_1)
+		).toDomainUser();
+
+	public static final User UNKNOWN_USER_2 =
+		new RegisterUserDto(
+			"unknown_user_2",
+			"UNKNOWN_USER_2",
+			"url",
+			DeviceDto.fromDomain(TEST_DEVICE_1)
+		).toDomainUser();
+
 	public static User getTestUser1(Device device) {
 		return new RegisterUserDto(
 			"test_user_1",

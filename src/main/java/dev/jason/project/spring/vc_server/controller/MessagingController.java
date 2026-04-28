@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.jason.project.spring.vc_server.data.dto.ResultDto;
+import dev.jason.project.spring.vc_server.domain.exception.BlockedByUserException;
 import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
+import dev.jason.project.spring.vc_server.domain.exception.UsersAlreadyConnectedException;
 import dev.jason.project.spring.vc_server.domain.model.Device;
 import dev.jason.project.spring.vc_server.domain.model.Message;
 import dev.jason.project.spring.vc_server.domain.model.Result;
@@ -60,8 +62,8 @@ public class MessagingController {
             }
 
             return new ResultDto(Result.Success);
-        } catch (UserNotFoundException e) {
-            return new ResultDto(Result.UserNotFound);
+        } catch (UserNotFoundException | UsersAlreadyConnectedException | BlockedByUserException e) {
+            return ResultDto.fromVcException(e);
         }
     }
 }

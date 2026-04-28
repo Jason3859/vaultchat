@@ -32,7 +32,6 @@ public class UserDeviceServiceTests {
         repository.save(UserEntity.fromDomainUser(TestConstants.TEST_USER_2));
     }
 
-    @SuppressWarnings("null")
 	@AfterEach
     void delete_test_users() {
         repository.deleteAll(
@@ -110,7 +109,6 @@ public class UserDeviceServiceTests {
     	});
     }
 
-    @SuppressWarnings("null")
 	@Test
     void updating_token_of_registered_device_succeeds() {
         String uid = TestConstants.TEST_USER_1.uid();
@@ -125,8 +123,7 @@ public class UserDeviceServiceTests {
         UserEntity entity = repository.findByUid(uid);
         entity.devices().forEach(d -> {
             if (d.name().equals(device.name())) {
-                Assertions.assertEquals(d.token(), newToken);
-                return;
+                Assertions.assertEquals(newToken, d.token());
             }
         });
     }

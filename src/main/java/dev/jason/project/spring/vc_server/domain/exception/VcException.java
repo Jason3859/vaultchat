@@ -10,7 +10,9 @@ public sealed class VcException extends Exception
 	UserAlreadyBlockedException,
 	UserAlreadyExistsException,
 	UserNotBlockedException,
-	UserNotFoundException {
+	UserNotFoundException, 
+	UsersAlreadyConnectedException, 
+	BlockedByUserException {
 
     @Serial
     private static final long serialVersionUID = -8573188056532471500L;
