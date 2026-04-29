@@ -1,11 +1,11 @@
 package dev.jason.project.spring.vc_server.test;
 
-import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyExistsException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
-import dev.jason.project.spring.vc_server.domain.model.User;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserEntity;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserRepository;
-import dev.jason.project.spring.vc_server.domain.service.UserService;
+import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyExistsException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserNotFoundException;
+import dev.jason.project.spring.vc_server.model.User;
+import dev.jason.project.spring.vc_server.repo.db.user.UserEntity;
+import dev.jason.project.spring.vc_server.repo.db.user.UserRepository;
+import dev.jason.project.spring.vc_server.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ public class UserServiceTests {
 	@Test
 	void adding_existing_user_with_same_device_throws_exception() {
 		Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
-            service.saveUserOrThrow(TestConstants.TEST_USER_1);
+            service.addUser(TestConstants.TEST_USER_1);
         });
 	}
 
@@ -53,7 +53,7 @@ public class UserServiceTests {
 		User testUser2 = TestConstants.getTestUser2(TestConstants.TEST_DEVICE_2);
 
 		try {
-			service.saveUserOrThrow(testUser2);
+			service.addUser(testUser2);
 		} catch (UserAlreadyExistsException ignored) {
         }
 

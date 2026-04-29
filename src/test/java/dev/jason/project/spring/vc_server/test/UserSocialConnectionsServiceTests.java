@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import dev.jason.project.spring.vc_server.domain.exception.BlockedByUserException;
-import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
-import dev.jason.project.spring.vc_server.domain.exception.UsersAlreadyConnectedException;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserEntity;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserRepository;
-import dev.jason.project.spring.vc_server.domain.service.UserSocialConnectionsService;
+import dev.jason.project.spring.vc_server.exception.VcException.BlockedByUserException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyBlockedException
+import dev.jason.project.spring.vc_server.exception.VcException.UserNotFoundException;
+import dev.jason.project.spring.vc_server.exception.VcException.UsersAlreadyConnectedException;
+import dev.jason.project.spring.vc_server.repo.db.user.UserEntity;
+import dev.jason.project.spring.vc_server.repo.db.user.UserRepository;
+import dev.jason.project.spring.vc_server.service.UserSocialConnectionsService;
 
 @SpringBootTest
 public class UserSocialConnectionsServiceTests {

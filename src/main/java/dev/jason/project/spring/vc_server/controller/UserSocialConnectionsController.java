@@ -1,99 +1,52 @@
 package dev.jason.project.spring.vc_server.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.jason.project.spring.vc_server.data.dto.ResultDto;
-import dev.jason.project.spring.vc_server.data.dto.UserDto;
-import dev.jason.project.spring.vc_server.domain.exception.NoUsersBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserAlreadyBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotBlockedException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
-import dev.jason.project.spring.vc_server.domain.model.Result;
-import dev.jason.project.spring.vc_server.domain.model.User;
-import dev.jason.project.spring.vc_server.domain.service.UserSocialConnectionsService;
+import dev.jason.project.spring.vc_server.model.User;
+import dev.jason.project.spring.vc_server.service.UserService;
 
 @RestController
 @RequestMapping("/user/social")
 public class UserSocialConnectionsController {
 	
 	@Autowired
-	private UserSocialConnectionsService userSocialConnectionsService;
+	private UserService userService;
+
+	@PatchMapping("/block")
+	public ResponseEntity<?> blockUser(@RequestParam String fromUid, @RequestParam String otherUid) {
+		userService.block(fromUid, otherUid);
+		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	}
 	
-	@PostMapping("/block")
-    public ResultDto blockUser(@RequestParam String uid, @RequestParam("uid_to_block") String uidToBlock) {
-        try {
-            User user = userSocialConnectionsService.getUserOrThrow(uid);
-            User userToBlock = userSocialConnectionsService.getUserOrThrow(uidToBlock);
-
-            if (uid.equals(userToBlock.uid())) {
-                return new ResultDto(Result.SelfBlock);
-            }
-
-            if (user.blocklist().contains(userToBlock.uid())) {
-            	return new ResultDto(Result.UserAlreadyBlocked);
-            }
-
-            userSocialConnectionsService.block(uid, uidToBlock);
-            return new ResultDto(Result.Success);
-        } catch (UserNotFoundException | UserAlreadyBlockedException e) {
-            return ResultDto.fromVcException(e);
-        }
-    }
-
-    @PostMapping("/unblock")
-    public ResultDto unblockUser(@RequestParam String uid, @RequestParam("uid_to_unblock") String uidToUnblock) {
-        if (uid.equals(uidToUnblock)) {
-            return new ResultDto(Result.SelfUnblock);
-        }
-
-        try {
-            userSocialConnectionsService.unblock(uid, uidToUnblock);
-            return new ResultDto(Result.Success);
-        } catch (UserNotFoundException | NoUsersBlockedException | UserNotBlockedException e) {
-            return ResultDto.fromVcException(e);
-        }
-    }
-    
-    @GetMapping("/get-connections")
-    public ResultDto getConnections(@RequestParam String uid) {
-        try {
-            User user = userSocialConnectionsService.getUserOrThrow(uid);
-
-            Object data = user.connections().stream()
-                .map(userSocialConnectionsService::getUserByUid)
-                .map(UserDto::fromDomainUser)
-                .toList();
-
-            return new ResultDto(Result.Success, data);
-        } catch (NullPointerException e) {
-            return new ResultDto(Result.NoUsersFound);
-        } catch (UserNotFoundException ignored) {
-            return new ResultDto(Result.UserNotFound);
-        }
-    }
-
-    @GetMapping("/get-blocked-users")
-    public ResultDto getBlockedUsers(@RequestParam String uid) {
-        try {
-            User user = userSocialConnectionsService.getUserOrThrow(uid);
-
-            if (user.blocklist() == null || user.blocklist().isEmpty()) {
-                return new ResultDto(Result.NoBlockedUsers);
-            }
-
-            Object data = user.blocklist().stream()
-                .map(userSocialConnectionsService::getUserByUid)
-                .map(UserDto::fromDomainUser)
-                .toList();
-
-            return new ResultDto(Result.Success, data);
-        } catch (UserNotFoundException e) {
-            return new ResultDto(Result.UserNotFound);
-        }
-    }
+	@PatchMapping("/unblock")
+	public ResponseEntity<?> unblockUser(@RequestParam String fromUid, @RequestParam String otherUid) {
+		userService.unblock(fromUid, otherUid);
+		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	}
+	
+	@PatchMapping("/connect")
+	public ResponseEntity<?> connect(@RequestParam String fromUid, @RequestParam String otherUid) {
+		userService.addConnection(fromUid, otherUid);
+		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<List<User>> search(@RequestParam String fromUid, @RequestParam String searchQuery) {
+		userService.getUserByUid(fromUid); // for verification that user exists
+		
+		List<User> requiredUsers =  userService.getAllUsersByDisplayName(searchQuery).stream()
+			.filter(user -> user.uid() != fromUid)
+			.toList();
+		
+		return new ResponseEntity<>(requiredUsers, HttpStatus.OK);
+	}
 }

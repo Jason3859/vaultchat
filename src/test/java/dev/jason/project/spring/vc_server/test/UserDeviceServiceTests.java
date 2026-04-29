@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import dev.jason.project.spring.vc_server.domain.exception.DeviceAlreadyExistsException;
-import dev.jason.project.spring.vc_server.domain.exception.DeviceNotFoundException;
-import dev.jason.project.spring.vc_server.domain.exception.UserNotFoundException;
-import dev.jason.project.spring.vc_server.domain.model.Device;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserEntity;
-import dev.jason.project.spring.vc_server.domain.repo.db.user.UserRepository;
-import dev.jason.project.spring.vc_server.domain.service.UserDeviceService;
+import dev.jason.project.spring.vc_server.exception.VcException.DeviceAlreadyExistsException;
+import dev.jason.project.spring.vc_server.exception.VcException.DeviceNotFoundException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserNotFoundException;
+import dev.jason.project.spring.vc_server.model.Device;
+import dev.jason.project.spring.vc_server.repo.db.user.UserEntity;
+import dev.jason.project.spring.vc_server.repo.db.user.UserRepository;
+import dev.jason.project.spring.vc_server.service.UserDeviceService;
 
 @SpringBootTest
 public class UserDeviceServiceTests {
