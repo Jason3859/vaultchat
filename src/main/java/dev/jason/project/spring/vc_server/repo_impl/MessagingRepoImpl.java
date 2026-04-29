@@ -1,13 +1,15 @@
 package dev.jason.project.spring.vc_server.repo_impl;
 
+import org.springframework.stereotype.Repository;
+
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
+
 import dev.jason.project.spring.vc_server.model.Device;
 import dev.jason.project.spring.vc_server.model.Message;
 import dev.jason.project.spring.vc_server.model.Result;
 import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class MessagingRepoImpl implements MessagingRepository {

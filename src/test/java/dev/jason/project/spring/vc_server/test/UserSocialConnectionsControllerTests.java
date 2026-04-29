@@ -48,7 +48,7 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void connecting_two_existing_users_returns_accepted() throws Exception {
-        mockMvc.perform(patch("/user/social/connect")
+        mockMvc.perform(patch("/social/connect")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("otherUid", TestConstants.TEST_USER_2.uid()))
             .andExpect(status().isAccepted());
@@ -56,7 +56,7 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void connecting_with_unknown_user_returns_not_found() throws Exception {
-        mockMvc.perform(patch("/user/social/connect")
+        mockMvc.perform(patch("/social/connect")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("otherUid", "unknown"))
             .andExpect(status().isNotFound());
@@ -64,11 +64,11 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void connecting_users_where_one_blocked_other_returns_forbidden() throws Exception {
-        mockMvc.perform(patch("/user/social/block")
+        mockMvc.perform(patch("/social/block")
                 .param("fromUid", TestConstants.TEST_USER_2.uid())
                 .param("otherUid", TestConstants.TEST_USER_1.uid()));
 
-        mockMvc.perform(patch("/user/social/connect")
+        mockMvc.perform(patch("/social/connect")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("otherUid", TestConstants.TEST_USER_2.uid()))
             .andExpect(status().isForbidden());
@@ -76,7 +76,7 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void blocking_user_returns_accepted() throws Exception {
-        mockMvc.perform(patch("/user/social/block")
+        mockMvc.perform(patch("/social/block")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("otherUid", TestConstants.TEST_USER_2.uid()))
             .andExpect(status().isAccepted());
@@ -84,7 +84,7 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void unblocking_user_that_was_not_blocked_returns_not_found() throws Exception {
-        mockMvc.perform(patch("/user/social/unblock")
+        mockMvc.perform(patch("/social/unblock")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("otherUid", TestConstants.TEST_USER_2.uid()))
             .andExpect(status().isNotFound());
@@ -92,7 +92,7 @@ public class UserSocialConnectionsControllerTests {
 
     @Test
     void search_users_returns_ok() throws Exception {
-        mockMvc.perform(get("/user/social/search")
+        mockMvc.perform(get("/social/search")
                 .param("fromUid", TestConstants.TEST_USER_1.uid())
                 .param("searchQuery", "Test"))
             .andExpect(status().isOk());

@@ -15,7 +15,7 @@ import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.service.UserService;
 
 @RestController
-@RequestMapping("/user/social")
+@RequestMapping("/social")
 public class UserSocialConnectionsController {
 	
 	@Autowired

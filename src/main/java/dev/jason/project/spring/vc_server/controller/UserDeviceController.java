@@ -17,7 +17,7 @@ import dev.jason.project.spring.vc_server.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.service.UserService;
 
 @RestController
-@RequestMapping("/user/devices")
+@RequestMapping("/device")
 public class UserDeviceController {
 	
 	@Autowired
