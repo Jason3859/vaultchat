@@ -4,9 +4,9 @@ import org.springframework.stereotype.Repository;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
 
 import dev.jason.project.spring.vc_server.model.Device;
-import dev.jason.project.spring.vc_server.model.Message;
 import dev.jason.project.spring.vc_server.model.Result;
 import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
@@ -14,37 +14,35 @@ import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
 @Repository
 public class MessagingRepoImpl implements MessagingRepository {
     @Override
-    public Result sendMessage(Message message, Device device) {
-        com.google.firebase.messaging.Message firebaseMessage = com.google.firebase.messaging.Message.builder()
+    public Result sendMessage(dev.jason.project.spring.vc_server.model.Message message, Device device) {
+        Message firebaseMessage = Message.builder()
             .setToken(device.token())
             .putData("type", "message")
             .putAllData(message.asMap())
             .build();
 
-        try {
-            FirebaseMessaging.getInstance().send(firebaseMessage);
-            return Result.Success;
-        } catch (FirebaseMessagingException e) {
-            e.printStackTrace(System.err);
-            return Result.Error;
-        }
+        return sendMessage(firebaseMessage);
     }
 
     @Override
     public Result sendUserStatusUpdate(Device device, String uid, User.Status status) {
-        com.google.firebase.messaging.Message firebaseMessage = com.google.firebase.messaging.Message.builder()
+        Message firebaseMessage = Message.builder()
             .setToken(device.token())
             .putData("type", "status_update")
             .putData("uid", uid)
             .putData("status", status.toString())
             .build();
 
-        try {
-            FirebaseMessaging.getInstance().send(firebaseMessage);
-            return Result.Success;
-        } catch (FirebaseMessagingException e) {
-            e.printStackTrace(System.err);
-            return Result.Error;
-        }
+        return sendMessage(firebaseMessage);
+    }
+    
+    private Result sendMessage(Message message) {
+    	try {
+    		FirebaseMessaging.getInstance().send(message);
+    		return Result.Success;
+    	} catch (FirebaseMessagingException e) {
+			e.printStackTrace(System.err);
+			return Result.Error;
+		}
     }
 }
