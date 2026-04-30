@@ -1,14 +1,9 @@
 package dev.jason.project.spring.vc_server.service;
 
 import java.util.List;
+import java.util.Objects;
 
-import dev.jason.project.spring.vc_server.exception.VcException.BlockedByUserException;
-import dev.jason.project.spring.vc_server.exception.VcException.DeviceAlreadyExistsException;
-import dev.jason.project.spring.vc_server.exception.VcException.DeviceNotFoundException;
-import dev.jason.project.spring.vc_server.exception.VcException.NoUsersBlockedException;
-import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyBlockedException;
-import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyExistsException;
-import dev.jason.project.spring.vc_server.exception.VcException.UserNotBlockedException;
+import dev.jason.project.spring.vc_server.exception.VcException.*;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,14 +48,6 @@ public class UserService {
     }
 
     public User getUserByUid(String uid) {
-        try {
-            return getUserOrThrow(uid);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public User getUserOrThrow(String uid) {
         return getUserEntityOrThrow(uid).toDomainUser();
     }
 
@@ -140,6 +127,11 @@ public class UserService {
     }
 
     public void block(String uid1, String uid2) {
+    	
+    	if (Objects.equals(uid1, uid2)) {
+			throw new SelfBlockException();
+		}
+    	
         UserEntity entity1 = getUserEntityOrThrow(uid1);
         UserEntity entity2 = getUserEntityOrThrow(uid2);
 
@@ -157,6 +149,11 @@ public class UserService {
     }
 
     public void unblock(String uid1, String uid2) {
+    	
+    	if (Objects.equals(uid1, uid2)) {
+    		throw new SelfUnblockException();
+    	}
+    	
         UserEntity entity1 = getUserEntityOrThrow(uid1);
         UserEntity entity2 = getUserEntityOrThrow(uid2);
 
@@ -210,7 +207,7 @@ public class UserService {
     	if (!connections.isEmpty()) {
     		connections.forEach(connectionUid -> {
     			try {
-    				User connection = getUserOrThrow(connectionUid);
+    				User connection = getUserByUid(connectionUid);
     				if (!connection.devices().isEmpty()) {
     					connection.devices().forEach(device -> {
     						Result result = messagingRepository.sendUserStatusUpdate(device, uid, status);

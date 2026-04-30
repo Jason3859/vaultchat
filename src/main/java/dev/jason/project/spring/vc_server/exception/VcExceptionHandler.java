@@ -35,6 +35,16 @@ public class VcExceptionHandler {
 	public ResponseEntity<?> handleNoUsersBlockedException() {
 		return new ResponseEntity<>(Result.NoBlockedUsers, HttpStatus.NOT_FOUND);
 	}
+	
+	@ExceptionHandler(SelfBlockException.class)
+	public ResponseEntity<?> handleSelfBlockException() {
+		return new ResponseEntity<>(Result.SelfBlock, HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(SelfUnblockException.class)
+	public ResponseEntity<?> handleSelfUnblockException() {
+		return new ResponseEntity<>(Result.SelfUnblock, HttpStatus.NOT_ACCEPTABLE);
+	}
 
 	@ExceptionHandler(UserAlreadyBlockedException.class)
 	public ResponseEntity<?> handleUserAlreadyBlockedException() {

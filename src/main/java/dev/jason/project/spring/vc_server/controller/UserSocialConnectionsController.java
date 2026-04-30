@@ -22,25 +22,25 @@ public class UserSocialConnectionsController {
 	private UserService userService;
 
 	@PatchMapping("/block")
-	public ResponseEntity<?> blockUser(@RequestParam String fromUid, @RequestParam String otherUid) {
+	public ResponseEntity<?> blockUser(@RequestParam("from_uid") String fromUid, @RequestParam("other_uid") String otherUid) {
 		userService.block(fromUid, otherUid);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@PatchMapping("/unblock")
-	public ResponseEntity<?> unblockUser(@RequestParam String fromUid, @RequestParam String otherUid) {
+	public ResponseEntity<?> unblockUser(@RequestParam("from_uid") String fromUid, @RequestParam("other_uid") String otherUid) {
 		userService.unblock(fromUid, otherUid);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@PatchMapping("/connect")
-	public ResponseEntity<?> connect(@RequestParam String fromUid, @RequestParam String otherUid) {
+	public ResponseEntity<?> connect(@RequestParam("from_uid") String fromUid, @RequestParam("other_uid") String otherUid) {
 		userService.addConnection(fromUid, otherUid);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@GetMapping("/search")
-	public ResponseEntity<List<User>> search(@RequestParam String fromUid, @RequestParam String searchQuery) {
+	public ResponseEntity<List<User>> search(@RequestParam("from_uid") String fromUid, @RequestParam("search_query") String searchQuery) {
 		userService.getUserByUid(fromUid); // for verification that user exists
 		
 		List<User> requiredUsers =  userService.getAllUsersByDisplayName(searchQuery).stream()
