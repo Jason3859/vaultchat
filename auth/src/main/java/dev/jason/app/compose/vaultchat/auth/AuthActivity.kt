@@ -31,7 +31,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
 import dev.jason.app.compose.vaultchat.auth.data.FirebaseGoogleAuthentication
-import dev.jason.app.compose.vaultchat.auth.data.RegisterUserDto
+import dev.jason.app.compose.vaultchat.auth.data.UserDto
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
 import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
@@ -119,14 +119,14 @@ class AuthActivity : ComponentActivity() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         viewModel.updateCurrentScreen(AuthViewModel.Screen.Loading)
                         remoteApi.registerUser(
-                            RegisterUserDto(
+                            UserDto(
                                 it?.user?.uid!!,
                                 it.user?.displayName!!,
                                 it.user?.photoUrl.toString().removeSuffix("=s96-c"),
                                 Device.getCurrentDevice(this@AuthActivity, token).let { device ->
-                                    RegisterUserDto.DeviceDto(
+                                    UserDto.DeviceDto(
                                         name = device.name,
-                                        type = RegisterUserDto.DeviceDto.Type.valueOf(device.type.name),
+                                        type = UserDto.DeviceDto.Type.valueOf(device.type.name),
                                         os = device.os.toString(),
                                         version = device.version,
                                         token = token

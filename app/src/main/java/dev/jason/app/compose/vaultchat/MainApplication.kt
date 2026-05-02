@@ -9,22 +9,32 @@ import dev.jason.app.compose.vaultchat.local_storage.LocalStorageKoinModule
 import dev.jason.app.compose.vaultchat.messaging.MessagingKoinModule
 import dev.jason.app.compose.vaultchat.messaging.data.MessagingDataKoinModule
 import dev.jason.app.compose.vaultchat.messaging.ui.MessagingUiKoinModule
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 class MainApplication : Application() {
 
     private val baseModule = module {
-        single<Retrofit> {
-            Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/")
-                .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-                .build()
+        single<HttpClient> {
+            HttpClient(Android) {
+                install(ContentNegotiation) {
+                    json(Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                }
+                engine {
+                    connectTimeout = 100_000
+                    socketTimeout = 100_000
+                }
+            }
         }
     }
 

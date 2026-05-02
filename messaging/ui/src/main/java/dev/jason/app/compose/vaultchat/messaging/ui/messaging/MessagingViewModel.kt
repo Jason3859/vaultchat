@@ -74,17 +74,19 @@ class MessagingViewModel(
 
         viewModelScope.launch {
             api.sendMessage(message)
-                .onSuccess {
-                    _pendingMessages.remove(message)
-                    localStorageRepository.addMessage(message)
-                }
-                .onError {
-                    Log.e(
-                        "MessagingViewModel",
-                        "sendMessage: error sending message. response from server: $it"
-                    )
-                    _pendingMessages.remove(message)
-                    _failedMessages.add(message)
+                .let { statusCode ->
+                    if (statusCode in 200..299) { // success
+                        _pendingMessages.remove(message)
+                        localStorageRepository.addMessage(message)
+                    } else { // not success
+                        Log.e(
+                            "MessagingViewModel",
+                            "sendMessage: error status code from server: $statusCode"
+                        )
+
+                        _pendingMessages.remove(message)
+                        _failedMessages.add(message)
+                    }
                 }
         }
     }

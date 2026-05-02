@@ -1,10 +1,22 @@
 package dev.jason.app.compose.vaultchat.auth.data
 
-import retrofit2.http.Body
-import retrofit2.http.POST
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+
+private const val BASE_URL = "http://10.0.2.2:8080"
 
 interface RemoteApi {
+    suspend fun registerUser(body: UserDto)
+}
 
-    @POST("/user/register")
-    suspend fun registerUser(@Body body: RegisterUserDto)
+class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
+    override suspend fun registerUser(body: UserDto) {
+        httpClient.post("$BASE_URL/user/register") {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+    }
 }

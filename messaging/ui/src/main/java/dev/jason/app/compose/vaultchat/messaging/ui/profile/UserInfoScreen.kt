@@ -78,7 +78,8 @@ fun UserInfoScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            viewModel.blockUser(user, navigateBackToHomeScreen)
+                            viewModel.blockUser(user)
+                            navigateBackToHomeScreen()
                         }
                     ) {
                         Text("Conform")

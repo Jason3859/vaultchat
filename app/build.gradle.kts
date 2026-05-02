@@ -50,8 +50,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
 
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter)
+    implementation(platform(libs.ktor.bom))
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(projects.core)

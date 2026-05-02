@@ -31,12 +31,12 @@ class SearchUsersViewModel(private val apiRepository: RemoteApiRepository) : Vie
     fun getAndUpdateUsers() {
         viewModelScope.launch {
             updateState(_uiState.value.copy(isLoading = true))
-            val response = apiRepository.searchUsers(_uiState.value.searchQuery, Firebase.auth.currentUser!!.uid)
+            val searchResults = apiRepository.searchUsers(_uiState.value.searchQuery, Firebase.auth.currentUser!!.uid)
             updateState(
                 _uiState.value.copy(
                     isLoading = false,
                     hasRequested = true,
-                    searchResults = response.data ?: emptyList()
+                    searchResults = searchResults
                 )
             )
         }

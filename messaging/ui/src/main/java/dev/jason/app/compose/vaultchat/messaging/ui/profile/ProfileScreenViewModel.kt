@@ -6,7 +6,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,16 +43,16 @@ class ProfileScreenViewModel(
 
     fun fetchBlocklist() {
         viewModelScope.launch {
-            repository.fetchBlocklist(currentUser.uid).let { response ->
-                _blocklist.update { response.data ?: emptyList() }
+            repository.fetchBlocklist(currentUser.uid).let {
+                _blocklist.update { it }
             }
         }
     }
 
     fun fetchDevices() {
         viewModelScope.launch {
-            repository.fetchDevices(currentUser.uid).let { response ->
-                _devices.update { response.data ?: emptyList() }
+            repository.fetchDevices(currentUser.uid).let { devices ->
+                _devices.update { devices }
             }
         }
     }
@@ -61,7 +60,6 @@ class ProfileScreenViewModel(
     fun unblockUser(user: User) {
         viewModelScope.launch {
             repository.unblock(currentUser.uid, user.uid)
-                .onSuccess { fetchBlocklist() }
         }
     }
 
@@ -69,11 +67,9 @@ class ProfileScreenViewModel(
         // TODO: implement this
     }
 
-    fun blockUser(user: User, navigateBack: () -> Unit) {
+    fun blockUser(user: User) {
         viewModelScope.launch {
             repository.block(currentUser.uid, user.uid)
-                .onSuccess { navigateBack() }
-                .onError { SnackbarController.showSnackbar("An internal error occurred") }
         }
     }
 

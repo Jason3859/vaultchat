@@ -3,7 +3,7 @@ package dev.jason.app.compose.vaultchat.auth.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterUserDto(
+data class UserDto(
     val uid: String,
     val displayName: String,
     val profilePictureUrl: String,

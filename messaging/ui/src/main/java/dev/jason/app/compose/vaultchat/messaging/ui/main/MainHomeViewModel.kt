@@ -35,7 +35,7 @@ class MainHomeViewModel(private val apiRepository: RemoteApiRepository) : ViewMo
         _isLoading.update { true }
         viewModelScope.launch {
             val connections = apiRepository.fetchConnections(currentUserUid)
-            MessagingState.updateConnections(connections.data ?: emptyList())
+            MessagingState.updateConnections(connections)
             _isLoading.update { false }
         }
     }
