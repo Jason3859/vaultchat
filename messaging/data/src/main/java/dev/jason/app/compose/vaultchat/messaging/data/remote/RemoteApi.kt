@@ -36,10 +36,10 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
     }
 
     override suspend fun searchUsers(name: String, from: String): List<UserDto> {
-        return httpClient.get("$baseUrl/user/search") {
+        return httpClient.get("$baseUrl/social/search") {
             url {
-                parameters.append("name", name)
-                parameters.append("from", from)
+                parameters.append("search_query", name)
+                parameters.append("from_uid", from)
             }
         }.body()
     }
