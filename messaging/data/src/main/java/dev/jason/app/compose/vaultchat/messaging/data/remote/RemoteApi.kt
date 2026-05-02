@@ -13,8 +13,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-private const val BASE_URL = "http://10.0.2.2:8080"
-
 interface RemoteApi {
     suspend fun sendMessage(body: MessageDto): Int
     suspend fun searchUsers(name: String, from: String): List<UserDto>
@@ -27,10 +25,10 @@ interface RemoteApi {
     suspend fun fetchDevices(uid: String): List<UserDto.DeviceDto>
 }
 
-class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
+class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: String) : RemoteApi {
 
     override suspend fun sendMessage(body: MessageDto): Int {
-        val response: HttpResponse = httpClient.post("$BASE_URL/messaging/send") {
+        val response: HttpResponse = httpClient.post("$baseUrl/messaging/send") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
@@ -38,7 +36,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun searchUsers(name: String, from: String): List<UserDto> {
-        return httpClient.get("$BASE_URL/user/search") {
+        return httpClient.get("$baseUrl/user/search") {
             url {
                 parameters.append("name", name)
                 parameters.append("from", from)
@@ -47,7 +45,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun updateStatus(uid: String, status: User.Status) {
-        httpClient.put("$BASE_URL/user/update-status") {
+        httpClient.put("$baseUrl/user/update-status") {
             contentType(ContentType.Application.Json)
             url {
                 parameters.append("uid", uid)
@@ -57,7 +55,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun getConnections(uid: String): List<UserDto> {
-        return httpClient.get("$BASE_URL/social/get-connections") {
+        return httpClient.get("$baseUrl/social/get-connections") {
             url {
                 parameters.append("uid", uid)
             }
@@ -65,7 +63,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun fetchBlocklist(uid: String): List<UserDto> {
-        return httpClient.get("$BASE_URL/social/get-blocked-users") {
+        return httpClient.get("$baseUrl/social/get-blocked-users") {
             url {
                 parameters.append("uid", uid)
             }
@@ -73,7 +71,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun block(uid: String, uidToBlock: String) {
-        httpClient.post("$BASE_URL/social/block") {
+        httpClient.post("$baseUrl/social/block") {
             contentType(ContentType.Application.Json)
             url {
                 parameters.append("uid", uid)
@@ -83,7 +81,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun unblock(uid: String, uidToUnblock: String) {
-        httpClient.post("$BASE_URL/social/unblock") {
+        httpClient.post("$baseUrl/social/unblock") {
             contentType(ContentType.Application.Json)
             url {
                 parameters.append("uid", uid)
@@ -93,7 +91,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun updateToken(uid: String, token: String, deviceDto: UserDto.DeviceDto) {
-        httpClient.post("$BASE_URL/device/update-token") {
+        httpClient.post("$baseUrl/device/update-token") {
             contentType(ContentType.Application.Json)
             url {
                 parameters.append("uid", uid)
@@ -104,7 +102,7 @@ class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
     }
 
     override suspend fun fetchDevices(uid: String): List<UserDto.DeviceDto> {
-        return httpClient.get("$BASE_URL/device/my-devices") {
+        return httpClient.get("$baseUrl/device/my-devices") {
             url {
                 parameters.append("uid", uid)
             }

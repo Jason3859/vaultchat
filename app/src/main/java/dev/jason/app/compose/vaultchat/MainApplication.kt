@@ -21,6 +21,11 @@ import org.koin.dsl.module
 class MainApplication : Application() {
 
     private val baseModule = module {
+        single<String> {
+            // base url
+            "http://127.0.0.1:8080"
+        }
+
         single<HttpClient> {
             HttpClient(Android) {
                 install(ContentNegotiation) {

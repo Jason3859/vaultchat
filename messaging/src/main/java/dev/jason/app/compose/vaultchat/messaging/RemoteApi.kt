@@ -5,15 +5,13 @@ import io.ktor.client.request.patch
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-private const val BASE_URL = "http://10.0.2.2:8080"
-
 interface RemoteApi {
     suspend fun heartbeat(uid: String)
 }
 
-class KtorRemoteApi(private val httpClient: HttpClient) : RemoteApi {
+class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: String) : RemoteApi {
     override suspend fun heartbeat(uid: String) {
-        httpClient.patch("$BASE_URL/user/heartbeat") {
+        httpClient.patch("$baseUrl/user/heartbeat") {
             contentType(ContentType.Application.Json)
             url {
                 parameters.append("uid", uid)
