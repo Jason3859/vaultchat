@@ -50,36 +50,8 @@ class PushNotificationService : FirebaseMessagingService() {
         val type = message.data["type"]
 
         when (type) {
-            "notification" -> {
-                val from = message.data["received_from"]!!
-                val to = message.data["to"]!!
-                val text = message.data["text"]!!
-                val timestamp = message.data["timestamp"]!!.toLocalDateTime()
-
-                val notification =
-                    NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
-                        .setContentTitle("New message")
-                        .setContentText(text)
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .build()
-
-                val notificationManager = getSystemService(NotificationManager::class.java)
-
-                if (MessagingState.otherUserUid.value != from) {
-                    notificationManager.notify(System.currentTimeMillis().toInt(), notification)
-                }
-
-                coroutineScope.launch {
-                    storageRepository.addMessage(Message(from, to, text, timestamp))
-                }
-            }
-
-            "status_update" -> {
-                val uid = message.data["uid"]!!
-                val status = User.Status.valueOf(message.data["status"]!!)
-
-                MessagingState.updateConnectionsStatus(uid, status)
-            }
+            "message" -> handleMessage(message.data)
+            "status_update" -> handleStatusUpdate(message.data)
         }
     }
 
@@ -94,4 +66,35 @@ class PushNotificationService : FirebaseMessagingService() {
     }
 
     private fun String.toLocalDateTime() = LocalDateTime.parse(this)
+
+    private fun handleMessage(data: Map<String, String>) {
+        val from = data["received_from"]!!
+        val to = data["to"]!!
+        val text = data["text"]!!
+        val timestamp = data["timestamp"]!!.toLocalDateTime()
+
+        val notification =
+            NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+                .setContentTitle("New message")
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .build()
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+
+        if (MessagingState.otherUserUid.value != from) {
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        }
+
+        coroutineScope.launch {
+            storageRepository.addMessage(Message(from, to, text, timestamp))
+        }
+    }
+
+    private fun handleStatusUpdate(data: Map<String, String>) {
+        val uid = data["uid"]!!
+        val status = User.Status.valueOf(data["status"]!!)
+
+        MessagingState.updateConnectionsStatus(uid, status)
+    }
 }
