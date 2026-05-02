@@ -36,9 +36,6 @@ public class VcException extends RuntimeException {
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public static final class UserNotFoundException extends VcException {}
-
-	@ResponseStatus(HttpStatus.CONFLICT)
-	public static final class UsersAlreadyConnectedException extends VcException {}
 	
 	@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
 	public static final class MessageTextBlankException extends VcException {}

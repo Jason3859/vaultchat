@@ -22,8 +22,10 @@ public class MessagingService {
 			throw new MessageTextBlankException();
 		}
 		
-		userService.getUserByUid(message.from()); // for verification that user exists
+		User from = userService.getUserByUid(message.from());
 		User to = userService.getUserByUid(message.to());
+		
+		userService.addConnection(from.uid(), to.uid());
 		
 		if (to.devices().isEmpty()) {
 			userService.addMessageToQueue(to.uid(), message);
@@ -32,6 +34,7 @@ public class MessagingService {
 		
 		to.devices().forEach(device -> {
 			messagingRepository.sendMessage(message, device);
+			System.out.println("sent message to device %s".formatted(device.name()));
 		});
 	}
 }

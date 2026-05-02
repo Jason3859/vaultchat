@@ -65,11 +65,6 @@ public class VcExceptionHandler {
 	public ResponseEntity<?> handleUserNotFoundException() {
 		return new ResponseEntity<>(Result.UserNotFound, HttpStatus.NOT_FOUND);
 	}
-
-	@ExceptionHandler(UsersAlreadyConnectedException.class)
-	public ResponseEntity<?> handleUsersAlreadyConnectedException() {
-		return new ResponseEntity<>(Result.UsersAlreadyConnected, HttpStatus.CONFLICT);
-	}
 	
 	@ExceptionHandler(MessageTextBlankException.class) 
 	public ResponseEntity<?> handleMessageTextBlankException() {

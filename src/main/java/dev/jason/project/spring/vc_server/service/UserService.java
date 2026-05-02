@@ -16,7 +16,6 @@ import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyBlock
 import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.exception.VcException.UserNotBlockedException;
 import dev.jason.project.spring.vc_server.exception.VcException.UserNotFoundException;
-import dev.jason.project.spring.vc_server.exception.VcException.UsersAlreadyConnectedException;
 import dev.jason.project.spring.vc_server.model.Device;
 import dev.jason.project.spring.vc_server.model.Message;
 import dev.jason.project.spring.vc_server.model.User;
@@ -111,7 +110,7 @@ public class UserService {
         UserEntity entity2 =  getUserEntityOrThrow(uid2);
 
         if (entity1.connections().contains(uid2)) {
-            throw new UsersAlreadyConnectedException();
+            return;
         }
         
         // if user is blocked
