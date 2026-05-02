@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,5 +31,11 @@ public class UserController {
 	public ResponseEntity<?> deleteUser(@RequestParam String uid) {
 		userService.deleteUser(uid);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	}
+	
+	@PatchMapping("/heartbeat")
+	public ResponseEntity<?> heartbeat(@RequestParam String uid) {
+		userService.updateHeartbeat(uid);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

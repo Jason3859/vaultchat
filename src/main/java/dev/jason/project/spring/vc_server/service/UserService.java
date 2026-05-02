@@ -3,17 +3,22 @@ package dev.jason.project.spring.vc_server.service;
 import java.util.List;
 import java.util.Objects;
 
-import dev.jason.project.spring.vc_server.exception.VcException.*;
-
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.exception.VcException.BlockedByUserException;
+import dev.jason.project.spring.vc_server.exception.VcException.DeviceAlreadyExistsException;
+import dev.jason.project.spring.vc_server.exception.VcException.DeviceNotFoundException;
+import dev.jason.project.spring.vc_server.exception.VcException.NoUsersBlockedException;
+import dev.jason.project.spring.vc_server.exception.VcException.SelfBlockException;
+import dev.jason.project.spring.vc_server.exception.VcException.SelfUnblockException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyBlockedException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserAlreadyExistsException;
+import dev.jason.project.spring.vc_server.exception.VcException.UserNotBlockedException;
 import dev.jason.project.spring.vc_server.exception.VcException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.exception.VcException.UsersAlreadyConnectedException;
 import dev.jason.project.spring.vc_server.model.Device;
 import dev.jason.project.spring.vc_server.model.Message;
-import dev.jason.project.spring.vc_server.model.Result;
 import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.repo.db.user.UserEntity;
 import dev.jason.project.spring.vc_server.repo.db.user.UserRepository;
@@ -21,8 +26,6 @@ import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
 
 @Service
 public class UserService {
-
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     protected UserRepository userRepository;
@@ -84,10 +87,6 @@ public class UserService {
         }
 
         throw new DeviceNotFoundException();
-    }
-
-    public List<Device> getUserDevicesByUid(String uid) {
-        return getUserEntityOrThrow(uid).devices();
     }
 
     public void updateToken(String uid, String token, Device device) {
@@ -197,7 +196,7 @@ public class UserService {
 
     // --- Helpers ---
 
-    public void updateUserStatusAndNotify(String uid, User.Status status) {
+    protected void updateUserStatusAndNotify(String uid, User.Status status) {
     	UserEntity entity = getUserEntityOrThrow(uid);
     	entity.setStatus(status);
     	userRepository.save(entity);
@@ -210,11 +209,7 @@ public class UserService {
     				User connection = getUserByUid(connectionUid);
     				if (!connection.devices().isEmpty()) {
     					connection.devices().forEach(device -> {
-    						Result result = messagingRepository.sendUserStatusUpdate(device, uid, status);
-    						
-    						if (result != Result.Success) {
-    							logger.error("Error result while sending user status update");
-    						}
+    						messagingRepository.sendUserStatusUpdate(device, uid, status);
     					});
     				}
     			} catch (UserNotFoundException ignored) {

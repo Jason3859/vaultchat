@@ -1,7 +1,6 @@
 package dev.jason.project.spring.vc_server.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import dev.jason.project.spring.vc_server.model.User;
@@ -26,9 +25,9 @@ public record UserDto(String uid, String displayName, String profilePictureUrl, 
             uid,
             displayName,
             profilePictureUrl,
-            device == null ? new ArrayList<>(List.of()) : new ArrayList<>(List.of(device.toDomainModel(LocalDateTime.now()))),
-            new ArrayList<>(List.of()),
-            new ArrayList<>(List.of()),
+            device == null ? List.of() : List.of(device.toDomainModel(LocalDateTime.now())),
+            List.of(),
+            List.of(),
             User.Status.Online,
             System.currentTimeMillis()
         );

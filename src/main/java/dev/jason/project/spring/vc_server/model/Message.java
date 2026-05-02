@@ -8,7 +8,6 @@ public record Message(String from, String to, String text, String timestamp) {
         return Map.of(
             "received_from", from,
             "to", to,
-            "title", "New Message!",
             "text", text,
             "timestamp", timestamp
         );

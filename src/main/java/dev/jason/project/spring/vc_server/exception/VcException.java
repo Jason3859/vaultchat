@@ -39,4 +39,10 @@ public class VcException extends RuntimeException {
 
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public static final class UsersAlreadyConnectedException extends VcException {}
+	
+	@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+	public static final class MessageTextBlankException extends VcException {}
+	
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public static final class MessagingException extends VcException {}
 }

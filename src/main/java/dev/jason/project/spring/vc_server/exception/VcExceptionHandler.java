@@ -70,4 +70,14 @@ public class VcExceptionHandler {
 	public ResponseEntity<?> handleUsersAlreadyConnectedException() {
 		return new ResponseEntity<>(Result.UsersAlreadyConnected, HttpStatus.CONFLICT);
 	}
+	
+	@ExceptionHandler(MessageTextBlankException.class) 
+	public ResponseEntity<?> handleMessageTextBlankException() {
+		return new ResponseEntity<>(Result.MessageTextBlank, HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(MessagingException.class)
+	public ResponseEntity<?> handleMessagingException() {
+		return new ResponseEntity<>(Result.Error, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
