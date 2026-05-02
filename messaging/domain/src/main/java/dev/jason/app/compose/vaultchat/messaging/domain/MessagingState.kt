@@ -11,8 +11,8 @@ object MessagingState {
     private val _otherUserUid = MutableStateFlow<String?>(null)
     val otherUserUid = _otherUserUid.asStateFlow()
 
-    private val _connectionsStatus = MutableStateFlow<List<User>>(emptyList())
-    val connections = _connectionsStatus.asStateFlow()
+    private val _connections = MutableStateFlow<List<User>>(emptyList())
+    val connections = _connections.asStateFlow()
 
     private val _currentDevice = MutableStateFlow<Device?>(null)
     val currentDevice = _currentDevice.asStateFlow()
@@ -26,11 +26,11 @@ object MessagingState {
     }
 
     fun updateConnections(list: List<User>) {
-        _connectionsStatus.update { list }
+        _connections.update { list }
     }
 
     fun updateConnectionsStatus(uid: String, status: User.Status) {
-        _connectionsStatus.update { list ->
+        _connections.update { list ->
             list.map { user ->
                 if (user.uid == uid) {
                     user.copy(status = status)
