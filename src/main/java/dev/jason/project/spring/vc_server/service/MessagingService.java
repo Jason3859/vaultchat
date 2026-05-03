@@ -12,12 +12,16 @@ import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
 public class MessagingService {
 	
 	@Autowired
-	private MessagingRepository messagingRepository;
+	protected MessagingRepository messagingRepository;
 	
 	@Autowired
 	private UserService userService;
 
 	public void sendMessage(Message message) {
+		sendMessage(message, false);
+	}
+	
+	public void sendMessage(Message message, boolean forDeviceCheck) {
 		if (message.text().isBlank()) {
 			throw new MessageTextBlankException();
 		}
@@ -33,7 +37,7 @@ public class MessagingService {
 		}
 		
 		to.devices().forEach(device -> {
-			messagingRepository.sendMessage(message, device);
+			messagingRepository.sendMessage(message, device, forDeviceCheck);
 			System.out.println("sent message to device %s".formatted(device.name()));
 		});
 	}

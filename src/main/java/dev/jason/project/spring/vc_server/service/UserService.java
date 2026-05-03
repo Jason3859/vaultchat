@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.VcServerApplication;
 import dev.jason.project.spring.vc_server.exception.VcException.BlockedByUserException;
 import dev.jason.project.spring.vc_server.exception.VcException.DeviceAlreadyExistsException;
 import dev.jason.project.spring.vc_server.exception.VcException.DeviceNotFoundException;
@@ -33,6 +34,10 @@ public class UserService {
     private MessagingRepository messagingRepository;
 
     // --- User Management ---
+    
+    public void addAdminToDB() {
+    	userRepository.save(UserEntity.fromDomainUser(VcServerApplication.ADMIN_USER));
+    }
 
     public void addUser(User user) {
         UserEntity entity = userRepository.findByUid(user.uid());
