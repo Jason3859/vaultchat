@@ -15,4 +15,17 @@ public record User(
     public enum Status {
         Online, Away, Offline
     }
+    
+    @Override
+    public boolean equals(Object other) {
+    	if (this == other) {
+			return true;
+		}
+    	
+    	if (!(other instanceof User)) {
+			return false;
+		}
+    	
+    	return this.uid().equals(((User) other).uid());
+    }
 }

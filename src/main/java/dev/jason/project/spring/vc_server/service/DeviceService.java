@@ -19,7 +19,7 @@ public class DeviceService extends UserService {
 	public void sendMessage() { // if device if reported unregistered by firebase, device will be removed
 		String uid = VcServerApplication.ADMIN_USER.uid();
 		
-		userRepository.findAll().forEach(user -> {
+		repository.findAll().forEach(user -> {
 			Message message = new Message(uid, user.uid(), "hai", LocalDateTime.now().toString());
 			messagingService.sendMessage(message, true);
 		});

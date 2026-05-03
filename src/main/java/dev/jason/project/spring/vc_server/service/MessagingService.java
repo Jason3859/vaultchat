@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.jason.project.spring.vc_server.exception.VcException.MessageTextBlankException;
+import dev.jason.project.spring.vc_server.model.Device;
 import dev.jason.project.spring.vc_server.model.Message;
 import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
@@ -12,7 +13,7 @@ import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
 public class MessagingService {
 	
 	@Autowired
-	protected MessagingRepository messagingRepository;
+	protected MessagingRepository repository;
 	
 	@Autowired
 	private UserService userService;
@@ -37,8 +38,12 @@ public class MessagingService {
 		}
 		
 		to.devices().forEach(device -> {
-			messagingRepository.sendMessage(message, device, forDeviceCheck);
+			repository.sendMessage(message, device, forDeviceCheck);
 			System.out.println("sent message to device %s".formatted(device.name()));
 		});
+	}
+	
+	public void sendUserStatusUpdate(Device device, String uid, User.Status status) {
+		repository.sendUserStatusUpdate(device, uid, status);
 	}
 }

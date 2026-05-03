@@ -22,28 +22,33 @@ import dev.jason.project.spring.vc_server.model.Message;
 import dev.jason.project.spring.vc_server.model.User;
 import dev.jason.project.spring.vc_server.repo.db.user.UserEntity;
 import dev.jason.project.spring.vc_server.repo.db.user.UserRepository;
-import dev.jason.project.spring.vc_server.repo.messaging.MessagingRepository;
 
 @Service
 public class UserService {
 
     @Autowired
-    protected UserRepository userRepository;
+    protected UserRepository repository;
 
     @Autowired
-    private MessagingRepository messagingRepository;
+    private MessagingService messagingService;
 
     // --- User Management ---
     
     public void addAdminToDB() {
-    	userRepository.save(UserEntity.fromDomainUser(VcServerApplication.ADMIN_USER));
+    	UserEntity entity = UserEntity.fromDomainUser(VcServerApplication.ADMIN_USER);
+    	
+    	boolean exists = repository.findByUid(entity.uid()) != null;
+    	
+    	if (!exists) {
+			repository.save(entity);
+		}
     }
 
     public void addUser(User user) {
-        UserEntity entity = userRepository.findByUid(user.uid());
+        UserEntity entity = repository.findByUid(user.uid());
 
         if (entity == null) {
-            userRepository.save(UserEntity.fromDomainUser(user));
+            repository.save(UserEntity.fromDomainUser(user));
         } else {
             throw new UserAlreadyExistsException();
         }
@@ -51,7 +56,7 @@ public class UserService {
     
     public void deleteUser(String uid) {
     	UserEntity entity = getUserEntityOrThrow(uid);
-    	userRepository.delete(entity);
+    	repository.delete(entity);
     }
 
     public User getUserByUid(String uid) {
@@ -59,7 +64,10 @@ public class UserService {
     }
 
     public List<User> getAllUsersByDisplayName(String name) {
-        return userRepository.findByDisplayNameContainingIgnoreCase(name).stream().map(UserEntity::toDomainUser).toList();
+        return repository.findByDisplayNameContainingIgnoreCase(name).stream()
+        	.map(UserEntity::toDomainUser)
+        	.filter(user -> !user.equals(VcServerApplication.ADMIN_USER))
+        	.toList();
     }
     
     // --- Device Management ---
@@ -75,7 +83,7 @@ public class UserService {
         }
 
         entity.devices().add(device);
-        userRepository.save(entity);
+        repository.save(entity);
     }
 
     public void deleteDevice(String uid, Device device) {
@@ -85,7 +93,7 @@ public class UserService {
         for (Device d : devices) {
             if (d.equals(device)) {
                 devices.remove(d);
-                userRepository.save(entity);
+                repository.save(entity);
                 return;
             }
         }
@@ -100,7 +108,7 @@ public class UserService {
         for (Device d : devices) {
             if (d.equals(device)) {
                 d.setFcmToken(token);
-                userRepository.save(entity);
+                repository.save(entity);
                 return;
             }
         }
@@ -126,7 +134,7 @@ public class UserService {
         entity1.connections().add(uid2);
         entity2.connections().add(uid1);
 
-        userRepository.saveAll(List.of(entity1, entity2));
+        repository.saveAll(List.of(entity1, entity2));
     }
 
     public void block(String uid1, String uid2) {
@@ -148,7 +156,7 @@ public class UserService {
         entity2.blocklist().add(uid1);
         entity2.connections().remove(uid1);
 
-        userRepository.saveAll(List.of(entity1, entity2));
+        repository.saveAll(List.of(entity1, entity2));
     }
 
     public void unblock(String uid1, String uid2) {
@@ -171,7 +179,7 @@ public class UserService {
             entity1.connections().add(entity2.uid());
             entity2.connections().add(entity1.uid());
 
-            userRepository.saveAll(List.of(entity1, entity2));
+            repository.saveAll(List.of(entity1, entity2));
         } else throw new UserNotBlockedException();
     }
     
@@ -180,7 +188,7 @@ public class UserService {
     public void updateHeartbeat(String uid) {
         UserEntity entity = getUserEntityOrThrow(uid);
         entity.setLastHeartbeat(System.currentTimeMillis());
-        userRepository.save(entity);
+        repository.save(entity);
         if (entity.status() == User.Status.Offline) {
             updateUserStatusAndNotify(uid, User.Status.Online);
         }
@@ -195,7 +203,7 @@ public class UserService {
         if (queuedMessages.contains(message)) return;
 
         queuedMessages.add(message);
-        userRepository.save(entity);
+        repository.save(entity);
     }
 
     // --- Helpers ---
@@ -203,7 +211,7 @@ public class UserService {
     protected void updateUserStatusAndNotify(String uid, User.Status status) {
     	UserEntity entity = getUserEntityOrThrow(uid);
     	entity.setStatus(status);
-    	userRepository.save(entity);
+    	repository.save(entity);
     	
     	// Notify connections
     	List<String> connections = entity.connections();
@@ -213,7 +221,7 @@ public class UserService {
     				User connection = getUserByUid(connectionUid);
     				if (!connection.devices().isEmpty()) {
     					connection.devices().forEach(device -> {
-    						messagingRepository.sendUserStatusUpdate(device, uid, status);
+    						messagingService.sendUserStatusUpdate(device, uid, status);
     					});
     				}
     			} catch (UserNotFoundException ignored) {
@@ -223,7 +231,7 @@ public class UserService {
     }
 
     protected UserEntity getUserEntityOrThrow(String uid) {
-        UserEntity entity = userRepository.findByUid(uid);
+        UserEntity entity = repository.findByUid(uid);
 
         if (entity == null) {
             throw new UserNotFoundException();
