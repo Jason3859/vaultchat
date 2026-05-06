@@ -1,0 +1,35 @@
+spring:
+    application:
+        name: vc_server
+    cloud:
+        gateway:
+            server:
+                webmvc:
+                    routes:
+                        # Device Microservice Route
+                        - id: device-route
+                          uri: http://localhost:9000
+                          predicates:
+                              - Path=/device/**
+
+                        # User Microservice Route
+                        - id: user-route
+                          uri: http://localhost:9003
+                          predicates:
+                              - Path=/user/**
+
+                        # Social Microservice Route
+                        - id: social-route
+                          uri: http://localhost:9002
+                          predicates:
+                              - Path=/social/**
+
+                        # Messaging Microservice Route
+                        - id: messaging-route
+                          uri: http://localhost:9001
+                          predicates:
+                              - Path=/messaging/**
+
+server:
+    port: 8080
+

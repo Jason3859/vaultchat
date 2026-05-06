@@ -1,6 +1,0 @@
-spring:
-    application:
-        name: vc_server
-    mongodb:
-        uri: mongodb://localhost:27017
-        database: vaultchat
