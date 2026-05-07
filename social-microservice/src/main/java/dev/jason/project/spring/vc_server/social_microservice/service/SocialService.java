@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.SelfBlockException;
 import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.SelfUnblockException;
+import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserNotBlockedException;
 import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.social_microservice.model.SocialEntity;
@@ -19,6 +20,15 @@ public class SocialService {
 
     @Autowired
     private SocialRepository repository;
+    
+	public void registerNewUser(String uid) {
+		if (repository.findByUserId(uid) != null) {
+			throw new UserAlreadyExistsException();
+		}
+		
+		SocialEntity entity = new SocialEntity(uid, List.of(), List.of(), List.of());
+		repository.save(entity);
+	}
 
     public void block(String uid1, String uid2) {
         if (Objects.equals(uid1, uid2)) {
@@ -33,6 +43,7 @@ public class SocialService {
         }
 
         entity1.getBlocklist().add(uid2);
+        entity1.getConnections().remove(uid2);
 
         repository.save(entity1);
     }

@@ -31,6 +31,9 @@ public class SocialException extends RuntimeException {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public static final class UserNotFoundException extends SocialException {}
 	
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public static final class UserAlreadyExistsException extends SocialException {}
+	
 	@RestControllerAdvice
 	public static class Handler {
 		
@@ -67,6 +70,11 @@ public class SocialException extends RuntimeException {
 		@ExceptionHandler(UserNotFoundException.class)
 		public ResponseEntity<?> handleUserNotFoundException() {
 			return new ResponseEntity<>(Result.UserNotFound, HttpStatus.NOT_FOUND);
+		}
+		
+		@ExceptionHandler(UserAlreadyExistsException.class)
+		public ResponseEntity<?> handleUserAlreadyExistsException() {
+			return new ResponseEntity<>(Result.UserAlreadyExists, HttpStatus.CONFLICT);
 		}
 	}
 }

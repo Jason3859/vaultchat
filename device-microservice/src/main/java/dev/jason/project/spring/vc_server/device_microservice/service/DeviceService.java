@@ -23,14 +23,18 @@ public class DeviceService {
 			.toList();
 	}
 	
-	public void addDevice(Device device) {
+	public Device addDevice(Device device) {
 		List<DeviceEntity> devices = deviceRepository.findByOwnerUid(device.getOwnerId());
 		
-		if (devices.contains(DeviceEntity.asEntity(device))) {
+		DeviceEntity entity = DeviceEntity.asEntity(device);
+		
+		if (devices.contains(entity)) {
 			throw new DeviceAlreadyExistsException();
 		}
 		
-		deviceRepository.save(DeviceEntity.asEntity(device));
+		deviceRepository.save(entity);
+		
+		return entity.asDevice();
 	}
 	
 	public void deleteDevice(Device device) {

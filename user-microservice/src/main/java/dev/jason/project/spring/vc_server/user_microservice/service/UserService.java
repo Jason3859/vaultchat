@@ -1,12 +1,18 @@
 package dev.jason.project.spring.vc_server.user_microservice.service;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
+import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
+import dev.jason.project.spring.vc_server.user_microservice.client.DeviceClient;
+import dev.jason.project.spring.vc_server.user_microservice.client.SocialClient;
 import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.user_microservice.model.UserEntity;
@@ -17,6 +23,12 @@ public class UserService {
 
 	@Autowired
 	protected UserRepository repository;
+	
+	@Autowired
+	protected SocialClient socialClient;
+	
+	@Autowired
+	protected DeviceClient deviceClient;
 
 	public User getUserById(String id) {
 	 	Optional<UserEntity> entity = repository.findById(id);
@@ -28,15 +40,18 @@ public class UserService {
 		throw new UserNotFoundException();
 	}
 	
-	public void addUser(User user) {
+	public Map.Entry<User, Device> addUser(User user, Device device) {
 		Optional<UserEntity> entity = repository.findById(user.uid());
 		
-		if (entity.isEmpty()) {
-			repository.save(UserEntity.asEntity(user));
-			return;
+		if (entity.isPresent()) {
+			throw new UserAlreadyExistsException();
 		}
 		
-		throw new UserAlreadyExistsException();
+		repository.save(UserEntity.asEntity(user));
+		socialClient.register(user.uid());
+		Device d = deviceClient.register(DeviceDto.asDto(device)).toDevice(null);
+		
+		return new AbstractMap.SimpleEntry<>(user, d);
 	}
 
 	public void deleteUser(String uid) {

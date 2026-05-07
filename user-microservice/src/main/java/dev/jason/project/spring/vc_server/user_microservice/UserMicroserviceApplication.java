@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -20,6 +21,7 @@ import dev.jason.project.spring.vc_server.user_microservice.exception.UserExcept
 @SpringBootApplication
 @EnableMongoRepositories
 @EnableScheduling
+@EnableFeignClients
 public class UserMicroserviceApplication {
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserMicroserviceApplication.class);

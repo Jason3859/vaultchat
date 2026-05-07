@@ -1,6 +1,7 @@
 package dev.jason.project.spring.vc_server.device_microservice.controller;
 
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
+import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.device_microservice.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,8 @@ public class DeviceController {
 
 	@PostMapping("/add")
 	public ResponseEntity<?> addDevice(@RequestBody DeviceDto device) {
-		deviceService.addDevice(device.toDevice(LocalDateTime.now()));
-		return new ResponseEntity<>(device, HttpStatus.CREATED);
+		Device d = deviceService.addDevice(device.toDevice(LocalDateTime.now()));
+		return new ResponseEntity<>(DeviceDto.asDto(d), HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/delete")

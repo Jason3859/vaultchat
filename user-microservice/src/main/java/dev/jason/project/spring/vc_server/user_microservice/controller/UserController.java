@@ -1,6 +1,8 @@
 package dev.jason.project.spring.vc_server.user_microservice.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.jason.project.spring.vc_server.core.dto.UserDto;
+import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.user_microservice.service.UserService;
 
@@ -28,8 +31,12 @@ public class UserController {
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody UserDto userDto) {
-		userService.addUser(userDto.asUser());
-		return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+		Map.Entry<User, Device> response =
+			userService.addUser(userDto.asUser(), userDto.device().toDevice(userDto.uid(), LocalDateTime.now()));
+		
+		UserDto dto = UserDto.fromUserAndDevice(response.getKey(), response.getValue());
+		
+		return new ResponseEntity<>(dto, HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/delete")
@@ -48,15 +55,6 @@ public class UserController {
 	public UserDto getUserById(@RequestParam String id) {
 		User user = userService.getUserById(id);
 		return UserDto.fromUser(user);
-	}
-	
-	@GetMapping("get-users-by-display-name")
-	public List<UserDto> getUsersByDisplayName(@RequestParam("search_query") String query) {
-		List<User> users = userService.getAllUsersByDisplayName(query);
-		
-		return users.stream()
-			.map(UserDto::fromUser)
-			.toList();
 	}
 	
 	@GetMapping("/search")
