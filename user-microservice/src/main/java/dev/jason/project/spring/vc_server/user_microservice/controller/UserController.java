@@ -51,7 +51,7 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@GetMapping("/get-user-by-id")
+	@GetMapping("/get-user-by-uid")
 	public UserDto getUserById(@RequestParam String uid) {
 		User user = userService.getUserById(uid);
 		return UserDto.fromUser(user);

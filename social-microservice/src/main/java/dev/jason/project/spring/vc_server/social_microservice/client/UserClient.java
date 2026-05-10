@@ -9,6 +9,6 @@ import dev.jason.project.spring.vc_server.core.dto.UserDto;
 @FeignClient(name = "user-microservice", url = "http://localhost:9003")
 public interface UserClient {
 
-	@GetMapping("/user/get-user-by-id")
+	@GetMapping("/user/get-user-by-uid")
 	UserDto getUserById(@RequestParam String uid);
 }

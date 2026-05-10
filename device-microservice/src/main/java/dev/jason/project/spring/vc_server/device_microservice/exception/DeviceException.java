@@ -16,6 +16,9 @@ public class DeviceException extends RuntimeException {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public static final class DeviceNotFoundException extends DeviceException {}
 	
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public static final class UserNotFoundException extends DeviceException {}
+	
 	@RestControllerAdvice
 	public static class Handler {
 		
@@ -27,6 +30,11 @@ public class DeviceException extends RuntimeException {
 		@ExceptionHandler(DeviceNotFoundException.class)
 		public ResponseEntity<?> handleDeviceNotFoundException() {
 			return new ResponseEntity<>(Result.DeviceNotFound, HttpStatus.NOT_FOUND);
+		}
+		
+		@ExceptionHandler(UserNotFoundException.class)
+		public ResponseEntity<?> handleUserNotFoundException() {
+			return new ResponseEntity<>(Result.UserNotFound, HttpStatus.NOT_FOUND);
 		}
 	}
 }

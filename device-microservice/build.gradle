@@ -18,6 +18,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     
+    implementation platform('org.springframework.cloud:spring-cloud-dependencies:2025.1.1')
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     

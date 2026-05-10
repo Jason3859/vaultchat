@@ -17,12 +17,12 @@ import lombok.Setter;
 @Setter
 public class DeviceEntity {
 
-	@Id
 	private final String ownerUid;
 	private final String name;
 	private final Device.Type type;
 	private final Device.OS os;
 	private final String version;
+	@Id
 	private final String token;
 	private LocalDateTime lastUsed;
 	

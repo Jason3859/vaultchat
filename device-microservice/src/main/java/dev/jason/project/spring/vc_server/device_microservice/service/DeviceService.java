@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.jason.project.spring.vc_server.core.model.Device;
+import dev.jason.project.spring.vc_server.device_microservice.client.UserClient;
 import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.DeviceAlreadyExistsException;
 import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.DeviceNotFoundException;
+import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.device_microservice.model.DeviceEntity;
 import dev.jason.project.spring.vc_server.device_microservice.repo.DeviceRepository;
 
@@ -17,6 +19,9 @@ public class DeviceService {
 	@Autowired
 	private DeviceRepository deviceRepository;
 	
+	@Autowired
+	private UserClient userClient;
+	
 	public List<Device> getDevicesByOwner(String id) {
 		return deviceRepository.findByOwnerUid(id).stream()
 			.map(DeviceEntity::asDevice)
@@ -24,6 +29,13 @@ public class DeviceService {
 	}
 	
 	public Device addDevice(Device device) {
+		
+		try {
+			userClient.getUserByUid(device.getOwnerId());
+		} catch (Exception e) {
+			throw new UserNotFoundException();
+		}
+		
 		List<DeviceEntity> devices = deviceRepository.findByOwnerUid(device.getOwnerId());
 		
 		DeviceEntity entity = DeviceEntity.asEntity(device);
