@@ -1,5 +1,6 @@
-package dev.jason.project.spring.vc_server.microservice.messaging.repo;
+package dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -10,6 +11,7 @@ import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.core.model.Device;
 
 @Repository
+@Profile("dev-fb") // fb here stands for firebase
 public class MessagingRepoImpl implements MessagingRepository {
 	
     @Override

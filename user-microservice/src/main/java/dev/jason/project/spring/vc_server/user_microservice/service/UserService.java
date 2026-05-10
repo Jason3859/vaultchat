@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
+import dev.jason.project.spring.vc_server.core.model.User.Status;
 import dev.jason.project.spring.vc_server.user_microservice.client.DeviceClient;
 import dev.jason.project.spring.vc_server.user_microservice.client.SocialClient;
 import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserAlreadyExistsException;
@@ -69,8 +70,12 @@ public class UserService {
 		Optional<UserEntity> entity = repository.findById(uid);
 
 		if (entity.isPresent()) {
-			entity.get().setLastHeartBeat(System.currentTimeMillis());
-			repository.save(entity.get());
+			UserEntity e = entity.get();
+			
+			e.setLastHeartBeat(System.currentTimeMillis());
+			e.setStatus(Status.Online);
+			repository.save(e);
+			
 			return;
 		}
 

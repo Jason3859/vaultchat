@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import dev.jason.project.spring.vc_server.core.model.Result;
 
 public class UserException extends RuntimeException {
-	
-	public static final class AdminSdkNotFoundException extends UserException {}
 
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public static final class UserAlreadyExistsException extends UserException {}

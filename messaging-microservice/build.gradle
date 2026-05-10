@@ -8,12 +8,6 @@ group = 'dev.jason.project.spring'
 version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
-}
-
 repositories {
 	mavenCentral()
 }
@@ -27,6 +21,7 @@ dependencies {
 	
 	implementation platform('org.springframework.cloud:spring-cloud-dependencies:2025.1.1')
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'io.github.openfeign:feign-okhttp'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

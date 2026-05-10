@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "device-microservice", url = "http://localhost:9001")
+@FeignClient(name = "device-microservice", url = "http://localhost:9000")
 public interface DeviceClient {
 
     @GetMapping("/device/get-devices-by-owner")

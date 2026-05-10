@@ -8,11 +8,9 @@ import org.springframework.stereotype.Service;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User;
-import dev.jason.project.spring.vc_server.microservice.messaging.client.DeviceClient;
-import dev.jason.project.spring.vc_server.microservice.messaging.client.SocialClient;
-import dev.jason.project.spring.vc_server.microservice.messaging.client.UserClient;
 import dev.jason.project.spring.vc_server.microservice.messaging.exception.MessagingException.MessageTextBlankException;
-import dev.jason.project.spring.vc_server.microservice.messaging.repo.MessagingRepository;
+import dev.jason.project.spring.vc_server.microservice.messaging.repo.client.ClientRepository;
+import dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging.MessagingRepository;
 
 @Service
 public class MessagingService {
@@ -21,13 +19,7 @@ public class MessagingService {
 	protected MessagingRepository repository;
 	
 	@Autowired
-	private UserClient userClient;
-	
-	@Autowired
-	private SocialClient socialClient;
-	
-	@Autowired
-	private DeviceClient deviceClient;
+    private ClientRepository client;
 
 	public void sendMessage(Message message) {
 		sendMessage(message, false);
@@ -38,17 +30,15 @@ public class MessagingService {
 			throw new MessageTextBlankException();
 		}
 		
-		User from = userClient.getUserById(message.from()).asUser();
-		User to = userClient.getUserById(message.to()).asUser();
+		User from = client.getUserById(message.from());
+		User to = client.getUserById(message.to());
 		
-		socialClient.connect(from.uid(), to.uid());
+		client.connect(from.uid(), to.uid());
 		
-		List<Device> devices = deviceClient.getDevicesByOwner(to.uid()).stream()
-			.map(deviceDto -> deviceDto.toDevice(null))
-			.toList();
+		List<Device> devices = client.getDevicesByOwner(to.uid());
 		
 		if (devices.isEmpty()) {
-			socialClient.addMessageToQueue(to.uid(), message);
+			client.addMessageToQueue(to.uid(), message);
 			return;
 		}
 		
@@ -57,7 +47,21 @@ public class MessagingService {
 		});
 	}
 	
-	public void sendUserStatusUpdate(Device device, String uid, User.Status status) {
-		repository.sendUserStatusUpdate(device, uid, status);
+	public void sendUserStatusUpdate(String uid, User.Status status) {
+		List<String> connections = client.getConnections(uid).stream()
+			.map(u -> u.uid())
+			.toList();
+		
+		connections.forEach(connectionUid -> {
+			List<Device> devices = client.getDevicesByOwner(connectionUid);
+			
+			if (devices.isEmpty()) {
+				return;
+			}
+			
+			devices.forEach(device -> {
+				repository.sendUserStatusUpdate(device, uid, status);
+			});
+		});
 	}
 }
