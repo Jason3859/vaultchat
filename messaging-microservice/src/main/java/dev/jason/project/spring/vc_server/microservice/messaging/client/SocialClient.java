@@ -1,5 +1,6 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.client;
 
+import dev.jason.project.spring.vc_server.core.Endpoints;
 import dev.jason.project.spring.vc_server.core.dto.UserDto;
 import dev.jason.project.spring.vc_server.core.model.Message;
 
@@ -11,15 +12,15 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "social-microservice", url = "http://localhost:9002", configuration = FeignConfig.class)
+@FeignClient(name = "social-microservice", url = Endpoints.SOCIAL_SERVICE_URL, configuration = FeignConfig.class)
 public interface SocialClient {
 
-    @PatchMapping("/social/connect")
+    @PatchMapping(Endpoints.SOCIAL_CONNECT)
     void connect(@RequestParam("from_uid") String uid1, @RequestParam("other_uid") String uid2);
 
-    @PatchMapping("/social/add-message-to-queue")
+    @PatchMapping(Endpoints.SOCIAL_ADD_MESSAGE_TO_QUEUE)
     void addMessageToQueue(@RequestParam String uid, @RequestBody Message message);
 
-    @GetMapping("/social/get-connections")
+    @GetMapping(Endpoints.SOCIAL_GET_CONNECTIONS)
 	List<UserDto> getConnections(@RequestParam String uid);
 }

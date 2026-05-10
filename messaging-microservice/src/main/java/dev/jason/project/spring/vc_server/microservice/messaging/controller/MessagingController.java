@@ -9,24 +9,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.jason.project.spring.vc_server.core.Endpoints;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User.Status;
 import dev.jason.project.spring.vc_server.microservice.messaging.service.MessagingService;
 
 @RestController
-@RequestMapping("/messaging")
+@RequestMapping(Endpoints.MESSAGING)
 public class MessagingController {
 
 	@Autowired
 	private MessagingService messagingService;
 	
-	@PostMapping("/send")
+	@PostMapping(Endpoints.SEND)
 	public ResponseEntity<Void> send(@RequestBody Message message) {
 		messagingService.sendMessage(message);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@PostMapping("/notify-status")
+	@PostMapping(Endpoints.NOTIFY_STATUS)
 	public void notifyStatus(@RequestParam String uid, @RequestParam Status status) {
 		messagingService.sendUserStatusUpdate(uid, status);
 	}

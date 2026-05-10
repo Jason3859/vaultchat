@@ -4,9 +4,11 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "social-microservice", url = "http://localhost:9002")
+import dev.jason.project.spring.vc_server.core.Endpoints;
+
+@FeignClient(name = "social-microservice", url = Endpoints.SOCIAL_SERVICE_URL)
 public interface SocialClient {
 
-	@PostMapping("/social/register")
+	@PostMapping(Endpoints.SOCIAL_REGISTER)
 	void register(@RequestParam String uid);
 }

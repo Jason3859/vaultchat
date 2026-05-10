@@ -1,5 +1,6 @@
 package dev.jason.project.spring.vc_server.device_microservice.controller;
 
+import dev.jason.project.spring.vc_server.core.Endpoints;
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.device_microservice.service.DeviceService;
@@ -12,25 +13,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/device")
+@RequestMapping(Endpoints.DEVICE)
 public class DeviceController {
 	
 	@Autowired
 	private DeviceService deviceService;
 
-	@PostMapping("/add")
+	@PostMapping(Endpoints.ADD)
 	public ResponseEntity<?> addDevice(@RequestBody DeviceDto device) {
 		Device d = deviceService.addDevice(device.toDevice(LocalDateTime.now()));
 		return new ResponseEntity<>(DeviceDto.asDto(d), HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/delete")
+	@DeleteMapping(Endpoints.DELETE)
 	public ResponseEntity<?> deleteDevice(@RequestBody DeviceDto device) {
 		deviceService.deleteDevice(device.toDevice(/*not required here*/ null));
 		return new ResponseEntity<>(device, HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping("/my-devices")
+	@GetMapping(Endpoints.MY_DEVICES)
 	public ResponseEntity<List<DeviceDto>> getDevices(@RequestParam String uid) {
 		List<DeviceDto> devices = deviceService.getDevicesByOwner(uid)
 			.stream()
@@ -40,7 +41,7 @@ public class DeviceController {
 		return new ResponseEntity<>(devices, HttpStatus.OK);
 	}
 
-	@GetMapping("/get-devices-by-owner")
+	@GetMapping(Endpoints.GET_DEVICES_BY_OWNER)
 	public List<DeviceDto> getDevicesByOwner(@RequestParam String uid) {
         return deviceService.getDevicesByOwner(uid)
             .stream()
