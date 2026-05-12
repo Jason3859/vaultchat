@@ -1,18 +1,21 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging;
 
-import org.springframework.context.annotation.Profile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MessagingErrorCode;
 
-import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.core.model.Device;
+import dev.jason.project.spring.vc_server.core.model.User;
 
 @Repository
-@Profile("dev-fb") // fb here stands for firebase
 public class MessagingRepoImpl implements MessagingRepository {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MessagingRepoImpl.class);
 	
     @Override
     public void sendMessage(dev.jason.project.spring.vc_server.core.model.Message message, Device device, boolean forDeviceCheck) {
@@ -41,7 +44,11 @@ public class MessagingRepoImpl implements MessagingRepository {
     	try {
     		FirebaseMessaging.getInstance().send(message);
     	} catch (FirebaseMessagingException e) {
-    		// TODO: remove device from db
+    		MessagingErrorCode errorCode = e.getMessagingErrorCode();
+    		
+    		if (!errorCode.equals(MessagingErrorCode.UNREGISTERED)) { // ignores test device instances in database
+				logger.error("Error occurred while sending message: {}", e.getMessage());
+			}
 		}
     }
 }

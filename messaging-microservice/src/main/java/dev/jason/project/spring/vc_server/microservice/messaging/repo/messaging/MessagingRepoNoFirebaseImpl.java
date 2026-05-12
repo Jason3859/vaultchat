@@ -2,6 +2,7 @@ package dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import dev.jason.project.spring.vc_server.core.model.Device;
@@ -9,6 +10,7 @@ import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User.Status;
 
 @Repository
+@Profile("no-firebase")
 public class MessagingRepoNoFirebaseImpl implements MessagingRepository {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MessagingRepoNoFirebaseImpl.class);
