@@ -1,0 +1,32 @@
+[versions]
+spring-boot = "4.0.6"
+spring-boot-dependency-management = "1.1.7"
+spring-cloud-dependencies = "2025.1.1"
+
+firebase = "9.8.0"
+lombok = "1.18.46"
+junit = "6.0.0"
+
+[libraries]
+spring-cloud-dependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "spring-cloud-dependencies" }
+spring-cloud-starter-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
+feign-okhttp = { module = "io.github.openfeign:feign-okhttp" }
+
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-data-mongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+spring-boot-starter-gateway-server-webmvc = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-data-mongodb-test = { module = "org.springframework.boot:spring-boot-starter-data-mongodb-test" }
+
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase" }
+
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+java = { id = "java" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-boot-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-boot-dependency-management" }

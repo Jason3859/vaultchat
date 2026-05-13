@@ -1,12 +1,10 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.6'
-	id 'io.spring.dependency-management' version '1.1.7'
+    alias libs.plugins.java
+    alias libs.plugins.spring.boot
+    alias libs.plugins.spring.boot.dependency.management
 }
 
 group = 'dev.jason.project.spring'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 repositories {
 	mavenCentral()
@@ -15,19 +13,19 @@ repositories {
 dependencies {
 	implementation projects.core
 
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	implementation 'com.google.firebase:firebase-admin:9.8.0'
+	implementation libs.spring.boot.starter.webmvc
+	implementation libs.spring.boot.starter.data.mongodb
+	implementation libs.firebase.admin
 	
-	implementation platform('org.springframework.cloud:spring-cloud-dependencies:2025.1.1')
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	implementation 'io.github.openfeign:feign-okhttp'
+	implementation platform(libs.spring.cloud.dependencies)
+	implementation libs.spring.cloud.starter.openfeign
+	implementation libs.feign.okhttp
 	
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation libs.spring.boot.starter.webmvc.test
+	testRuntimeOnly libs.junit.platform.launcher
 	
-    compileOnly 'org.projectlombok:lombok:1.18.46'
-	annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    compileOnly libs.lombok
+	annotationProcessor libs.lombok
 }
 
 tasks.named('test') {

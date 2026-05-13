@@ -1,7 +1,7 @@
 plugins {
-    id 'java'
-	id 'org.springframework.boot' version '4.0.6'
-	id 'io.spring.dependency-management' version '1.1.7'
+    alias libs.plugins.java
+	alias libs.plugins.spring.boot
+	alias libs.plugins.spring.boot.dependency.management
 }
 
 group = 'dev.jason.project.spring'
@@ -12,14 +12,14 @@ repositories {
 }
 
 dependencies {
-	compileOnly 'org.projectlombok:lombok:1.18.46'
-    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+	compileOnly libs.lombok
+    annotationProcessor libs.lombok
     
-    implementation 'com.google.firebase:firebase-admin:9.8.0'
+    implementation libs.firebase.admin
 
-    testImplementation platform('org.junit:junit-bom:6.0.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
 }
 
 test {
