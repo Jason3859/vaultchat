@@ -13,6 +13,7 @@ import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.core.model.User.Status;
 import dev.jason.project.spring.vc_server.user_microservice.client.DeviceClient;
+import dev.jason.project.spring.vc_server.user_microservice.client.MessagingClient;
 import dev.jason.project.spring.vc_server.user_microservice.client.SocialClient;
 import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserNotFoundException;
@@ -30,6 +31,9 @@ public class UserService {
 	
 	@Autowired
 	protected DeviceClient deviceClient;
+	
+	@Autowired
+	protected MessagingClient messagingClient;
 
 	public User getUserById(String id) {
 	 	Optional<UserEntity> entity = repository.findById(id);
@@ -68,18 +72,19 @@ public class UserService {
 
 	public void updateHeartBeat(String uid) {
 		Optional<UserEntity> entity = repository.findById(uid);
-
-		if (entity.isPresent()) {
-			UserEntity e = entity.get();
-			
-			e.setLastHeartBeat(System.currentTimeMillis());
-			e.setStatus(Status.Online);
-			repository.save(e);
-			
-			return;
+		
+		if (entity.isEmpty()) {
+			throw new UserNotFoundException();
 		}
 
-		throw new UserNotFoundException();
+		UserEntity e = entity.get();
+		
+		e.setLastHeartBeat(System.currentTimeMillis());
+		e.setStatus(Status.Online);
+		
+		repository.save(e);
+		
+		messagingClient.notifyStatus(uid, Status.Online);
 	}
 
     public List<User> getAllUsersByDisplayName(String query) {
