@@ -47,6 +47,11 @@ public class ClientRepoImpl implements ClientRepository {
             .map(d -> d.toDevice(null))
             .toList();
     }
+    
+    @Override
+    public boolean getIsUserBlocked(String uid1, String uid2) {
+    	return socialClient.isUserBlocked(uid1, uid2);
+    }
 
     @Override
     public User getUserById(String uid) {

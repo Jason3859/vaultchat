@@ -16,6 +16,9 @@ public class MessagingException extends RuntimeException {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public static final class InternalError extends MessagingException {}
 	
+	@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+	public static final class BlockedByUserException extends MessagingException {}
+	
 	@RestControllerAdvice
 	public static class Handler {
 		
@@ -27,6 +30,11 @@ public class MessagingException extends RuntimeException {
 		@ExceptionHandler(InternalError.class)
 		public ResponseEntity<?> handleMessagingException() {
 			return new ResponseEntity<>(Result.Error, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		@ExceptionHandler(BlockedByUserException.class)
+		public ResponseEntity<?> handleBlockedByUserException() {
+			return new ResponseEntity<>(Result.BlockedByUser, HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
 }

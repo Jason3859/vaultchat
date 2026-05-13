@@ -42,11 +42,13 @@ public class Endpoints {
 	public static final String GET_BLOCKED_USERS = "/blocked-users";
 	public static final String GET_CONNECTIONS = "/connections";
 	public static final String UNBLOCK = "/unblock";
+	public static final String IS_USER_BLOCKED = "/is-user-blocked";
 	
 	public static final String SOCIAL_ADD_MESSAGE_TO_QUEUE = SOCIAL + ADD_MESSAGE_TO_QUEUE;
 	public static final String SOCIAL_CONNECT = SOCIAL + CONNECT;
 	public static final String SOCIAL_GET_CONNECTIONS = SOCIAL + GET_CONNECTIONS;
 	public static final String SOCIAL_REGISTER = SOCIAL + REGISTER;
+	public static final String SOCIAL_IS_USER_BLOCKED = SOCIAL + IS_USER_BLOCKED;
 	
 	// user microservice
 	public static final int USER_MICROSERVICE_PORT = 9003;

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User;
+import dev.jason.project.spring.vc_server.microservice.messaging.exception.MessagingException.BlockedByUserException;
 import dev.jason.project.spring.vc_server.microservice.messaging.exception.MessagingException.MessageTextBlankException;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.client.ClientRepository;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging.MessagingRepository;
@@ -26,12 +27,16 @@ public class MessagingService {
 	}
 	
 	public void sendMessage(Message message, boolean forDeviceCheck) {
-		if (message.text().isBlank()) {
+		if (message == null || message.text().isBlank()) {
 			throw new MessageTextBlankException();
 		}
 		
 		User from = client.getUserById(message.from());
 		User to = client.getUserById(message.to());
+		
+		if (client.getIsUserBlocked(message.from(), message.to())) {
+			throw new BlockedByUserException();
+		}
 		
 		client.connect(from.uid(), to.uid());
 		

@@ -74,4 +74,13 @@ public class SocialController {
 		
 		return new ResponseEntity<>(blockedUsers, HttpStatus.OK);
 	}
+	
+	@GetMapping(Endpoints.IS_USER_BLOCKED)
+	public boolean isUserBlocked(@RequestParam String uid1, @RequestParam String uid2) {
+		var entity1 = socialService.getSocialEntityByUid(uid1);
+		var entity2 = socialService.getSocialEntityByUid(uid2);
+		
+		return entity1.getBlocklist().contains(uid2) ||
+			entity2.getBlocklist().contains(uid1);
+	}
 }

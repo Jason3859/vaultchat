@@ -12,7 +12,8 @@ public interface ClientRepository {
 
     void connect(String uid1, String uid2);
     void addMessageToQueue(String uid, Message message);
-	List<User> getConnections( String uid);
+	List<User> getConnections(String uid);
+	boolean getIsUserBlocked(String uid1, String uid2);
 
     User getUserById(String uid);
 }

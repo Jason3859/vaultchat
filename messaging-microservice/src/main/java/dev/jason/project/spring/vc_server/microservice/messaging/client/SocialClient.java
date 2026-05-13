@@ -23,4 +23,7 @@ public interface SocialClient {
 
     @GetMapping(Endpoints.SOCIAL_GET_CONNECTIONS)
 	List<UserDto> getConnections(@RequestParam String uid);
+    
+    @GetMapping(Endpoints.SOCIAL_IS_USER_BLOCKED)
+    boolean isUserBlocked(@RequestParam String uid1, @RequestParam String uid2);
 }
