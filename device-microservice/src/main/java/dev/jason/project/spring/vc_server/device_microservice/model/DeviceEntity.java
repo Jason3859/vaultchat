@@ -25,15 +25,15 @@ public class DeviceEntity {
 	@Id
 	private final String token;
 	private LocalDateTime lastUsed;
-	
+
 	public Device asDevice() {
 		return new Device(ownerUid, name, type, os, version, token, lastUsed);
 	}
-	
+
 	public static DeviceEntity asEntity(Device device) {
 		return new DeviceEntity(device.getOwnerId(), device.getName(), device.getType(), device.getOs(), device.getVersion(), device.getToken(), device.getLastUsed());
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,7 +46,14 @@ public class DeviceEntity {
 
 		DeviceEntity that = (DeviceEntity) obj;
 
-		return Objects.equals(this.name, that.getName()) &&
-			Objects.equals(this.token, that.getToken());
+		if (Objects.equals(this.name, that.getName())) {
+			return true;
+		}
+
+		if (Objects.equals(this.token, that.getToken())) {
+			return true;
+		}
+
+		return false;
 	}
 }
