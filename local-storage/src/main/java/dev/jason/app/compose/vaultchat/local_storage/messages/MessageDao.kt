@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.local_storage.data
+package dev.jason.app.compose.vaultchat.local_storage.messages
 
 import androidx.room.Dao
 import androidx.room.Insert

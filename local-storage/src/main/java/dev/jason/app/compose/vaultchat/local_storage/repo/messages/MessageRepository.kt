@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.local_storage.domain
+package dev.jason.app.compose.vaultchat.local_storage.repo.messages
 
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import kotlinx.coroutines.flow.Flow

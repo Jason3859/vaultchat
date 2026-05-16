@@ -1,7 +1,9 @@
-package dev.jason.app.compose.vaultchat.local_storage.data
+package dev.jason.app.compose.vaultchat.local_storage.repo.messages
 
 import dev.jason.app.compose.vaultchat.core.domain.Message
-import dev.jason.app.compose.vaultchat.local_storage.domain.MessageRepository
+import dev.jason.app.compose.vaultchat.local_storage.messages.MessageDao
+import dev.jason.app.compose.vaultchat.local_storage.messages.MessageEntity
+import dev.jason.app.compose.vaultchat.local_storage.messages.toDbEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
