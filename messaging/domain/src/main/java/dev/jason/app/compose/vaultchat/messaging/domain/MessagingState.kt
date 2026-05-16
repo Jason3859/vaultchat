@@ -11,6 +11,7 @@ object MessagingState {
     private val _otherUserUid = MutableStateFlow<String?>(null)
     val otherUserUid = _otherUserUid.asStateFlow()
 
+    // TODO: remove this field and point usage to that from db
     private val _connections = MutableStateFlow<List<User>>(emptyList())
     val connections = _connections.asStateFlow()
 

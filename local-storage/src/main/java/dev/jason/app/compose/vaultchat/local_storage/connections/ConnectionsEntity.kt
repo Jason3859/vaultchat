@@ -9,8 +9,9 @@ data class ConnectionsEntity(
     @PrimaryKey
     val id: String,
     val displayName: String,
-    val profilePictureUrl: String
+    val profilePictureUrl: String,
+    val status: User.Status
 )
 
-fun User.toEntity() = ConnectionsEntity(uid, displayName, profilePictureUrl)
-fun ConnectionsEntity.toUser() = User(id, displayName, profilePictureUrl, emptyList(), User.Status.Offline)
+fun User.toEntity() = ConnectionsEntity(uid, displayName, profilePictureUrl, status)
+fun ConnectionsEntity.toUser() = User(id, displayName, profilePictureUrl, emptyList(), status)

@@ -11,3 +11,4 @@ local.properties
 /app/google-services.json
 /gradle/gradle-daemon-jvm.properties
 /core/schema
+/local-storage/schema/

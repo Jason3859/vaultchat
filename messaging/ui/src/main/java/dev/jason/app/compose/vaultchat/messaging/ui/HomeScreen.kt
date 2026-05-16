@@ -63,20 +63,15 @@ fun HomeScreen(isOffline: Boolean, navEvents: SharedFlow<Intent>? = null) {
         }
     }
 
+    // FIXME: not opening MessagingScreen when app is killed. instead, opening app only 
     LaunchedEffect(navEvents) {
         navEvents?.collect { intent ->
             val destination = intent.getStringExtra("nav_destination")
             val id = intent.getStringExtra("id")
             if (destination == "messaging" && id != null) {
-                // FIXME: create db to store connections and load connection from db with id
-                val name = intent.getStringExtra("displayName") ?: "User"
-                val photo = intent.getStringExtra("profilePictureUrl") ?: ""
-                val statusStr = intent.getStringExtra("status") ?: "Online"
-                val status = try {
-                    User.Status.valueOf(statusStr)
-                } catch (_: Exception) {
-                    User.Status.Online
-                }
+                val name = intent.getStringExtra("display_name") ?: "User"
+                val photo = intent.getStringExtra("profile_picture_url") ?: ""
+                val status = User.Status.valueOf(intent.getStringExtra("status") ?: "Online")
 
                 mainBackStack.add(Route.Messaging(id, name, photo, status))
             }

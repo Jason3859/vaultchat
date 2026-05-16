@@ -24,8 +24,8 @@ class LocalStorageRepoImpl(
         return messageRepository.getMessages(currentUserId, otherUserId)
     }
 
-    override suspend fun addConnection(user: User) {
-        connectionsRepository.addConnection(user)
+    override suspend fun updateStatus(uid: String, status: User.Status) {
+        connectionsRepository.updateStatus(uid, status)
     }
 
     override suspend fun addAllConnections(users: List<User>) {
@@ -34,5 +34,9 @@ class LocalStorageRepoImpl(
 
     override fun getConnections(): Flow<List<User>> {
         return connectionsRepository.getConnections()
+    }
+
+    override fun getConnectionByUid(uid: String): User {
+        return connectionsRepository.getConnectionById(uid)
     }
 }

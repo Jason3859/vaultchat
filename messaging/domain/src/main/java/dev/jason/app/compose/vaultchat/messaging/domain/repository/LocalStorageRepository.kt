@@ -10,7 +10,8 @@ interface LocalStorageRepository {
     suspend fun deleteMessageHistory(currentUserId: String, otherUserId: String)
     fun getMessages(currentUserId: String, otherUserId: String): Flow<List<Message>>
 
-    suspend fun addConnection(user: User)
+    suspend fun updateStatus(uid: String, status: User.Status)
     suspend fun addAllConnections(users: List<User>)
     fun getConnections(): Flow<List<User>>
+    fun getConnectionByUid(uid: String): User
 }
