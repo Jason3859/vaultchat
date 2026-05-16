@@ -60,6 +60,11 @@ public class UserController {
 	
 	@GetMapping(Endpoints.SEARCH)
 	public ResponseEntity<List<UserDto>> search(@RequestParam("from_uid") String fromUid, @RequestParam("search_query") String searchQuery) {
+		
+		if (searchQuery.isBlank()) {
+			return new ResponseEntity<>(List.of(), HttpStatus.BAD_REQUEST);
+		}
+		
 		userService.getUserById(fromUid); // for verification that user exists
 		
 		List<UserDto> requiredUsers = userService.getAllUsersByDisplayName(searchQuery).stream()
