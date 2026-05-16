@@ -48,7 +48,7 @@ import org.koin.android.ext.android.inject
 class AuthActivity : ComponentActivity() {
 
     private val remoteApi: RemoteApi by inject()
-    private lateinit var token: String
+    private var token: String? = null
 
     private val viewModel by viewModels<AuthViewModel>()
 
@@ -62,7 +62,10 @@ class AuthActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            token = Firebase.messaging.token.await()
+            try {
+                token = Firebase.messaging.token.await()
+            } catch (_: Exception) {
+            }
         }
 
         setContent {
@@ -117,6 +120,8 @@ class AuthActivity : ComponentActivity() {
             FirebaseGoogleAuthentication.beginSignIn(this@AuthActivity)
                 ?.addOnSuccessListener {
                     lifecycleScope.launch(Dispatchers.IO) {
+                        val token = this@AuthActivity.token ?: Firebase.messaging.token.await()
+
                         viewModel.updateCurrentScreen(AuthViewModel.Screen.Loading)
                         remoteApi.registerUser(
                             UserDto(

@@ -36,7 +36,7 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
     }
 
     override suspend fun searchUsers(name: String, from: String): List<UserDto> {
-        return httpClient.get("$baseUrl/social/search") {
+        return httpClient.get("$baseUrl/user/search") {
             url {
                 parameters.append("search_query", name)
                 parameters.append("from_uid", from)
@@ -55,7 +55,7 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
     }
 
     override suspend fun getConnections(uid: String): List<UserDto> {
-        return httpClient.get("$baseUrl/social/get-connections") {
+        return httpClient.get("$baseUrl/social/connections") {
             url {
                 parameters.append("uid", uid)
             }
@@ -63,7 +63,7 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
     }
 
     override suspend fun fetchBlocklist(uid: String): List<UserDto> {
-        return httpClient.get("$baseUrl/social/get-blocked-users") {
+        return httpClient.get("$baseUrl/social/blocked-users") {
             url {
                 parameters.append("uid", uid)
             }
@@ -102,7 +102,7 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
     }
 
     override suspend fun fetchDevices(uid: String): List<UserDto.DeviceDto> {
-        return httpClient.get("$baseUrl/device/my-devices") {
+        return httpClient.get("$baseUrl/device/mine") {
             url {
                 parameters.append("uid", uid)
             }

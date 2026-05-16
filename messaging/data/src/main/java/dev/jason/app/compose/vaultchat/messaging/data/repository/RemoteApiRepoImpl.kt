@@ -46,7 +46,6 @@ class RemoteApiRepoImpl(private val api: RemoteApi) : RemoteApiRepository {
         return try {
             api.getConnections(uid).map(UserDto::toDomain)
         } catch (e: Exception) {
-            SnackbarController.showSnackbar("An Internal error occurred")
             Log.e("RemoteApiRepoImpl", "fetchConnections: exception", e)
             emptyList()
         }
