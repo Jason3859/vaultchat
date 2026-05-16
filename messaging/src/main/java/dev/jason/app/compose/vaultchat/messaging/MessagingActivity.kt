@@ -6,7 +6,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,12 +18,13 @@ import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
+import dev.jason.app.compose.vaultchat.messaging.ui.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -32,7 +32,8 @@ class MessagingActivity : ComponentActivity() {
 
     private val remoteApi: RemoteApi by inject()
     private val isOffline = MutableStateFlow(false)
-    private val navEvents = MutableSharedFlow<Intent>(extraBufferCapacity = 1)
+
+    private val homeViewModel by viewModel<HomeViewModel>()
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -74,7 +75,7 @@ class MessagingActivity : ComponentActivity() {
         setContent {
             val isOfflineState by isOffline.collectAsState()
             VaultChatTheme {
-                HomeScreen(isOfflineState, navEvents)
+                HomeScreen(isOfflineState, homeViewModel)
             }
         }
     }
@@ -82,10 +83,8 @@ class MessagingActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent) {
         val destination = intent.getStringExtra("nav_destination")
         if (destination != null) {
-            navEvents.tryEmit(intent)
+            homeViewModel.emitNavEvent(intent)
         }
-
-        Log.d("MessagingActivity", "handleIntent: destination: $destination")
     }
 
     private fun isNetworkAvailable(connectivityManager: ConnectivityManager): Boolean {

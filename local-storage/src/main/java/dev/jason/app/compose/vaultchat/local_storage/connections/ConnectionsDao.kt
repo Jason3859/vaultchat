@@ -19,5 +19,5 @@ interface ConnectionsDao {
     fun getAllConnections(): Flow<List<ConnectionsEntity>>
 
     @Query("SELECT * FROM connections WHERE id = :id")
-    fun getById(id: String): ConnectionsEntity
+    fun getById(id: String): Flow<ConnectionsEntity>
 }

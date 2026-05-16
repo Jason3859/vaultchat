@@ -36,7 +36,7 @@ class LocalStorageRepoImpl(
         return connectionsRepository.getConnections()
     }
 
-    override fun getConnectionByUid(uid: String): User {
+    override fun getConnectionByUid(uid: String): Flow<User> {
         return connectionsRepository.getConnectionById(uid)
     }
 }

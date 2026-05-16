@@ -87,11 +87,6 @@ class PushNotificationService : FirebaseMessagingService() {
             putExtra("nav_destination", "messaging")
             putExtra("id", from)
 
-            val user = storageRepository.getConnectionByUid(from)
-            putExtra("display_name", user.displayName)
-            putExtra("profile_picture_url", user.profilePictureUrl)
-            putExtra("status", user.status.toString())
-
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
@@ -117,7 +112,6 @@ class PushNotificationService : FirebaseMessagingService() {
         val status = User.Status.valueOf(data["status"]!!)
 
         coroutineScope.launch {
-            MessagingState.updateConnectionsStatus(uid, status)
             storageRepository.updateStatus(uid, status)
         }
     }

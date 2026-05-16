@@ -8,5 +8,5 @@ interface ConnectionsRepository {
     suspend fun addAllConnections(users: List<User>)
     suspend fun updateStatus(id: String, status: User.Status)
     fun getConnections(): Flow<List<User>>
-    fun getConnectionById(id: String): User
+    fun getConnectionById(id: String): Flow<User>
 }

@@ -12,4 +12,5 @@ val MessagingUiKoinModule = module {
     viewModelOf(::MessagingViewModel)
     viewModelOf(::MainHomeViewModel)
     viewModelOf(::ProfileScreenViewModel)
+    viewModelOf(::HomeViewModel)
 }

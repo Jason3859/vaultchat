@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,8 @@ class MainHomeViewModel(
     private val localStorageRepository: LocalStorageRepository
 ) : ViewModel() {
 
-    val connections = MessagingState.connections
+    private val _connections = MutableStateFlow(emptyList<User>())
+    val connections = _connections
         .onStart {
             updateConnections()
         }
@@ -41,7 +42,7 @@ class MainHomeViewModel(
         viewModelScope.launch {
             val connections = apiRepository.fetchConnections(currentUserUid)
             localStorageRepository.addAllConnections(connections)
-            MessagingState.updateConnections(localStorageRepository.getConnections().first())
+            _connections.update { localStorageRepository.getConnections().first() }
             _isLoading.update { false }
         }
     }

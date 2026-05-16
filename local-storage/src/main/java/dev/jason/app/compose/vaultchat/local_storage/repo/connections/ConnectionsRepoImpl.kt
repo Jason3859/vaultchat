@@ -22,7 +22,7 @@ class ConnectionsRepoImpl(private val dao: ConnectionsDao) : ConnectionsReposito
         return dao.getAllConnections().map { it.map(ConnectionsEntity::toUser) }
     }
 
-    override fun getConnectionById(id: String): User {
-        return dao.getById(id).toUser()
+    override fun getConnectionById(id: String): Flow<User> {
+        return dao.getById(id).map(ConnectionsEntity::toUser)
     }
 }

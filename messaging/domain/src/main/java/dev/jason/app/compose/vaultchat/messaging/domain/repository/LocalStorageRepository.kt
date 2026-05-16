@@ -13,5 +13,5 @@ interface LocalStorageRepository {
     suspend fun updateStatus(uid: String, status: User.Status)
     suspend fun addAllConnections(users: List<User>)
     fun getConnections(): Flow<List<User>>
-    fun getConnectionByUid(uid: String): User
+    fun getConnectionByUid(uid: String): Flow<User>
 }

@@ -1,7 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -48,12 +47,12 @@ import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(isOffline: Boolean, navEvents: SharedFlow<Intent>? = null) {
+fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
     val mainBackStack = rememberNavBackStack(Route.Home)
     val snackbarHostState = SnackbarHostState()
 
@@ -64,16 +63,14 @@ fun HomeScreen(isOffline: Boolean, navEvents: SharedFlow<Intent>? = null) {
     }
 
     // FIXME: not opening MessagingScreen when app is killed. instead, opening app only 
-    LaunchedEffect(navEvents) {
-        navEvents?.collect { intent ->
+    LaunchedEffect(true) {
+        viewModel.navEvents.collect { intent ->
             val destination = intent.getStringExtra("nav_destination")
             val id = intent.getStringExtra("id")
             if (destination == "messaging" && id != null) {
-                val name = intent.getStringExtra("display_name") ?: "User"
-                val photo = intent.getStringExtra("profile_picture_url") ?: ""
-                val status = User.Status.valueOf(intent.getStringExtra("status") ?: "Online")
+                val user = viewModel.getUserByUid(id).first()
 
-                mainBackStack.add(Route.Messaging(id, name, photo, status))
+                mainBackStack.add(Route.Messaging(id, user.displayName, user.profilePictureUrl, user.status))
             }
         }
     }
