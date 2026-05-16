@@ -1,6 +1,7 @@
-package dev.jason.app.compose.vaultchat.messaging.domain.service
+package dev.jason.app.compose.vaultchat.messaging.service
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -11,6 +12,7 @@ import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
@@ -73,21 +75,35 @@ class PushNotificationService : FirebaseMessagingService() {
         val text = data["text"]!!
         val timestamp = data["timestamp"]!!.toLocalDateTime()
 
-        val notification =
-            NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
-                .setContentTitle("New message")
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .build()
+        showNotification(text, from)
+
+        coroutineScope.launch {
+            storageRepository.addMessage(Message(from, to, text, timestamp))
+        }
+    }
+
+    private fun showNotification(text: String, from: String) {
+        val intent = Intent(this, MessagingActivity::class.java).apply {
+            putExtra("nav_destination", "messaging")
+            putExtra("id", from)
+
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, flags)
+
+        val notification = NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+            .setContentTitle("New message")
+            .setContentText(text)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // FIXME: to be replaced
+            .setContentIntent(pendingIntent)
+            .build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)
 
         if (MessagingState.otherUserUid.value != from) {
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
-        }
-
-        coroutineScope.launch {
-            storageRepository.addMessage(Message(from, to, text, timestamp))
         }
     }
 

@@ -1,10 +1,12 @@
 package dev.jason.app.compose.vaultchat.messaging
 
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,6 +21,7 @@ import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -29,6 +32,7 @@ class MessagingActivity : ComponentActivity() {
 
     private val remoteApi: RemoteApi by inject()
     private val isOffline = MutableStateFlow(false)
+    private val navEvents = MutableSharedFlow<Intent>(extraBufferCapacity = 1)
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -65,12 +69,23 @@ class MessagingActivity : ComponentActivity() {
             }
         }
 
+        handleIntent(intent)
+
         setContent {
             val isOfflineState by isOffline.collectAsState()
             VaultChatTheme {
-                HomeScreen(isOfflineState)
+                HomeScreen(isOfflineState, navEvents)
             }
         }
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val destination = intent.getStringExtra("nav_destination")
+        if (destination != null) {
+            navEvents.tryEmit(intent)
+        }
+
+        Log.d("MessagingActivity", "handleIntent: destination: $destination")
     }
 
     private fun isNetworkAvailable(connectivityManager: ConnectivityManager): Boolean {
@@ -83,5 +98,10 @@ class MessagingActivity : ComponentActivity() {
         super.onDestroy()
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
     }
 }

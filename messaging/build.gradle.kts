@@ -39,6 +39,9 @@ dependencies {
     implementation(projects.messaging.domain)
     implementation(projects.messaging.ui)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

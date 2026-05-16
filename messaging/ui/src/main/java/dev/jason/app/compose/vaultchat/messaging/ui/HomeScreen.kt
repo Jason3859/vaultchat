@@ -1,6 +1,7 @@
 package dev.jason.app.compose.vaultchat.messaging.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,22 +45,41 @@ import dev.jason.app.compose.vaultchat.messaging.ui.main.MainHomeScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.messaging.MessagingScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.nav.Route
 import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
+import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
-import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
+import kotlinx.coroutines.flow.SharedFlow
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(isOffline: Boolean) {
-
+fun HomeScreen(isOffline: Boolean, navEvents: SharedFlow<Intent>? = null) {
     val mainBackStack = rememberNavBackStack(Route.Home)
-
     val snackbarHostState = SnackbarHostState()
 
     LaunchedEffect(true) {
         SnackbarController.flow.collect { string ->
             snackbarHostState.showSnackbar(string)
+        }
+    }
+
+    LaunchedEffect(navEvents) {
+        navEvents?.collect { intent ->
+            val destination = intent.getStringExtra("nav_destination")
+            val id = intent.getStringExtra("id")
+            if (destination == "messaging" && id != null) {
+                // FIXME: create db to store connections and load connection from db with id
+                val name = intent.getStringExtra("displayName") ?: "User"
+                val photo = intent.getStringExtra("profilePictureUrl") ?: ""
+                val statusStr = intent.getStringExtra("status") ?: "Online"
+                val status = try {
+                    User.Status.valueOf(statusStr)
+                } catch (_: Exception) {
+                    User.Status.Online
+                }
+
+                mainBackStack.add(Route.Messaging(id, name, photo, status))
+            }
         }
     }
 

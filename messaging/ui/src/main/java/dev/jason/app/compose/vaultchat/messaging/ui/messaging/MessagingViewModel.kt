@@ -53,7 +53,6 @@ class MessagingViewModel(
         updateState(state(_uiState.value))
     }
 
-
     fun sendMessage() {
         val state = _uiState.value.copy()
         if (!state.sendButtonEnabled) return
