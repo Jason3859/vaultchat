@@ -47,6 +47,7 @@ import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
+import kotlinx.coroutines.flow.filterNotNull
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,15 +62,17 @@ fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
         }
     }
 
-    // FIXME: not opening MessagingScreen when app is killed. instead, opening app only 
     LaunchedEffect(true) {
-        viewModel.navEvents.collect { intent ->
-            val destination = intent.getStringExtra("nav_destination")
-            val id = intent.getStringExtra("id")
-            if (destination == "messaging" && id != null) {
-                mainBackStack.add(Route.Messaging(id))
+        viewModel.navEvent
+            .filterNotNull()
+            .collect { intent ->
+                val destination = intent.getStringExtra("nav_destination")
+                val id = intent.getStringExtra("id")
+                if (destination == "messaging" && id != null) {
+                    mainBackStack.add(Route.Messaging(id))
+                    viewModel.clearNavEvent()
+                }
             }
-        }
     }
 
     Scaffold(
