@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.core.exception.VcException.DeviceException.DeviceAlreadyExistsException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.DeviceException.DeviceNotFoundException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.device_microservice.client.UserClient;
-import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.DeviceAlreadyExistsException;
-import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.DeviceNotFoundException;
-import dev.jason.project.spring.vc_server.device_microservice.exception.DeviceException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.device_microservice.model.DeviceEntity;
 import dev.jason.project.spring.vc_server.device_microservice.repo.DeviceRepository;
 

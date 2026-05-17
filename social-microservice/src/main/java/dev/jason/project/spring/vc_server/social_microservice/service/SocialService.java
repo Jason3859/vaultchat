@@ -6,12 +6,12 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.SelfBlockException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.SelfUnblockException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.UserNotBlockedException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserAlreadyExistsException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.core.model.Message;
-import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.SelfBlockException;
-import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.SelfUnblockException;
-import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserAlreadyExistsException;
-import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserNotBlockedException;
-import dev.jason.project.spring.vc_server.social_microservice.exception.SocialException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.social_microservice.model.SocialEntity;
 import dev.jason.project.spring.vc_server.social_microservice.repo.SocialRepository;
 

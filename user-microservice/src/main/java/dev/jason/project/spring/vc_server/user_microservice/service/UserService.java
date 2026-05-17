@@ -9,14 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
+import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserAlreadyExistsException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.core.model.User.Status;
 import dev.jason.project.spring.vc_server.user_microservice.client.DeviceClient;
 import dev.jason.project.spring.vc_server.user_microservice.client.MessagingClient;
 import dev.jason.project.spring.vc_server.user_microservice.client.SocialClient;
-import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserAlreadyExistsException;
-import dev.jason.project.spring.vc_server.user_microservice.exception.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.user_microservice.model.UserEntity;
 import dev.jason.project.spring.vc_server.user_microservice.repo.UserRepository;
 

@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.core.exception.VcException.MessagingException.MessageTextBlankException;
+import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.BlockedByUserException;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User;
-import dev.jason.project.spring.vc_server.microservice.messaging.exception.MessagingException.BlockedByUserException;
-import dev.jason.project.spring.vc_server.microservice.messaging.exception.MessagingException.MessageTextBlankException;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.client.ClientRepository;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging.MessagingRepository;
 
