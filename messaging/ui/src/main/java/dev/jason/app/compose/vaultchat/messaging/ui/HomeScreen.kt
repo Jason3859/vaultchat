@@ -1,9 +1,12 @@
 package dev.jason.app.compose.vaultchat.messaging.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -27,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -35,6 +40,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.User
@@ -139,12 +148,22 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
     val searchUsersViewModel: SearchUsersViewModel = koinViewModel()
     val searchUsersUiState by searchUsersViewModel.uiState.collectAsStateWithLifecycle()
 
+    val firebaseUser = Firebase.auth.currentUser!!
+    val user = User(
+        firebaseUser.uid,
+        firebaseUser.displayName!!,
+        firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
+        emptyList(),
+        User.Status.Online
+    )
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopBar(topAppBarTexts[bottomBarBackStack.last()]!!, isOffline) },
         bottomBar = {
             BottomBar(
                 currentScreen = bottomBarBackStack.last() as Route,
+                profilePictureUrl = user.profilePictureUrl,
                 onScreenChange = {
                     bottomBarBackStack.add(1, it)
                     try {
@@ -189,15 +208,6 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
                 }
 
                 entry<Route.Home.Profile> {
-                    val firebaseUser = Firebase.auth.currentUser!!
-                    val user = User(
-                        firebaseUser.uid,
-                        firebaseUser.displayName!!,
-                        firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
-                        emptyList(),
-                        User.Status.Online
-                    )
-
                     ProfileScreen(
                         user = user,
                         innerPadding = innerPadding
@@ -227,8 +237,8 @@ fun TopBar(text: String, isOffline: Boolean) {
 }
 
 data class BottomBarIcon(
-    val filled: ImageVector,
-    val outlined: ImageVector,
+    val filled: ImageVector?,
+    val outlined: ImageVector?,
     val text: String,
     val route: Route
 )
@@ -237,8 +247,13 @@ data class BottomBarIcon(
 fun BottomBar(
     currentScreen: Route,
     onScreenChange: (Route) -> Unit,
+    profilePictureUrl: String,
     modifier: Modifier = Modifier
 ) {
+    val imageModifier = modifier
+        .size(25.dp)
+        .clip(CircleShape)
+
     BottomAppBar(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -256,8 +271,8 @@ fun BottomBar(
                 route = Route.Home.Search
             ),
             BottomBarIcon(
-                filled = Icons.Default.AccountCircle,
-                outlined = Icons.Outlined.AccountCircle,
+                filled = null,
+                outlined = null,
                 text = "You",
                 route = Route.Home.Profile
             ),
@@ -267,10 +282,33 @@ fun BottomBar(
                 onClick = { onScreenChange(icon.route) },
                 label = { Text(icon.text) },
                 icon = {
-                    Icon(
-                        imageVector = if (currentScreen == icon.route) icon.filled else icon.outlined,
-                        contentDescription = null
-                    )
+                    if (icon.filled != null && icon.outlined != null) {
+                        Icon(
+                            imageVector = if (currentScreen == icon.route) icon.filled else icon.outlined,
+                            contentDescription = null,
+                            modifier = imageModifier
+                        )
+                    } else {
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(profilePictureUrl)
+                                .crossfade(true)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .memoryCachePolicy(CachePolicy.ENABLED)
+                                .build(),
+                            contentDescription = null,
+                            modifier = imageModifier,
+                            error = {
+                                Log.e("HomeScreen", "BottomBar: error while loading image", it.result.throwable)
+
+                                Icon(
+                                    imageVector = if (currentScreen == icon.route) Icons.Default.AccountCircle else Icons.Outlined.AccountCircle,
+                                    contentDescription = null,
+                                    modifier = imageModifier
+                                )
+                            }
+                        )
+                    }
                 }
             )
         }
