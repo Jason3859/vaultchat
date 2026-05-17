@@ -34,8 +34,6 @@ public class MessagingRepoImpl implements MessagingRepository {
             .build();
 
         sendMessage(firebaseMessage);
-        
-        logger.info("sent message {} to {}", message.text(), device);
     }
 
     @Override
