@@ -1,6 +1,7 @@
 package dev.jason.project.spring.vc_server.user_microservice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,4 +13,7 @@ public interface DeviceClient {
 
 	@PostMapping(Endpoints.DEVICE_ADD)
 	DeviceDto register(@RequestBody DeviceDto device);
+	
+	@DeleteMapping(Endpoints.DEVICE_DELETE)
+	void deleteDevice(@RequestBody DeviceDto device);
 }

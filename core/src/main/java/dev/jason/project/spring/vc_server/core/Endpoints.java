@@ -14,6 +14,7 @@ public class Endpoints {
 	public static final String MY_DEVICES = "/mine";
 	
 	public static final String DEVICE_ADD = DEVICE + ADD;
+	public static final String DEVICE_DELETE = DEVICE + DELETE;
 	public static final String DEVICE_GET_DEVICES_BY_OWNER = DEVICE + GET_DEVICES_BY_OWNER;
 	
 	// messaging microservice
@@ -58,6 +59,7 @@ public class Endpoints {
 	
 	public static final String GET_USER_BY_UID = "/of-uid";
 	public static final String HEARTBEAT = "/heartbeat";
+	public static final String LOGOUT = "/logout";
 	public static final String SEARCH = "/search";
 	
 	public static final String USER_GET_USER_BY_UID = USER + GET_USER_BY_UID;

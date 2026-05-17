@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.jason.project.spring.vc_server.core.Endpoints;
+import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.dto.UserDto;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
@@ -41,15 +43,14 @@ public class UserController {
 	}
 	
 	@DeleteMapping(Endpoints.DELETE)
-	public ResponseEntity<?> deleteUser(@RequestParam String uid) {
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public void deleteUser(@RequestParam String uid) {
 		userService.deleteUser(uid);
-		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@PatchMapping(Endpoints.HEARTBEAT)
-	public ResponseEntity<?> heartbeat(@RequestParam String uid) {
+	public void heartbeat(@RequestParam String uid) {
 		userService.updateHeartBeat(uid);
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@GetMapping(Endpoints.GET_USER_BY_UID)
@@ -73,5 +74,12 @@ public class UserController {
 			.toList();
 		
 		return new ResponseEntity<>(requiredUsers, HttpStatus.OK);
+	}
+	
+	@DeleteMapping(Endpoints.LOGOUT)
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public DeviceDto logout(@RequestBody DeviceDto device) {
+		userService.logout(device.toDevice(null));
+		return device;
 	}
 }

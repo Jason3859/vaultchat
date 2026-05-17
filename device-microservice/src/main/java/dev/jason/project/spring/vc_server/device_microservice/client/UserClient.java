@@ -10,5 +10,5 @@ import dev.jason.project.spring.vc_server.core.Endpoints;
 public interface UserClient {
 
 	@GetMapping(Endpoints.USER_GET_USER_BY_UID)
-	Object getUserByUid(@RequestParam String uid);
+	void getUserByUid(@RequestParam String uid);
 }

@@ -31,7 +31,7 @@ public class DeviceEntity {
 	}
 
 	public static DeviceEntity asEntity(Device device) {
-		return new DeviceEntity(device.getOwnerId(), device.getName(), device.getType(), device.getOs(), device.getVersion(), device.getToken(), device.getLastUsed());
+		return new DeviceEntity(device.getOwnerUid(), device.getName(), device.getType(), device.getOs(), device.getVersion(), device.getToken(), device.getLastUsed());
 	}
 
 	@Override
@@ -46,14 +46,6 @@ public class DeviceEntity {
 
 		DeviceEntity that = (DeviceEntity) obj;
 
-		if (Objects.equals(this.name, that.getName())) {
-			return true;
-		}
-
-		if (Objects.equals(this.token, that.getToken())) {
-			return true;
-		}
-
-		return false;
+		return Objects.equals(this.name, that.getName());
 	}
 }

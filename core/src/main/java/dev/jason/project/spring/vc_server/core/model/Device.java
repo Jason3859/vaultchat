@@ -10,7 +10,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 public final class Device {
-    private final String ownerId;
+    private final String ownerUid;
     private final String name;
     private final Type type;
     private final OS os;

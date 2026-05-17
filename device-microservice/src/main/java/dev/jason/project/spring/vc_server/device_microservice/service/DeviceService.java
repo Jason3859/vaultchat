@@ -12,6 +12,7 @@ import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.device_microservice.client.UserClient;
 import dev.jason.project.spring.vc_server.device_microservice.model.DeviceEntity;
 import dev.jason.project.spring.vc_server.device_microservice.repo.DeviceRepository;
+import feign.FeignException;
 
 @Service
 public class DeviceService {
@@ -31,12 +32,12 @@ public class DeviceService {
 	public Device addDevice(Device device) {
 		
 		try {
-			userClient.getUserByUid(device.getOwnerId());
-		} catch (Exception e) {
+			userClient.getUserByUid(device.getOwnerUid());
+		} catch (FeignException.NotFound e) {
 			throw new UserNotFoundException();
 		}
 		
-		List<DeviceEntity> devices = deviceRepository.findByOwnerUid(device.getOwnerId());
+		List<DeviceEntity> devices = deviceRepository.findByOwnerUid(device.getOwnerUid());
 		
 		DeviceEntity entity = DeviceEntity.asEntity(device);
 		
@@ -50,7 +51,7 @@ public class DeviceService {
 	}
 	
 	public void deleteDevice(Device device) {
-		List<DeviceEntity> entities = deviceRepository.findByOwnerUid(device.getOwnerId());
+		List<DeviceEntity> entities = deviceRepository.findByOwnerUid(device.getOwnerUid());
 		
 		if (entities.contains(DeviceEntity.asEntity(device))) {			
 			deviceRepository.delete(DeviceEntity.asEntity(device));

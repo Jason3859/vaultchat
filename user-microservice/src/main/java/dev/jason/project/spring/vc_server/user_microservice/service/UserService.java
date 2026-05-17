@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
+import dev.jason.project.spring.vc_server.core.exception.VcException.DeviceException.DeviceNotFoundException;
 import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.core.model.Device;
@@ -19,6 +20,7 @@ import dev.jason.project.spring.vc_server.user_microservice.client.MessagingClie
 import dev.jason.project.spring.vc_server.user_microservice.client.SocialClient;
 import dev.jason.project.spring.vc_server.user_microservice.model.UserEntity;
 import dev.jason.project.spring.vc_server.user_microservice.repo.UserRepository;
+import feign.FeignException;
 
 @Service
 public class UserService {
@@ -92,4 +94,12 @@ public class UserService {
 			.map(UserEntity::asUser)
 			.toList();
     }
+
+	public void logout(Device device) {
+		try {
+			deviceClient.deleteDevice(DeviceDto.asDto(device));
+		} catch (FeignException.NotFound _) {
+			throw new DeviceNotFoundException();
+		}
+	}
 }
