@@ -15,14 +15,14 @@ import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
 
 @Repository
-@Profile("firebase")
+@Profile("!no-firebase")
 public class MessagingRepoImpl implements MessagingRepository {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MessagingRepoImpl.class);
 	
     @Override
     public void sendMessage(dev.jason.project.spring.vc_server.core.model.Message message, Device device, boolean forDeviceCheck) {
-        Message firebaseMessage = Message.builder()
+    	Message firebaseMessage = Message.builder()
             .setToken(device.getToken())
             .putData("type", forDeviceCheck ? "check" : "message")
             .putAllData(message.asMap())
