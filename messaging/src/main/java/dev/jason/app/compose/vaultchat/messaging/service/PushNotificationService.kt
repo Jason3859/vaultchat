@@ -1,5 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging.service
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
@@ -48,6 +49,7 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+        Log.d("PushNotificationService", "onMessageReceived: ${message.data}")
 
         val type = message.data["type"]
 
@@ -83,6 +85,19 @@ class PushNotificationService : FirebaseMessagingService() {
     }
 
     private fun showNotification(text: String, from: String) {
+        val channelId = getString(R.string.notification_channel_id)
+        val channelName = getString(R.string.notification_channel_name)
+        val channelDescription = getString(R.string.notification_channel_description)
+
+        val channel = NotificationChannel(
+            channelId,
+            channelName,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = channelDescription
+            enableVibration(true)
+        }
+
         val intent = Intent(this, MessagingActivity::class.java).apply {
             putExtra("nav_destination", "messaging")
             putExtra("id", from)
@@ -93,14 +108,16 @@ class PushNotificationService : FirebaseMessagingService() {
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, flags)
 
-        val notification = NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+        val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("New message")
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // FIXME: to be replaced
             .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
             .build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
 
         if (MessagingState.otherUserUid.value != from) {
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)

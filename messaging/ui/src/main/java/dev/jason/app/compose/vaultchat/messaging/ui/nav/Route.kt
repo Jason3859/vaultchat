@@ -1,7 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.nav
 
 import androidx.navigation3.runtime.NavKey
-import dev.jason.app.compose.vaultchat.core.domain.User
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,12 +20,7 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
-    data class Messaging(
-        val uid: String,
-        val displayName: String,
-        val profilePictureUrl: String,
-        val status: User.Status
-    ) : Route
+    data class Messaging(val uid: String) : Route
 
     @Serializable
     data class UserInfo(

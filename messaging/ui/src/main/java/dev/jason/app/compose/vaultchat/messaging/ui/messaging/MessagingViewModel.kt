@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class MessagingViewModel(
-    private val otherUser: User,
+    private val otherUserUid: String,
     private val api: RemoteApiRepository,
     private val localStorageRepository: LocalStorageRepository
 ) : ViewModel() {
@@ -26,6 +26,9 @@ class MessagingViewModel(
         val messageText: String = "",
         val sendButtonEnabled: Boolean = false,
     )
+
+    private val _otherUser = MutableStateFlow<User?>(null)
+    val otherUser = _otherUser.asStateFlow()
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
@@ -59,7 +62,7 @@ class MessagingViewModel(
 
         val message = Message(
             from = currentUserUid,
-            to = otherUser.uid,
+            to = otherUserUid,
             text = state.messageText,
             timestamp = LocalDateTime.now()
         )
@@ -92,7 +95,7 @@ class MessagingViewModel(
 
     init {
         viewModelScope.launch {
-            localStorageRepository.getMessages(currentUserUid, otherUser.uid).collect { messages ->
+            localStorageRepository.getMessages(currentUserUid, otherUserUid).collect { messages ->
                 if (!_messages.isEmpty()) {
                     try {
                         val msg = messages.last()
@@ -106,6 +109,12 @@ class MessagingViewModel(
                 } else {
                     _messages.addAll(messages) // initial state
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            localStorageRepository.getConnectionByUid(otherUserUid).collect { user ->
+                _otherUser.update { user }
             }
         }
     }

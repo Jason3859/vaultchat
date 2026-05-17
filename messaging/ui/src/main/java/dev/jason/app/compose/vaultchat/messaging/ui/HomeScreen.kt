@@ -47,7 +47,6 @@ import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.profile.UserInfoScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.search.SearchUsersViewModel
-import kotlinx.coroutines.flow.first
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -68,9 +67,7 @@ fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
             val destination = intent.getStringExtra("nav_destination")
             val id = intent.getStringExtra("id")
             if (destination == "messaging" && id != null) {
-                val user = viewModel.getUserByUid(id).first()
-
-                mainBackStack.add(Route.Messaging(id, user.displayName, user.profilePictureUrl, user.status))
+                mainBackStack.add(Route.Messaging(id))
             }
         }
     }
@@ -88,24 +85,18 @@ fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
                 entry<Route.Messaging> {
                     MessagingState.updateOtherUserId(it.uid)
                     MessagingScreen(
-                        otherUser = User(
-                            it.uid,
-                            it.displayName,
-                            it.profilePictureUrl,
-                            emptyList(),
-                            it.status
-                        ),
+                        otherUserUid = it.uid,
                         onBackClick = {
                             MessagingState.updateOtherUserId(null)
                             mainBackStack.removeLastOrNull()
                         },
                         isOffline = isOffline,
-                        onUserInfoClick = {
+                        onUserInfoClick = { user ->
                             mainBackStack.add(
                                 Route.UserInfo(
-                                    it.uid,
-                                    it.displayName,
-                                    it.profilePictureUrl
+                                    user.uid,
+                                    user.displayName,
+                                    user.profilePictureUrl
                                 )
                             )
                         }
@@ -168,12 +159,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
                     MainHomeScreen(
                         onUserClick = {
                             mainBackStack.add(
-                                Route.Messaging(
-                                    it.uid,
-                                    it.displayName,
-                                    it.profilePictureUrl,
-                                    it.status
-                                )
+                                Route.Messaging(it.uid)
                             )
                         },
                         isOffline = isOffline,
@@ -190,12 +176,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
                         onSearch = { searchUsersViewModel.getAndUpdateUsers() },
                         onUserClick = {
                             mainBackStack.add(
-                                Route.Messaging(
-                                    it.uid,
-                                    it.displayName,
-                                    it.profilePictureUrl,
-                                    it.status
-                                )
+                                Route.Messaging(it.uid)
                             )
                         },
                         modifier = Modifier

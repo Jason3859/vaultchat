@@ -46,4 +46,12 @@ class MainHomeViewModel(
             _isLoading.update { false }
         }
     }
+
+    init {
+        viewModelScope.launch {
+            localStorageRepository.getConnections().collect { list ->
+                _connections.update { list }
+            }
+        }
+    }
 }

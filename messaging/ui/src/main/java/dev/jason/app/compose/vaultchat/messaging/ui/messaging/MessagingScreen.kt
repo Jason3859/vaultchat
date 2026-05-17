@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -63,26 +64,39 @@ import java.time.LocalDateTime
 
 @Composable
 fun MessagingScreen(
-    otherUser: User,
+    otherUserUid: String,
     onBackClick: () -> Unit,
-    onUserInfoClick: () -> Unit,
+    onUserInfoClick: (User) -> Unit,
     isOffline: Boolean
 ) {
-    val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
+    val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUserUid) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val otherUserFromViewModel by viewModel.otherUser.collectAsStateWithLifecycle()
 
-    MessagingScreen(
-        otherUser = otherUser,
-        onBackClick = onBackClick,
-        uiState = uiState,
-        updateState = viewModel::updateState,
-        sendMessage = viewModel::sendMessage,
-        messages = viewModel.messages,
-        pendingMessages = viewModel.pendingMessages,
-        failedMessages = viewModel.failedMessages,
-        isOffline = isOffline,
-        onUserInfoClick = onUserInfoClick
-    )
+    if (otherUserFromViewModel == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingIndicator(
+                modifier = Modifier.size(150.dp)
+            )
+        }
+    } else {
+        MessagingScreen(
+            otherUser = otherUserFromViewModel!!,
+            onBackClick = onBackClick,
+            uiState = uiState,
+            updateState = viewModel::updateState,
+            sendMessage = viewModel::sendMessage,
+            messages = viewModel.messages,
+            pendingMessages = viewModel.pendingMessages,
+            failedMessages = viewModel.failedMessages,
+            isOffline = isOffline,
+            onUserInfoClick = onUserInfoClick
+        )
+    }
+
 }
 
 @Composable
@@ -92,7 +106,7 @@ private fun MessagingScreen(
     uiState: MessagingViewModel.UiState,
     updateState: (MessagingViewModel.UiState) -> Unit,
     sendMessage: () -> Unit,
-    onUserInfoClick: () -> Unit,
+    onUserInfoClick: (User) -> Unit,
     messages: List<Message>,
     pendingMessages: List<Message>,
     failedMessages: List<Message>,
@@ -166,7 +180,7 @@ private fun LocalDateTime.display() =
 private fun TopBar(
     otherUser: User,
     onBackClick: () -> Unit,
-    onUserInfoClick: () -> Unit,
+    onUserInfoClick: (User) -> Unit,
     isOffline: Boolean
 ) {
     val context = LocalContext.current
@@ -177,7 +191,7 @@ private fun TopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onUserInfoClick() }
+                    .clickable { onUserInfoClick(otherUser) }
             ) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(context)
