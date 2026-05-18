@@ -13,8 +13,6 @@ interface RemoteApi {
 
 class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: String) : RemoteApi {
 
-    // TODO: remove logs
-
     override suspend fun registerUser(body: UserDto): Int {
         val response = httpClient.post("$baseUrl/user/register") {
             contentType(ContentType.Application.Json)
