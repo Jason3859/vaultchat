@@ -11,12 +11,14 @@ data class UserDto(
 ) {
     @Serializable
     data class DeviceDto(
+        val ownerUid: String,
         val name: String,
         val type: Type,
         val os: String,
         val version: String,
         val token: String,
     ) {
+        @Serializable
         enum class Type {
             Mobile, Tablet
         }

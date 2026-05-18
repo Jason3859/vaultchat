@@ -121,6 +121,16 @@ class AuthActivity : ComponentActivity() {
                 ?.addOnSuccessListener {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val token = this@AuthActivity.token ?: Firebase.messaging.token.await()
+                        val deviceDto = Device.getCurrentDevice(this@AuthActivity, token).let { device ->
+                            UserDto.DeviceDto(
+                                ownerUid = it?.user?.uid!!,
+                                name = device.name,
+                                type = UserDto.DeviceDto.Type.valueOf(device.type.name),
+                                os = device.os.toString(),
+                                version = device.version,
+                                token = token
+                            )
+                        }
 
                         viewModel.updateCurrentScreen(AuthViewModel.Screen.Loading)
                         remoteApi.registerUser(
@@ -128,17 +138,13 @@ class AuthActivity : ComponentActivity() {
                                 it?.user?.uid!!,
                                 it.user?.displayName!!,
                                 it.user?.photoUrl.toString().removeSuffix("=s96-c"),
-                                Device.getCurrentDevice(this@AuthActivity, token).let { device ->
-                                    UserDto.DeviceDto(
-                                        name = device.name,
-                                        type = UserDto.DeviceDto.Type.valueOf(device.type.name),
-                                        os = device.os.toString(),
-                                        version = device.version,
-                                        token = token
-                                    )
-                                }
+                                deviceDto
                             )
-                        )
+                        ).let { statusCode ->
+                            if (statusCode !in 200..299) {
+                                remoteApi.addDevice(deviceDto)
+                            }
+                        }
                         startActivity(Intent(this@AuthActivity, MessagingActivity::class.java))
                         finish()
                     }
