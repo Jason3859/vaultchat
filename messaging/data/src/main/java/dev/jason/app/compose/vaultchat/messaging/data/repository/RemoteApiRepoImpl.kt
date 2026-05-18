@@ -99,6 +99,16 @@ class RemoteApiRepoImpl(private val api: RemoteApi) : RemoteApiRepository {
         }
     }
 
+    override suspend fun logout(): Int {
+        return try {
+            api.logout()
+        } catch (e: Exception) {
+            Log.e("RemoteApiRepoImpl", "logout: exception", e)
+            handleException(e)
+            1000 // internal error
+        }
+    }
+
     private fun handleException(e: Exception) {
         when (e) {
             is ClientRequestException -> {

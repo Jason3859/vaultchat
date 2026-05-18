@@ -49,7 +49,6 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d("PushNotificationService", "onMessageReceived: ${message.data}")
 
         val type = message.data["type"]
 

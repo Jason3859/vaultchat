@@ -20,6 +20,9 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
+    object Loading : Route
+
+    @Serializable
     data class Messaging(val uid: String) : Route
 
     @Serializable

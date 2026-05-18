@@ -100,7 +100,9 @@ private enum class ProfileScreenRowItemId {
 fun ProfileScreen(
     user: User,
     innerPadding: PaddingValues,
-    viewModel: ProfileScreenViewModel = koinViewModel()
+    viewModel: ProfileScreenViewModel = koinViewModel(),
+    navigateToLoadingScreen: () -> Unit,
+    onLogoutSuccessful: () -> Unit
 ) {
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val blocklist by viewModel.blocklist.collectAsStateWithLifecycle()
@@ -112,7 +114,10 @@ fun ProfileScreen(
         devices = devices,
         blocklist = blocklist,
         onUnblockClick = viewModel::unblockUser,
-        onLogOutClick = viewModel::logout,
+        onLogOutClick = {
+            navigateToLoadingScreen()
+            viewModel.logout(onLogoutSuccessful)
+        },
         innerPadding = innerPadding,
         currentProfileScreenRowItemId = currentProfileScreenRowItemId.value,
         onProfileScreenRowItemIdChange = { currentProfileScreenRowItemId.value = it }
@@ -266,7 +271,7 @@ private fun ProfileScreen(
                 AlertDialog(
                     onDismissRequest = { showLogoutDialog = false },
                     confirmButton = {
-                        TextButton(onLogOutClick) {
+                        TextButton(onClick = { showLogoutDialog = false; onLogOutClick() }) {
                             Text("Logout")
                         }
                     },

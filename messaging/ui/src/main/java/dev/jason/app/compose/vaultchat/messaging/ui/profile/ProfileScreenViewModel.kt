@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileScreenViewModel(
-    private val repository: RemoteApiRepository,
+    private val remoteApiRepository: RemoteApiRepository,
     private val localStorageRepository: LocalStorageRepository
 ) : ViewModel() {
 
@@ -43,7 +43,7 @@ class ProfileScreenViewModel(
 
     fun fetchBlocklist() {
         viewModelScope.launch {
-            repository.fetchBlocklist(currentUser.uid).let {
+            remoteApiRepository.fetchBlocklist(currentUser.uid).let {
                 _blocklist.update { it }
             }
         }
@@ -51,7 +51,7 @@ class ProfileScreenViewModel(
 
     fun fetchDevices() {
         viewModelScope.launch {
-            repository.fetchDevices(currentUser.uid).let { devices ->
+            remoteApiRepository.fetchDevices(currentUser.uid).let { devices ->
                 _devices.update { devices }
             }
         }
@@ -59,17 +59,23 @@ class ProfileScreenViewModel(
 
     fun unblockUser(user: User) {
         viewModelScope.launch {
-            repository.unblock(currentUser.uid, user.uid)
+            remoteApiRepository.unblock(currentUser.uid, user.uid)
         }
     }
 
-    fun logout() {
-        // TODO: implement this
+    fun logout(onLogoutSuccessful: () -> Unit) {
+        viewModelScope.launch {
+            remoteApiRepository.logout().let { statusCode ->
+                if (statusCode in 200..299) {
+                    onLogoutSuccessful()
+                }
+            }
+        }
     }
 
     fun blockUser(user: User) {
         viewModelScope.launch {
-            repository.block(currentUser.uid, user.uid)
+            remoteApiRepository.block(currentUser.uid, user.uid)
         }
     }
 

@@ -2,6 +2,7 @@ package dev.jason.app.compose.vaultchat.messaging.ui
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -29,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,8 +47,6 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
@@ -61,7 +62,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
+fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel, onLogoutSuccessful: () -> Unit) {
     val mainBackStack = rememberNavBackStack(Route.Home)
     val snackbarHostState = SnackbarHostState()
 
@@ -91,7 +92,7 @@ fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
             backStack = mainBackStack,
             entryProvider = entryProvider {
                 entry<Route.Home> {
-                    HomeScreenCore(mainBackStack, isOffline)
+                    HomeScreenCore(mainBackStack, isOffline, onLogoutSuccessful)
                 }
 
                 entry<Route.Messaging> {
@@ -131,13 +132,28 @@ fun HomeScreen(isOffline: Boolean, viewModel: HomeViewModel) {
                         }
                     )
                 }
+
+                entry<Route.Loading> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingIndicator(
+                            modifier = Modifier.size(150.dp)
+                        )
+                    }
+                }
             }
         )
     }
 }
 
 @Composable
-private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boolean) {
+private fun HomeScreenCore(
+    mainBackStack: NavBackStack<NavKey>,
+    isOffline: Boolean,
+    onLogoutSuccessful: () -> Unit
+) {
     val bottomBarBackStack = rememberNavBackStack(Route.Home.Main)
     val topAppBarTexts = mapOf(
         Route.Home.Main to "Home",
@@ -148,14 +164,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
     val searchUsersViewModel: SearchUsersViewModel = koinViewModel()
     val searchUsersUiState by searchUsersViewModel.uiState.collectAsStateWithLifecycle()
 
-    val firebaseUser = Firebase.auth.currentUser!!
-    val user = User(
-        firebaseUser.uid,
-        firebaseUser.displayName!!,
-        firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
-        emptyList(),
-        User.Status.Online
-    )
+    val user by MessagingState.currentUser.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -163,7 +172,7 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
         bottomBar = {
             BottomBar(
                 currentScreen = bottomBarBackStack.last() as Route,
-                profilePictureUrl = user.profilePictureUrl,
+                profilePictureUrl = user!!.profilePictureUrl,
                 onScreenChange = {
                     bottomBarBackStack.add(1, it)
                     try {
@@ -209,8 +218,13 @@ private fun HomeScreenCore(mainBackStack: NavBackStack<NavKey>, isOffline: Boole
 
                 entry<Route.Home.Profile> {
                     ProfileScreen(
-                        user = user,
-                        innerPadding = innerPadding
+                        user = user!!,
+                        innerPadding = innerPadding,
+                        onLogoutSuccessful = onLogoutSuccessful,
+                        navigateToLoadingScreen = {
+                            mainBackStack.add(Route.Loading)
+                            mainBackStack.removeIf { it !is Route.Loading }
+                        }
                     )
                 }
             }

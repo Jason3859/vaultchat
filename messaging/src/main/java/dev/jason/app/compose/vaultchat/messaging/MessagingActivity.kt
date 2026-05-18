@@ -14,7 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.messaging.messaging
 import dev.jason.app.compose.vaultchat.core.domain.Device
+import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
@@ -23,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.seconds
@@ -34,6 +37,15 @@ class MessagingActivity : ComponentActivity() {
     private val isOffline = MutableStateFlow(false)
 
     private val homeViewModel by viewModel<HomeViewModel>()
+
+    private val firebaseUser = Firebase.auth.currentUser!!
+    private val user = User(
+        firebaseUser.uid,
+        firebaseUser.displayName!!,
+        firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
+        emptyList(),
+        User.Status.Online
+    )
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -57,7 +69,11 @@ class MessagingActivity : ComponentActivity() {
 
         isOffline.value = !isNetworkAvailable(connectivityManager)
 
-        MessagingState.updateCurrentDevice(Device.getCurrentDevice(this, "not needed"))
+        lifecycleScope.launch {
+            val token = Firebase.messaging.token.await()
+            MessagingState.updateCurrentUser(user)
+            MessagingState.updateCurrentDevice(Device.getCurrentDevice(this@MessagingActivity, token))
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
             Firebase.auth.currentUser?.let { firebaseUser ->
@@ -75,9 +91,27 @@ class MessagingActivity : ComponentActivity() {
         setContent {
             val isOfflineState by isOffline.collectAsState()
             VaultChatTheme {
-                HomeScreen(isOfflineState, homeViewModel)
+                HomeScreen(
+                    isOffline = isOfflineState,
+                    viewModel = homeViewModel,
+                    onLogoutSuccessful = {
+                        Firebase.auth.signOut()
+                        restartApp()
+                    }
+                )
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent) {
@@ -93,14 +127,12 @@ class MessagingActivity : ComponentActivity() {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.unregisterNetworkCallback(networkCallback)
-    }
+    private fun restartApp() {
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        val componentName = intent?.component
+        val mainIntent = Intent.makeRestartActivityTask(componentName)
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleIntent(intent)
+        startActivity(mainIntent)
+        finish()
     }
 }

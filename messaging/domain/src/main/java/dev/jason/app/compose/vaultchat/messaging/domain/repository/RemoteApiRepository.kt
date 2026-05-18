@@ -19,4 +19,6 @@ interface RemoteApiRepository {
     suspend fun updateToken(uid: String, token: String, device: Device)
 
     suspend fun sendMessage(body: Message): Int // status code
+
+    suspend fun logout(): Int // status code
 }
