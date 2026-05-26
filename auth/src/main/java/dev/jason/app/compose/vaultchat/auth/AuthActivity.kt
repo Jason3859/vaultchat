@@ -31,10 +31,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
 import dev.jason.app.compose.vaultchat.auth.data.FirebaseGoogleAuthentication
-import dev.jason.app.compose.vaultchat.auth.data.UserDto
 import dev.jason.app.compose.vaultchat.auth.data.RemoteApi
+import dev.jason.app.compose.vaultchat.auth.data.UserDto
+import dev.jason.app.compose.vaultchat.auth.ui.AuthScreen
 import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
-import dev.jason.app.compose.vaultchat.auth.ui.ExampleSignInScreen
 import dev.jason.app.compose.vaultchat.auth.ui.SnackbarController
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
@@ -87,10 +87,9 @@ class AuthActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                             snackbarHost = { SnackbarHost(snackbarHostState) }
                         ) { innerPadding ->
-                            ExampleSignInScreen(
+                            AuthScreen(
                                 onSignInClick = { signInWithGoogle() },
                                 modifier = Modifier
-                                    .fillMaxSize()
                                     .padding(innerPadding)
                             )
                         }

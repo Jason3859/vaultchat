@@ -2,4 +2,6 @@
 <resources>
     <string name="web_client_id">264713615872-ufevv8k7n6nj97qsvt5eicedvr4kdrj4.apps.googleusercontent.com</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="auth_screen_title">Welcome to VaultChat</string>
+    <string name="auth_screen_text">Sign in to get started.</string>
 </resources>
