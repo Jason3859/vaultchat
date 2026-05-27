@@ -7,11 +7,11 @@ plugins {
 android {
     namespace = "dev.jason.app.compose.vaultchat.local_storage"
     compileSdk {
-        version = release(36)
+        version = release(libs.versions.android.compileSdk.get().toInt())
     }
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.android.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

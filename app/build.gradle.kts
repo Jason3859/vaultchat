@@ -8,13 +8,13 @@ plugins {
 android {
     namespace = "dev.jason.app.compose.vaultchat"
     compileSdk {
-        version = release(36)
+        version = release(libs.versions.android.compileSdk.get().toInt())
     }
 
     defaultConfig {
         applicationId = "dev.jason.app.compose.vaultchat"
-        minSdk = 26
-        targetSdk = 36
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
