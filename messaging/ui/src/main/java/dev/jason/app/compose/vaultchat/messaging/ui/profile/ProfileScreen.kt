@@ -1,53 +1,56 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.profile
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.Tablet
+import androidx.compose.material.icons.filled.TabletAndroid
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
@@ -56,423 +59,442 @@ import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
+import dev.jason.app.compose.vaultchat.messaging.ui.R
+import dev.jason.app.compose.vaultchat.messaging.ui.home.HomeUiState
 import org.koin.androidx.compose.koinViewModel
 
-private object ProfileScreen {
-
-    val IMAGE_SIZE = 35.dp
-
-    val defaultUser = User("name", "name", "url", emptyList(), User.Status.Online)
-
-    val defaultDeviceList = List(10) {
-        Device(
-            name = "device",
-            type = Device.Type.Mobile,
-            os = Device.Os.Android,
-            version = "13",
-            token = "not required"
-        )
-    }
-
-    val defaultUserList = List(10) { index ->
-        User(
-            uid = "uid",
-            displayName = "display name @$index",
-            profilePictureUrl = "",
-            devices = emptyList(),
-            status = User.Status.Online
-        )
-    }
-}
-
-private data class ProfileScreenRowItem(
-    val id: ProfileScreenRowItemId,
-    val label: String,
-    val icon: ImageVector,
-    val action: () -> Unit
-)
-
-private enum class ProfileScreenRowItemId {
+enum class ProfileScreenRowItemId {
     Devices, Blocklist, Logout
 }
 
 @Composable
 fun ProfileScreen(
-    user: User,
-    innerPadding: PaddingValues,
-    viewModel: ProfileScreenViewModel = koinViewModel(),
-    navigateToLoadingScreen: () -> Unit,
-    onLogoutSuccessful: () -> Unit
+    showCurrentUserProfile: Boolean,
+    onBack: () -> Unit,
+    onLogoutClick: (clearMessages: Boolean) -> Unit,
+    onDeviceLogoutClick: (device: Device, clearMessages: Boolean) -> Unit,
 ) {
+    val viewModel: ProfileScreenViewModel = koinViewModel()
+
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val blocklist by viewModel.blocklist.collectAsStateWithLifecycle()
+    val currentUser by MessagingState.currentUser.collectAsStateWithLifecycle()
+    val otherUser by MessagingState.otherUser.collectAsStateWithLifecycle()
 
-    val currentProfileScreenRowItemId = retain { mutableStateOf<ProfileScreenRowItemId?>(null) }
+    BackHandler { onBack.invoke() }
 
-    ProfileScreen(
-        user = user,
-        devices = devices,
-        blocklist = blocklist,
-        onUnblockClick = viewModel::unblockUser,
-        onLogOutClick = {
-            navigateToLoadingScreen()
-            viewModel.logout(onLogoutSuccessful)
-        },
-        innerPadding = innerPadding,
-        currentProfileScreenRowItemId = currentProfileScreenRowItemId.value,
-        onProfileScreenRowItemIdChange = { currentProfileScreenRowItemId.value = it }
-    )
+    if (showCurrentUserProfile)
+        ProfileScreen(
+            onBack = onBack,
+            user = currentUser ?: throw IllegalStateException("user is null"),
+            devices = devices,
+            blocklist = blocklist,
+            onLogoutWithoutClearingMessagesClick = { onLogoutClick(false) },
+            onLogoutClearingMessagesClick = { onLogoutClick(true) },
+            onDeviceLogoutClick = onDeviceLogoutClick,
+        )
+    else
+        ProfileScreen(
+            onBack = onBack,
+            user = otherUser ?: throw IllegalStateException("other user is null")
+        )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ProfileScreen(
+fun ProfileScreen(
+    onBack: () -> Unit,
     user: User,
-    devices: List<Device>,
-    blocklist: List<User>,
-    onUnblockClick: (User) -> Unit,
-    onLogOutClick: () -> Unit,
-    innerPadding: PaddingValues,
-    currentProfileScreenRowItemId: ProfileScreenRowItemId?,
-    onProfileScreenRowItemIdChange: (ProfileScreenRowItemId?) -> Unit
+    devices: List<Device>? = null,
+    blocklist: List<User>? = null,
+    onLogoutWithoutClearingMessagesClick: (() -> Unit)? = null,
+    onLogoutClearingMessagesClick: (() -> Unit)? = null,
+    onDeviceLogoutClick: ((Device, Boolean) -> Unit)? = null
 ) {
-    var showLogoutDialog by retain { mutableStateOf(false) }
+    val context = LocalContext.current
+    val imageModifier = Modifier
+        .size(175.dp)
+        .clip(CircleShape)
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-    ) {
-        Box {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally
+    var currentDialog by remember { mutableStateOf<ProfileScreenRowItemId?>(null) }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBack,
+                        colors = IconButtonDefaults.iconButtonVibrantColors()
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        when (currentDialog) {
+            ProfileScreenRowItemId.Devices -> DevicesDialog(
+                // it should not throw any exception here because
+                // it will only be triggered when buttons below are visible
+                // but those buttons are hidden when these values (i.e., devices and blocklist) are null
+                devices = devices!!,
+                onDismiss = { currentDialog = null },
+                onLogoutDeviceClick = { d, b -> onDeviceLogoutClick?.invoke(d, b) }
+            )
+
+            ProfileScreenRowItemId.Blocklist -> BlocklistDialog(
+                blocklist = blocklist!!,
+                onDismiss = { currentDialog = null }
+            )
+
+            ProfileScreenRowItemId.Logout -> LogoutDialog(
+                onDismiss = { currentDialog = null },
+                onLogoutClearingMessagesClick = { onLogoutClearingMessagesClick?.invoke() },
+                onLogoutWithoutClearingMessagesClick = { onLogoutWithoutClearingMessagesClick?.invoke() }
+            )
+
+            null -> {}
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f),
+                contentAlignment = Alignment.Center
             ) {
-                item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
+                        model = ImageRequest.Builder(context)
                             .data(user.profilePictureUrl)
                             .crossfade(true)
                             .diskCachePolicy(CachePolicy.ENABLED)
                             .memoryCachePolicy(CachePolicy.ENABLED)
                             .build(),
                         contentDescription = null,
+                        modifier = imageModifier,
                         error = {
-                            Log.w(
+                            Log.e(
                                 "ProfileScreen",
-                                "ProfileScreen: failed to load image",
+                                "ProfileScreen: error while loading image",
                                 it.result.throwable
                             )
 
-                            Image(Icons.Default.AccountCircle, null)
-                        },
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(150.dp)
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = null,
+                                modifier = imageModifier
+                            )
+                        }
                     )
-                }
 
-                item {
                     Text(
                         text = user.displayName,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 30.sp
+                        fontSize = 24.sp,
+                        style = MaterialTheme.typography.labelMediumEmphasized
                     )
                 }
+            }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        listOf(
-                            ProfileScreenRowItem(
-                                id = ProfileScreenRowItemId.Devices,
-                                label = "Your Devices",
-                                icon = Icons.Default.Devices,
-                                action = {
-                                    onProfileScreenRowItemIdChange(ProfileScreenRowItemId.Devices)
-                                }
-                            ),
-                            ProfileScreenRowItem(
-                                id = ProfileScreenRowItemId.Blocklist,
-                                label = "Blocklist",
-                                icon = Icons.Default.Block,
-                                action = {
-                                    onProfileScreenRowItemIdChange(ProfileScreenRowItemId.Blocklist)
-                                }
-                            ),
-                            ProfileScreenRowItem(
-                                id = ProfileScreenRowItemId.Logout,
-                                label = "Logout",
-                                icon = Icons.AutoMirrored.Filled.Logout,
-                                action = { showLogoutDialog = true }
-                            )
-                        ).forEach { item ->
-                            OutlinedButton(
-                                onClick = {
-                                    item.action()
-                                },
-                                shape = RoundedCornerShape(15.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = when {
-                                        item.id == ProfileScreenRowItemId.Logout -> MaterialTheme.colorScheme.errorContainer
-                                        currentProfileScreenRowItemId == item.id -> MaterialTheme.colorScheme.primaryContainer
-                                        else -> Color.Unspecified
-                                    }
-                                )
+            if (devices != null && blocklist != null) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    mapOf(
+                        ProfileScreenRowItemId.Devices to Icons.Default.Devices,
+                        ProfileScreenRowItemId.Blocklist to Icons.Default.Block,
+                        ProfileScreenRowItemId.Logout to Icons.AutoMirrored.Filled.Logout
+                    ).forEach { (id, icon) ->
+                        OutlinedButton(
+                            onClick = { currentDialog = id },
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(item.icon, null)
-                                    Text(item.label)
-                                }
+                                Icon(icon, null)
+                                Text(id.name)
                             }
                         }
                     }
                 }
-
-                when (currentProfileScreenRowItemId) {
-                    ProfileScreenRowItemId.Devices -> {
-                        items(devices) { device ->
-                            DeviceItem(device)
-                        }
-                    }
-
-                    ProfileScreenRowItemId.Blocklist -> {
-                        if (blocklist.isEmpty()) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillParentMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "No blocked users",
-                                        fontSize = 20.sp
-                                    )
-                                }
-                            }
-                        } else {
-                            items(blocklist) { blocklistUser ->
-                                BlocklistItem(blocklistUser, onUnblockClick)
-                            }
-                        }
-
-                    }
-
-                    else -> {}
-                }
-            }
-
-            if (showLogoutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLogoutDialog = false },
-                    confirmButton = {
-                        TextButton(onClick = { showLogoutDialog = false; onLogOutClick() }) {
-                            Text("Logout")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showLogoutDialog = false }) {
-                            Text("Cancel")
-                        }
-                    },
-                    title = {
-                        Text("Logout?")
-                    },
-                    text = {
-                        Text("You'll have to log in again.")
-                    }
-                )
             }
         }
     }
 }
 
 @Composable
-private fun ProfileScreenItemContainer(content: @Composable RowScope.() -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .border(
-                border = ButtonDefaults.outlinedButtonBorder(),
-                shape = RoundedCornerShape(15.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            content = content
-        )
-    }
-}
+private fun LogoutDialog(
+    onDismiss: () -> Unit,
+    onLogoutClearingMessagesClick: () -> Unit,
+    onLogoutWithoutClearingMessagesClick: () -> Unit
+) {
+    var showAnotherDialog by remember { mutableStateOf(false) }
 
-@Composable
-private fun DeviceItem(device: Device) {
-    ProfileScreenItemContainer {
-        Icon(
-            imageVector = when (device.type) {
-                Device.Type.Mobile -> {
-                    Icons.Default.PhoneAndroid
-                }
-
-                else -> {
-                    Icons.Default.Tablet
-                }
-            },
-            contentDescription = null,
-            modifier = Modifier.size(ProfileScreen.IMAGE_SIZE)
-        )
-
-        Column {
-            Text(
-                text = if (device == Device.getCurrentDevice(
-                        LocalContext.current, "not required"
-                    )
-                ) "${device.name} (current)" else device.name
-            )
-            Text(
-                text = "${device.os} ${device.version}",
-                fontSize = 12.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun BlocklistItem(user: User, onUnblockClick: (User) -> Unit) {
-    ProfileScreenItemContainer {
-        SubcomposeAsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(user.profilePictureUrl)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            error = {
-                Log.w(
-                    "ProfileScreen",
-                    "ProfileScreen: failed to load image",
-                    it.result.throwable
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.logout_warning_title))
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { showAnotherDialog = true },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
                 )
-
-                Image(Icons.Default.AccountCircle, null)
-            },
-            loading = {
-                Image(Icons.Default.AccountCircle, null)
-            },
-            modifier = Modifier
-                .size(ProfileScreen.IMAGE_SIZE)
-                .clip(CircleShape)
-        )
-
-        Text(user.displayName)
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            OutlinedButton(
-                onClick = { onUnblockClick(user) },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                ),
-                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Text("Unblock")
+                Text(stringResource(R.string.logout))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+
+    if (showAnotherDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAnotherDialog = false // ignore warning. it just works.
+                onDismiss()
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = onLogoutClearingMessagesClick,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.logout_by_clearing_messages))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onLogoutWithoutClearingMessagesClick,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.logout_without_clearing_messages))
+                }
+            },
+            title = {
+                Text(stringResource(R.string.logout_clear_messages_title))
+            },
+            text = {
+                Text(stringResource(R.string.logout_clear_messages_text))
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BlocklistDialog(
+    blocklist: List<User>,
+    onDismiss: () -> Unit
+) {
+    val imageModifier = Modifier
+        .size(30.dp)
+        .clip(CircleShape)
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        LazyColumn {
+            if (blocklist.isEmpty()) {
+                item {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(stringResource(R.string.no_blocked_users))
+                    }
+                }
+            }
+            itemsIndexed(blocklist) { index, user ->
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(
+                        index = index,
+                        count = blocklist.count(),
+                    ),
+                    onClick = {},
+                    leadingContent = {
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(user.profilePictureUrl)
+                                .crossfade(true)
+                                .memoryCachePolicy(CachePolicy.ENABLED)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .build(),
+                            contentDescription = null,
+                            modifier = imageModifier,
+                            error = {
+                                Log.e(
+                                    "ProfileScreen",
+                                    "BlocklistDialog: error while loading image",
+                                    it.result.throwable
+                                )
+
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = null,
+                                    modifier = imageModifier
+                                )
+                            }
+                        )
+                    }
+                ) {
+                    Text(user.displayName)
+                }
             }
         }
     }
-
 }
 
-@Preview(device = "id:pixel_9a")
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ProfileScreenPreview() {
+private fun DevicesDialog(
+    devices: List<Device>,
+    onLogoutDeviceClick: (device: Device, clearMessages: Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showClearMessagesInDeviceDialog by remember { mutableStateOf(false) }
+    var deviceToLogout by remember { mutableStateOf<Device?>(null) }
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    deviceToLogout = null
+                    showLogoutDialog = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showClearMessagesInDeviceDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.logout))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            deviceToLogout = null
+                            showLogoutDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+                title = {
+                    Text(stringResource(R.string.device_logout_warning_title))
+                },
+                text = {
+                    Text(stringResource(R.string.device_logout_warning_text))
+                }
+            )
+        }
+
+        if (showClearMessagesInDeviceDialog) {
+            val deviceToLogout = deviceToLogout ?: throw IllegalStateException("device to logout is null")
+
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text(stringResource(R.string.logout_clear_messages_title)) },
+                text = { Text(stringResource(R.string.logout_clear_messages_text)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = { onLogoutDeviceClick(deviceToLogout, true) },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.logout_by_clearing_messages))
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { onLogoutDeviceClick(deviceToLogout, false) },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.logout_without_clearing_messages))
+                    }
+                }
+            )
+        }
+
+        LazyColumn {
+            item {
+                Text(stringResource(R.string.your_devices))
+            }
+            itemsIndexed(devices) { index, device ->
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(
+                        index = index,
+                        count = devices.count(),
+                    ),
+                    onClick = {
+                        deviceToLogout = device
+                        showLogoutDialog = true
+                    },
+                    leadingContent = {
+                        val icon = when (device.type) {
+                            Device.Type.Mobile -> Icons.Default.PhoneAndroid
+                            Device.Type.Tablet -> Icons.Default.TabletAndroid
+                        }
+
+                        Icon(icon, null)
+                    }
+                ) {
+                    val text =
+                        if (device == MessagingState.currentDevice)
+                            "${device.name} (current)"
+                        else device.name
+
+                    Text(text)
+                }
+            }
+        }
+    }
+}
+
+val previewContent = @Composable {
     VaultChatTheme {
         ProfileScreen(
-            user = ProfileScreen.defaultUser,
-            innerPadding = PaddingValues(),
-            onLogOutClick = {},
-            devices = ProfileScreen.defaultDeviceList,
-            blocklist = ProfileScreen.defaultUserList,
-            onUnblockClick = {},
-            currentProfileScreenRowItemId = null,
-            onProfileScreenRowItemIdChange = {}
+            onBack = {},
+            user = HomeUiState.defaultUsers.first(),
+            devices = HomeUiState.defaultDevices,
+            blocklist = HomeUiState.defaultUsers.subList(15, 20),
+            onLogoutWithoutClearingMessagesClick = { },
+            onLogoutClearingMessagesClick = { },
         )
     }
 }
 
-@Preview(device = "id:pixel_9a")
+@Preview
 @Composable
-private fun ProfileScreenWithDevicesPreview() {
-    VaultChatTheme {
-        ProfileScreen(
-            user = ProfileScreen.defaultUser,
-            innerPadding = PaddingValues(),
-            onLogOutClick = {},
-            devices = ProfileScreen.defaultDeviceList,
-            blocklist = ProfileScreen.defaultUserList,
-            onUnblockClick = {},
-            currentProfileScreenRowItemId = ProfileScreenRowItemId.Devices,
-            onProfileScreenRowItemIdChange = {}
-        )
-    }
-}
-
-@Preview(device = "id:pixel_9a")
-@Composable
-private fun ProfileScreenWithBlocklistPreview() {
-    VaultChatTheme {
-        ProfileScreen(
-            user = ProfileScreen.defaultUser,
-            innerPadding = PaddingValues(),
-            onLogOutClick = {},
-            devices = ProfileScreen.defaultDeviceList,
-            blocklist = ProfileScreen.defaultUserList,
-            onUnblockClick = {},
-            currentProfileScreenRowItemId = ProfileScreenRowItemId.Blocklist,
-            onProfileScreenRowItemIdChange = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MobileDeviceItemPreview() {
-    VaultChatTheme {
-        DeviceItem(
-            device = Device("name", Device.Type.Mobile, Device.Os.Android, "11", "")
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TabletDeviceItemPreview() {
-    VaultChatTheme {
-        DeviceItem(
-            device = Device("name", Device.Type.Tablet, Device.Os.Android, "10", "")
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BlocklistItemPreview() {
-    VaultChatTheme {
-        BlocklistItem(
-            user = ProfileScreen.defaultUser,
-            onUnblockClick = {}
-        )
-    }
+private fun ProfileScreenLightModePreview() {
+    previewContent.invoke()
 }

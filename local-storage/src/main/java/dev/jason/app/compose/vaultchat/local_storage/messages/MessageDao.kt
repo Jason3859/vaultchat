@@ -18,6 +18,9 @@ interface MessageDao {
     )
     suspend fun deleteMessageHistory(currentUserUid: String, otherUserUid: String)
 
+    @Query("DELETE FROM messages")
+    suspend fun deleteAllMessages()
+
     @Query(
         "SELECT * FROM messages WHERE " +
         "(`from` = :currentUserUid AND `to` = :otherUserUid) OR " +

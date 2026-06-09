@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_users_found">No users found</string>
+    <string name="no_recent_connections">No recent connections</string>
+    <string name="no_blocked_users">No blocked users</string>
+
+    <string name="search_for_users">Search for users</string>
+    <string name="your_devices">Your devices</string>
+
+    <string name="logout">Logout</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="device_logout_warning_title">Do you want to log this device out from your account?</string>
+    <string name="device_logout_warning_text">Logging out of device makes that device not able to receive new messages. App may still store old messages. Device will be logged out as soon as it comes online</string>
+
+    <string name="logout_warning_title">Logout from this device?</string>
+
+    <string name="logout_clear_messages_title">Do you also want to clear messages from device?</string>
+    <string name="logout_clear_messages_text">This action cannot be undone and messages will be lost permanently</string>
+
+    <string name="logout_by_clearing_messages">Logout by clearing messages</string>
+    <string name="logout_without_clearing_messages">Logout without clearing messages</string>
+</resources>

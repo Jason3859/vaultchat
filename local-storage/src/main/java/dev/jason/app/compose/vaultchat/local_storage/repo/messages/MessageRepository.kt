@@ -7,5 +7,6 @@ interface MessageRepository {
 
     suspend fun addMessage(message: Message)
     suspend fun deleteChatHistory(currentUserUid: String, otherUserUid: String)
+    suspend fun deleteAllMessages()
     fun getMessages(currentUserUid: String, otherUserUid: String): Flow<List<Message>>
 }

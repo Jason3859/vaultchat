@@ -1,5 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
@@ -9,9 +10,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
@@ -19,41 +32,40 @@ import dev.jason.app.compose.vaultchat.core.domain.Device
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
-import dev.jason.app.compose.vaultchat.messaging.ui.HomeScreen
-import dev.jason.app.compose.vaultchat.messaging.ui.HomeViewModel
+import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
+import dev.jason.app.compose.vaultchat.messaging.ui.home.HomeScreen
+import dev.jason.app.compose.vaultchat.messaging.ui.messaging.MessagingScreen
+import dev.jason.app.compose.vaultchat.messaging.ui.nav.Route
+import dev.jason.app.compose.vaultchat.messaging.ui.profile.ProfileScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.seconds
 
 
 class MessagingActivity : ComponentActivity() {
 
     private val remoteApi: RemoteApi by inject()
-    private val isOffline = MutableStateFlow(false)
-
-    private val homeViewModel by viewModel<HomeViewModel>()
+    private var navEventIntent: Intent? = null
 
     private val firebaseUser = Firebase.auth.currentUser!!
-    private val user = User(
+    private val currentUser = User(
         firebaseUser.uid,
         firebaseUser.displayName!!,
         firebaseUser.photoUrl.toString().removeSuffix("=s96-c"),
-        emptyList(),
+        emptyList(), // TODO: fetch from server
         User.Status.Online
     )
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            isOffline.value = false
+            MessagingState.deviceOnline()
         }
 
         override fun onLost(network: Network) {
-            isOffline.value = true
+            MessagingState.deviceOffline()
         }
     }
 
@@ -67,18 +79,29 @@ class MessagingActivity : ComponentActivity() {
             .build()
         connectivityManager.registerNetworkCallback(request, networkCallback)
 
-        isOffline.value = !isNetworkAvailable(connectivityManager)
+        MessagingState.apply {
+            if (isNetworkAvailable(connectivityManager))
+                deviceOnline()
+            else
+                deviceOffline()
+        }
 
         lifecycleScope.launch {
             val token = Firebase.messaging.token.await()
-            MessagingState.updateCurrentUser(user)
-            MessagingState.updateCurrentDevice(Device.getCurrentDevice(this@MessagingActivity, token))
+            MessagingState.updateCurrentUser(currentUser)
+            MessagingState.updateCurrentDevice(
+                Device.getCurrentDevice(
+                    this@MessagingActivity,
+                    token
+                )
+            )
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
             Firebase.auth.currentUser?.let { firebaseUser ->
+                val isOnline = isNetworkAvailable(connectivityManager)
                 while (true) {
-                    if (!isOffline.value) { // if device is online
+                    if (isOnline) {
                         remoteApi.heartbeat(firebaseUser.uid)
                     }
                     delay(15.seconds)
@@ -89,16 +112,8 @@ class MessagingActivity : ComponentActivity() {
         handleIntent(intent)
 
         setContent {
-            val isOfflineState by isOffline.collectAsState()
             VaultChatTheme {
-                HomeScreen(
-                    isOffline = isOfflineState,
-                    viewModel = homeViewModel,
-                    onLogoutSuccessful = {
-                        Firebase.auth.signOut()
-                        restartApp()
-                    }
-                )
+                App()
             }
         }
     }
@@ -117,7 +132,7 @@ class MessagingActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent) {
         val destination = intent.getStringExtra("nav_destination")
         if (destination != null) {
-            homeViewModel.emitNavEvent(intent)
+            navEventIntent = intent
         }
     }
 
@@ -127,12 +142,90 @@ class MessagingActivity : ComponentActivity() {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    private fun restartApp() {
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        val componentName = intent?.component
-        val mainIntent = Intent.makeRestartActivityTask(componentName)
+    @Composable
+    @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    private fun App() {
+        val snackbarHostState = remember { SnackbarHostState() }
 
-        startActivity(mainIntent)
-        finish()
+        LaunchedEffect(true) {
+            SnackbarController.flow.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { // base Scaffold for showing snack bars.
+            val backStack = rememberNavBackStack(Route.Home)
+
+            LaunchedEffect(true) {
+                navEventIntent?.let { intent ->
+                    val destination = intent.getStringExtra("nav_destination")
+                    val id = intent.getStringExtra("id")
+                    if (destination == "messaging" && id != null) {
+                        backStack.add(Route.Messaging(id))
+                        navEventIntent = null
+                    }
+                }
+            }
+
+            val navigateToProfileScreen: (showCurrentUserProfile: Boolean) -> Unit = { bool ->
+                backStack.apply {
+                    if (last() is Route.Profile) {
+                        removeLastOrNull()
+                    }
+
+                    add(Route.Profile(bool))
+                }
+            }
+
+            NavDisplay(
+                backStack = backStack,
+                sceneStrategies = listOf(rememberListDetailSceneStrategy()),
+                entryProvider = entryProvider {
+                    entry<Route.Home>(
+                        metadata = ListDetailSceneStrategy.listPane()
+                    ) {
+                        HomeScreen(
+                            onUserClick = {
+                                backStack.apply {
+                                    if (last() is Route.Messaging) {
+                                        removeLastOrNull()
+                                    }
+
+                                    add(Route.Messaging(it.uid))
+                                }
+                            },
+                            onProfileClick = { navigateToProfileScreen.invoke(true) }
+                        )
+                    }
+
+                    entry<Route.Messaging>(
+                        metadata = ListDetailSceneStrategy.detailPane()
+                    ) {
+                        MessagingScreen(
+                            otherUserUid = it.uid,
+                            onBackClick = {
+                                backStack.removeLastOrNull()
+                            },
+                            onUserProfileClick = { navigateToProfileScreen.invoke(false) }
+                        )
+                    }
+
+                    entry<Route.Profile>(
+                        metadata = ListDetailSceneStrategy.extraPane()
+                    ) { route ->
+                        ProfileScreen(
+                            showCurrentUserProfile = route.showCurrentUserProfile,
+                            onBack = { backStack.removeLastOrNull() },
+                            onLogoutClick = {},
+                            onDeviceLogoutClick = { _, _ -> }
+                        )
+                    }
+                }
+            )
+        }
     }
 }

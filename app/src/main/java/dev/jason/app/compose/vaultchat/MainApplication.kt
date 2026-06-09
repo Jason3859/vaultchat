@@ -1,13 +1,16 @@
 package dev.jason.app.compose.vaultchat
 
+import android.app.Activity
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.os.Bundle
 import dev.jason.app.compose.vaultchat.auth.AuthKoinModule
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.local_storage.LocalStorageKoinModule
 import dev.jason.app.compose.vaultchat.messaging.MessagingKoinModule
 import dev.jason.app.compose.vaultchat.messaging.data.MessagingDataKoinModule
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.MessagingUiKoinModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -19,6 +22,8 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
 class MainApplication : Application() {
+
+    private var activityCount = 0
 
     private val baseModule = module {
         single<String> {
@@ -50,6 +55,26 @@ class MainApplication : Application() {
             androidContext(this@MainApplication)
             modules(baseModule, AuthKoinModule, LocalStorageKoinModule, MessagingKoinModule, MessagingDataKoinModule, MessagingUiKoinModule)
         }
+
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+            override fun onActivityStarted(activity: Activity) {
+                if (activityCount == 0) {
+                    MessagingState.appInForeground()
+                }
+                activityCount++
+            }
+            override fun onActivityResumed(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityStopped(activity: Activity) {
+                activityCount--
+                if (activityCount == 0) {
+                    MessagingState.appInBackground()
+                }
+            }
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
     }
 
     private fun createNotificationChannel() {

@@ -3,7 +3,6 @@ package dev.jason.app.compose.vaultchat.messaging.data.remote
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.messaging.data.dto.MessageDto
 import dev.jason.app.compose.vaultchat.messaging.data.dto.UserDto
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -14,6 +13,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.parameters
 
 interface RemoteApi {
     suspend fun sendMessage(body: MessageDto): Int
@@ -25,7 +25,7 @@ interface RemoteApi {
     suspend fun unblock(uid: String, uidToUnblock: String)
     suspend fun updateToken(uid: String, token: String, deviceDto: UserDto.DeviceDto)
     suspend fun fetchDevices(uid: String): List<UserDto.DeviceDto>
-    suspend fun logout(): Int
+    suspend fun logout(device: UserDto.DeviceDto, clearMessages: Boolean): Int
 }
 
 class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: String) : RemoteApi {
@@ -104,13 +104,13 @@ class KtorRemoteApi(private val httpClient: HttpClient, private val baseUrl: Str
         }
     }
 
-    override suspend fun logout(): Int {
-        val currentUser = MessagingState.currentUser.value!!
-        val currentDevice = MessagingState.currentDevice.value!!
-
+    override suspend fun logout(device: UserDto.DeviceDto, clearMessages: Boolean): Int {
         val response = httpClient.delete("$baseUrl/user/logout") {
             contentType(ContentType.Application.Json)
-            setBody(UserDto.DeviceDto.fromDomain(currentUser.uid, currentDevice))
+            setBody(device)
+            parameters {
+                append("clearMessages", clearMessages.toString())
+            }
         }
 
         return response.status.value

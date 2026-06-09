@@ -17,6 +17,10 @@ class MessageRepoImpl(private val dao: MessageDao) : MessageRepository {
         dao.deleteMessageHistory(currentUserUid, otherUserUid)
     }
 
+    override suspend fun deleteAllMessages() {
+        dao.deleteAllMessages()
+    }
+
     override fun getMessages(currentUserUid: String, otherUserUid: String): Flow<List<Message>> {
         return dao.getMessages(currentUserUid, otherUserUid).map { it.map(MessageEntity::toDomain) }
     }

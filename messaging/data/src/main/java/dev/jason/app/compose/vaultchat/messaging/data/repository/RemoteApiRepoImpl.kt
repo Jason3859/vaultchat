@@ -11,6 +11,7 @@ import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
+import java.net.ConnectException
 
 class RemoteApiRepoImpl(private val api: RemoteApi) : RemoteApiRepository {
 
@@ -99,9 +100,9 @@ class RemoteApiRepoImpl(private val api: RemoteApi) : RemoteApiRepository {
         }
     }
 
-    override suspend fun logout(): Int {
+    override suspend fun logout(device: Device, clearMessages: Boolean): Int {
         return try {
-            api.logout()
+            api.logout(UserDto.DeviceDto.fromDomain(device), clearMessages)
         } catch (e: Exception) {
             Log.e("RemoteApiRepoImpl", "logout: exception", e)
             handleException(e)
@@ -118,6 +119,9 @@ class RemoteApiRepoImpl(private val api: RemoteApi) : RemoteApiRepository {
             is ServerResponseException -> {
                 Log.e("RemoteApiRepoImpl", "Server error: ${e.response.status}", e)
                 SnackbarController.showSnackbar("Server error occurred")
+            }
+            is ConnectException -> {
+                SnackbarController.showSnackbar("No internet")
             }
             else -> {}
         }

@@ -20,5 +20,5 @@ interface RemoteApiRepository {
 
     suspend fun sendMessage(body: Message): Int // status code
 
-    suspend fun logout(): Int // status code
+    suspend fun logout(device: Device, clearMessages: Boolean): Int // status code
 }

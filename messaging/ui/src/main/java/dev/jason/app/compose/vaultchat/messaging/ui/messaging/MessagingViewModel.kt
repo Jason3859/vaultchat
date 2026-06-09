@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +41,7 @@ class MessagingViewModel(
     private val _failedMessages = mutableStateListOf<Message>()
     val failedMessages: List<Message> = _failedMessages
 
-    private val currentUserUid by lazy { Firebase.auth.currentUser!!.uid }
+    val currentUserUid = MessagingState.currentUser.value?.uid ?: throw IllegalStateException("User is null")
 
     fun updateState(state: UiState) {
         _uiState.update {

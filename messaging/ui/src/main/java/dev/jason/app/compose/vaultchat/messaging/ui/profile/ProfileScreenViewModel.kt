@@ -64,13 +64,22 @@ class ProfileScreenViewModel(
     }
 
     fun logout(onLogoutSuccessful: () -> Unit) {
-        viewModelScope.launch {
-            remoteApiRepository.logout().let { statusCode ->
-                if (statusCode in 200..299) {
-                    onLogoutSuccessful()
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            val currentDevice = MessagingState.currentDevice.value!!
+//            val currentUser = MessagingState.currentUser.value!!
+//
+//            remoteApiRepository.logout().let { statusCode ->
+//                if (statusCode in 200..299) {
+//                    onLogoutSuccessful()
+//                }
+//            }
+//        }
+
+        // TODO: implement this
+    }
+
+    fun logout(device: Device, onLogoutSuccessful: () -> Unit) {
+        // TODO: implement this
     }
 
     fun blockUser(user: User) {

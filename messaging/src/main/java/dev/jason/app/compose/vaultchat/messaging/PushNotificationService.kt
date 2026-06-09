@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.messaging.service
+package dev.jason.app.compose.vaultchat.messaging
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,12 +13,12 @@ import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
@@ -55,6 +55,7 @@ class PushNotificationService : FirebaseMessagingService() {
         when (type) {
             "message" -> handleMessage(message.data)
             "status_update" -> handleStatusUpdate(message.data)
+            "logout_request" -> handleLogout(message.data)
         }
     }
 
@@ -118,7 +119,7 @@ class PushNotificationService : FirebaseMessagingService() {
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
 
-        if (MessagingState.otherUserUid.value != from) {
+        if (MessagingState.otherUser.value?.uid != from) {
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
         }
     }
@@ -129,6 +130,27 @@ class PushNotificationService : FirebaseMessagingService() {
 
         coroutineScope.launch {
             storageRepository.updateStatus(uid, status)
+        }
+    }
+
+    private fun handleLogout(data: Map<String, String>) {
+        val clearMessages = data["clear_messages"].toBoolean()
+
+        coroutineScope.launch {
+            if (clearMessages) {
+                storageRepository.deleteAllMessages()
+            }
+
+            Firebase.auth.signOut()
+
+            if (MessagingState.isAppInForeground.value) {
+                val intent = packageManager.getLaunchIntentForPackage(packageName)
+                intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
+            }
+
+            delay(500)
+            Runtime.getRuntime().exit(0)
         }
     }
 }

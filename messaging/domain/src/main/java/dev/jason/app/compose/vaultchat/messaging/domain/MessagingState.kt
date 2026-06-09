@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.update
 
 object MessagingState {
 
-    private val _otherUserUid = MutableStateFlow<String?>(null)
-    val otherUserUid = _otherUserUid.asStateFlow()
+    private val _otherUser = MutableStateFlow<User?>(null)
+    val otherUser = _otherUser.asStateFlow()
 
     private val _currentDevice = MutableStateFlow<Device?>(null)
     val currentDevice = _currentDevice.asStateFlow()
@@ -17,8 +17,14 @@ object MessagingState {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser = _currentUser.asStateFlow()
 
-    fun updateOtherUserId(string: String?) {
-        _otherUserUid.update { string }
+    private val _isOnline = MutableStateFlow(true)
+    val isOnline = _isOnline.asStateFlow()
+
+    private val _isAppInForeground = MutableStateFlow(false)
+    val isAppInForeground = _isAppInForeground.asStateFlow()
+
+    fun updateOtherUser(user: User?) {
+        _otherUser.update { user }
     }
 
     fun updateCurrentDevice(device: Device) {
@@ -27,5 +33,25 @@ object MessagingState {
 
     fun updateCurrentUser(user: User) {
         _currentUser.update { user }
+    }
+
+    fun deviceOnline() {
+        _isOnline.update { true }
+    }
+
+    fun deviceOffline() {
+        _isOnline.update { false }
+    }
+
+    fun clearOtherUser() {
+        updateOtherUser(null)
+    }
+
+    fun appInForeground() {
+        _isAppInForeground.update { true }
+    }
+
+    fun appInBackground() {
+        _isAppInForeground.update { false }
     }
 }

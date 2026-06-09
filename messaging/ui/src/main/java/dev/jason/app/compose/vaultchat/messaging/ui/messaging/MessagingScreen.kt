@@ -27,6 +27,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -58,20 +59,26 @@ import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.domain.Message
 import dev.jason.app.compose.vaultchat.core.domain.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
+import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MessagingScreen(
     otherUserUid: String,
     onBackClick: () -> Unit,
-    onUserInfoClick: (User) -> Unit,
-    isOffline: Boolean
+    onUserProfileClick: () -> Unit
 ) {
     val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUserUid) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val otherUserFromViewModel by viewModel.otherUser.collectAsStateWithLifecycle()
+    val isOnline by MessagingState.isOnline.collectAsStateWithLifecycle()
+
+    LaunchedEffect(otherUserFromViewModel) {
+        MessagingState.updateOtherUser(otherUserFromViewModel)
+    }
 
     if (otherUserFromViewModel == null) {
         Box(
@@ -85,18 +92,17 @@ fun MessagingScreen(
     } else {
         MessagingScreen(
             otherUser = otherUserFromViewModel!!,
-            onBackClick = onBackClick,
+            onBackClick = { MessagingState.clearOtherUser(); onBackClick.invoke() },
             uiState = uiState,
             updateState = viewModel::updateState,
             sendMessage = viewModel::sendMessage,
             messages = viewModel.messages,
             pendingMessages = viewModel.pendingMessages,
             failedMessages = viewModel.failedMessages,
-            isOffline = isOffline,
-            onUserInfoClick = onUserInfoClick
+            isOffline = !isOnline,
+            onUserInfoClick = onUserProfileClick
         )
     }
-
 }
 
 @Composable
@@ -106,7 +112,7 @@ private fun MessagingScreen(
     uiState: MessagingViewModel.UiState,
     updateState: (MessagingViewModel.UiState) -> Unit,
     sendMessage: () -> Unit,
-    onUserInfoClick: (User) -> Unit,
+    onUserInfoClick: () -> Unit,
     messages: List<Message>,
     pendingMessages: List<Message>,
     failedMessages: List<Message>,
@@ -180,7 +186,7 @@ private fun LocalDateTime.display() =
 private fun TopBar(
     otherUser: User,
     onBackClick: () -> Unit,
-    onUserInfoClick: (User) -> Unit,
+    onUserInfoClick: () -> Unit,
     isOffline: Boolean
 ) {
     val context = LocalContext.current
@@ -191,7 +197,7 @@ private fun TopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onUserInfoClick(otherUser) }
+                    .clickable { onUserInfoClick() }
             ) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(context)

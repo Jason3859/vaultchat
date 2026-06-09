@@ -20,6 +20,10 @@ class LocalStorageRepoImpl(
         messageRepository.deleteChatHistory(currentUserId, otherUserId)
     }
 
+    override suspend fun deleteAllMessages() {
+        messageRepository.deleteAllMessages()
+    }
+
     override fun getMessages(currentUserId: String, otherUserId: String): Flow<List<Message>> {
         return messageRepository.getMessages(currentUserId, otherUserId)
     }
