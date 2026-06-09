@@ -47,6 +47,22 @@ public class MessagingRepoImpl implements MessagingRepository {
 
         sendMessage(firebaseMessage);
     }
+    
+    @Override
+    public void sendLogoutRequest(Device device, boolean clearMessages) {
+    	Message firebaseMessage = Message.builder()
+    		.putData("type", "logout_request")
+    		.putData("clear_messages", String.valueOf(clearMessages))
+    		.setToken(device.getToken())
+    		.setAndroidConfig(
+    			AndroidConfig.builder()
+    				.setPriority(Priority.HIGH)
+    				.build()
+    		)
+    		.build();
+    	
+    	sendMessage(firebaseMessage);
+    }
 
 	private void sendMessage(Message message) {
     	try {

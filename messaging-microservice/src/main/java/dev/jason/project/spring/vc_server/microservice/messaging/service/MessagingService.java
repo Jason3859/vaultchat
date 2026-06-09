@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.jason.project.spring.vc_server.core.exception.VcException.DeviceException.DeviceNotFoundException;
 import dev.jason.project.spring.vc_server.core.exception.VcException.MessagingException.MessageTextBlankException;
 import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.BlockedByUserException;
 import dev.jason.project.spring.vc_server.core.model.Device;
@@ -12,6 +13,7 @@ import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.client.ClientRepository;
 import dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging.MessagingRepository;
+import feign.FeignException;
 
 @Service
 public class MessagingService {
@@ -68,5 +70,15 @@ public class MessagingService {
 				repository.sendUserStatusUpdate(device, uid, status);
 			});
 		});
+	}
+	
+	public void sendLogoutRequest(Device device, boolean clearMessages) {
+		try {
+			client.verifyDevice(device);
+		} catch (FeignException.NotFound e) {
+			throw new DeviceNotFoundException();
+		}
+		
+		repository.sendLogoutRequest(device, clearMessages);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User;
@@ -57,4 +58,9 @@ public class ClientRepoImpl implements ClientRepository {
     public User getUserById(String uid) {
         return userClient.getUserById(uid).asUser();
     }
+
+	@Override
+	public void verifyDevice(Device device) {
+		deviceClient.verifyDevice(DeviceDto.asDto(device));
+	}
 }

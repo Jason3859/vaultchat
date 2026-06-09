@@ -95,9 +95,12 @@ public class UserService {
 			.toList();
     }
 
-	public void logout(Device device) {
+	public void logout(Device device, boolean clearMessages) {
+		DeviceDto dto = DeviceDto.asDto(device);
+		
 		try {
-			deviceClient.deleteDevice(DeviceDto.asDto(device));
+			messagingClient.logoutDevice(dto, clearMessages);
+			deviceClient.deleteDevice(dto);
 		} catch (FeignException.NotFound _) {
 			throw new DeviceNotFoundException();
 		}

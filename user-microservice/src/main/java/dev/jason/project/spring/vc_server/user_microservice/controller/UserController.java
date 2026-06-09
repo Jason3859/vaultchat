@@ -78,8 +78,8 @@ public class UserController {
 	
 	@DeleteMapping(Endpoints.LOGOUT)
 	@ResponseStatus(HttpStatus.ACCEPTED)
-	public DeviceDto logout(@RequestBody DeviceDto device) {
-		userService.logout(device.toDevice(null));
+	public DeviceDto logout(@RequestParam boolean clearMessages, @RequestBody DeviceDto device) {
+		userService.logout(device.toDevice(null), clearMessages);
 		return device;
 	}
 }

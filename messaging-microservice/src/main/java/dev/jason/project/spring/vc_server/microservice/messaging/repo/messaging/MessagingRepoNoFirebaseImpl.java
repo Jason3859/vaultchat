@@ -24,4 +24,9 @@ public class MessagingRepoNoFirebaseImpl implements MessagingRepository {
 	public void sendUserStatusUpdate(Device device, String uid, Status status) {
 		logger.info("sent status update to device {} about user {}, status {}", device, uid, status);
 	}
+
+	@Override
+	public void sendLogoutRequest(Device device, boolean bool) {
+		logger.info("sent logout request to device {}, clear messages is set to {}", device, bool);
+	}
 }

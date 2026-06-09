@@ -25,6 +25,12 @@ public class DeviceController {
 		return new ResponseEntity<>(DeviceDto.asDto(d), HttpStatus.CREATED);
 	}
 	
+	@PostMapping(Endpoints.VERIFY)
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public void verifyDevice(@RequestBody DeviceDto device) {
+		deviceService.verifyDevice(device.toDevice(null));
+	}
+	
 	@DeleteMapping(Endpoints.DELETE)
 	public ResponseEntity<?> deleteDevice(@RequestBody DeviceDto device) {
 		deviceService.deleteDevice(device.toDevice(/*not required here*/ null));

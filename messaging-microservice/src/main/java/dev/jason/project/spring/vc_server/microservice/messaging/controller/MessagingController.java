@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.jason.project.spring.vc_server.core.Endpoints;
+import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.model.Message;
 import dev.jason.project.spring.vc_server.core.model.User.Status;
 import dev.jason.project.spring.vc_server.microservice.messaging.service.MessagingService;
@@ -31,4 +32,10 @@ public class MessagingController {
 	public void notifyStatus(@RequestParam String uid, @RequestParam Status status) {
 		messagingService.sendUserStatusUpdate(uid, status);
 	}
+	
+	@PostMapping(Endpoints.LOGOUT)
+	public void logout(@RequestParam boolean clearMessages, @RequestBody DeviceDto deviceDto) {
+		messagingService.sendLogoutRequest(deviceDto.toDevice(null), clearMessages);
+	}
+	
 }

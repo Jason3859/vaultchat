@@ -60,4 +60,12 @@ public class DeviceService {
 		
 		throw new DeviceNotFoundException();
 	}
+
+	public void verifyDevice(Device device) {
+		List<Device> devices = getDevicesByOwner(device.getOwnerUid());
+		
+		if (!devices.contains(device)) {
+			throw new DeviceNotFoundException();
+		}
+	}
 }

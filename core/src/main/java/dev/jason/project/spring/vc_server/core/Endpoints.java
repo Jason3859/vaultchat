@@ -12,10 +12,12 @@ public class Endpoints {
 	public static final String DELETE = "/delete";
 	public static final String GET_DEVICES_BY_OWNER = "/of-owner";
 	public static final String MY_DEVICES = "/mine";
+	public static final String VERIFY = "/verify";
 	
 	public static final String DEVICE_ADD = DEVICE + ADD;
 	public static final String DEVICE_DELETE = DEVICE + DELETE;
 	public static final String DEVICE_GET_DEVICES_BY_OWNER = DEVICE + GET_DEVICES_BY_OWNER;
+	public static final String DEVICE_VERIFY = DEVICE + VERIFY;
 	
 	// messaging microservice
 	public static final int MESSAGING_MICROSERVICE_PORT = 9001;

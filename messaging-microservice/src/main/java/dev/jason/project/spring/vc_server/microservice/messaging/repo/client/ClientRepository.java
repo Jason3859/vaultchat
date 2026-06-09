@@ -9,6 +9,7 @@ import dev.jason.project.spring.vc_server.core.model.User;
 public interface ClientRepository {
     
     List<Device> getDevicesByOwner(String uid);
+    void verifyDevice(Device device);
 
     void connect(String uid1, String uid2);
     void addMessageToQueue(String uid, Message message);

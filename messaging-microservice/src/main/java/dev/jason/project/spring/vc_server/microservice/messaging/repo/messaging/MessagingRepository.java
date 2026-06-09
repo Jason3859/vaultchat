@@ -8,4 +8,5 @@ public interface MessagingRepository {
 
     void sendMessage(Message message, Device device, boolean forDeviceCheck);
     void sendUserStatusUpdate(Device device, String uid, User.Status status);
+    void sendLogoutRequest(Device device, boolean clearMessages);
 }
