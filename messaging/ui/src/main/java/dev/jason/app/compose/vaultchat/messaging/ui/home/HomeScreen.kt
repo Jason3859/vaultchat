@@ -47,9 +47,8 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.ui.R
 import kotlinx.coroutines.launch

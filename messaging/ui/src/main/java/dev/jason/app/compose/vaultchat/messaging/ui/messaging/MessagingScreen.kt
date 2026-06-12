@@ -1,6 +1,5 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.messaging
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,10 +55,11 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.domain.Message
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.AppState
+import dev.jason.app.compose.vaultchat.core.ToastController
+import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime
@@ -74,10 +74,10 @@ fun MessagingScreen(
     val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUserUid) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val otherUserFromViewModel by viewModel.otherUser.collectAsStateWithLifecycle()
-    val isOnline by MessagingState.isOnline.collectAsStateWithLifecycle()
+    val isOnline by AppState.isOnline.collectAsStateWithLifecycle()
 
     LaunchedEffect(otherUserFromViewModel) {
-        MessagingState.updateOtherUser(otherUserFromViewModel)
+        AppState.updateOtherUser(otherUserFromViewModel)
     }
 
     if (otherUserFromViewModel == null) {
@@ -92,7 +92,7 @@ fun MessagingScreen(
     } else {
         MessagingScreen(
             otherUser = otherUserFromViewModel!!,
-            onBackClick = { MessagingState.clearOtherUser(); onBackClick.invoke() },
+            onBackClick = { AppState.clearOtherUser(); onBackClick.invoke() },
             uiState = uiState,
             updateState = viewModel::updateState,
             sendMessage = viewModel::sendMessage,
@@ -212,7 +212,7 @@ private fun TopBar(
                         .size(40.dp),
                     error = {
                         Icon(Icons.Default.AccountCircle, null)
-                        Toast.makeText(context, "Error loading image", Toast.LENGTH_SHORT).show()
+                        ToastController.showToast("Error loading image")
                     }
                 )
 
@@ -305,7 +305,7 @@ private fun MessagingScreenPreview() {
 
     VaultChatTheme {
         MessagingScreen(
-            otherUser = User(other, other, other, emptyList(), User.Status.Online),
+            otherUser = User(other, other, other, User.Status.Online),
             onBackClick = {},
             uiState = MessagingViewModel.UiState(),
             updateState = {},

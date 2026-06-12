@@ -28,10 +28,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
-import dev.jason.app.compose.vaultchat.core.domain.Device
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.domain.SnackbarController
 import dev.jason.app.compose.vaultchat.messaging.ui.home.HomeScreen
 import dev.jason.app.compose.vaultchat.messaging.ui.messaging.MessagingScreen

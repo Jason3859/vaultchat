@@ -1,7 +1,6 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.profile
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.ToastController
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -179,7 +179,7 @@ private fun UserInfoScreen(
                         it.result.throwable
                     )
 
-                    Toast.makeText(context, "Failed to load image", Toast.LENGTH_SHORT).show()
+                    ToastController.showToast("Failed to load image")
 
                     Image(Icons.Default.AccountCircle, null)
                 },
@@ -249,7 +249,7 @@ private fun ActionButton(
 private fun UserInfoScreenPreview() {
     VaultChatTheme {
         UserInfoScreen(
-            user = User("uid", "Display Name", "url", emptyList(), User.Status.Online),
+            user = User("uid", "Display Name", "url", User.Status.Online),
             onBackClick = {},
             onBlockClick = {},
             onClearHistoryClick = {}

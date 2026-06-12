@@ -3,11 +3,11 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
-        <activity android:name=".MessagingActivity" />
-        <service android:name=".PushNotificationService" android:exported="false">
+        <activity android:name=".MessagingActivity" android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="dev.jason.app.compose.vaultchat.messaging.ACTION_OPEN_MESSAGING_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </service>
+        </activity>
     </application>
 </manifest>

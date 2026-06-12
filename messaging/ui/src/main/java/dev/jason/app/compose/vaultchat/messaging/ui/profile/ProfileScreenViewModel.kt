@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import dev.jason.app.compose.vaultchat.core.domain.Device
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.feature_service.logout.LogoutService
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 
 class ProfileScreenViewModel(
     private val remoteApiRepository: RemoteApiRepository,
-    private val localStorageRepository: LocalStorageRepository
+    private val localStorageRepository: LocalStorageRepository,
+    private val logoutService: LogoutService
 ) : ViewModel() {
 
     private val currentUser by lazy { Firebase.auth.currentUser!! }
@@ -63,23 +65,16 @@ class ProfileScreenViewModel(
         }
     }
 
-    fun logout(onLogoutSuccessful: () -> Unit) {
-//        viewModelScope.launch {
-//            val currentDevice = MessagingState.currentDevice.value!!
-//            val currentUser = MessagingState.currentUser.value!!
-//
-//            remoteApiRepository.logout().let { statusCode ->
-//                if (statusCode in 200..299) {
-//                    onLogoutSuccessful()
-//                }
-//            }
-//        }
-
-        // TODO: implement this
+    fun logoutDevice(device: Device, clearMessages: Boolean, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            logoutService.beginLogout(device, clearMessages, onSuccess)
+        }
     }
 
-    fun logout(device: Device, onLogoutSuccessful: () -> Unit) {
-        // TODO: implement this
+    fun logoutCurrentDevice(clearMessages: Boolean, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            logoutService.logoutCurrentDevice(clearMessages, onSuccess)
+        }
     }
 
     fun blockUser(user: User) {

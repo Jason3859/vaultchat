@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.messaging.ui.home
 
-import dev.jason.app.compose.vaultchat.core.domain.Device
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.User
 
 data class HomeUiState(
     val connections: List<User> = emptyList(),
@@ -14,6 +14,7 @@ data class HomeUiState(
     companion object {
         val defaultDevices = List(10) { index ->
             Device(
+                ownerUid = "owner",
                 name = "device @$index",
                 type = if (index % 2 == 0) Device.Type.Mobile else Device.Type.Tablet,
                 os = Device.Os.Android,
@@ -27,7 +28,6 @@ data class HomeUiState(
                 uid = "uid-$index",
                 displayName = "User @$index",
                 profilePictureUrl = "url @$index",
-                devices = defaultDevices,
                 status = User.Status.Online
             )
         }

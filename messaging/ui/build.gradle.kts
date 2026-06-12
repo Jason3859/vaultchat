@@ -35,6 +35,7 @@ android {
 dependencies {
     implementation(projects.core)
     implementation(projects.messaging.domain)
+    implementation(projects.featureService.logout)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)

@@ -33,7 +33,6 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.localStorage)
     implementation(projects.messaging.domain)
 
     implementation(platform(libs.koin.bom))

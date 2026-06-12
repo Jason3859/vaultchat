@@ -4,9 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.jason.app.compose.vaultchat.core.domain.Message
-import dev.jason.app.compose.vaultchat.core.domain.User
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
+import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.LocalStorageRepository
 import dev.jason.app.compose.vaultchat.messaging.domain.repository.RemoteApiRepository
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -58,7 +58,6 @@ dependencies {
 
     implementation(projects.core)
     implementation(projects.auth)
-    implementation(projects.localStorage)
     implementation(projects.messaging)
     implementation(projects.messaging.data)
     implementation(projects.messaging.domain)

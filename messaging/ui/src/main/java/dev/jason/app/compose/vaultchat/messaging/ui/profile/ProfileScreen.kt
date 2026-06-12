@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,10 +57,10 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.domain.Device
-import dev.jason.app.compose.vaultchat.core.domain.User
+import dev.jason.app.compose.vaultchat.core.AppState
+import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.messaging.domain.MessagingState
 import dev.jason.app.compose.vaultchat.messaging.ui.R
 import dev.jason.app.compose.vaultchat.messaging.ui.home.HomeUiState
 import org.koin.androidx.compose.koinViewModel
@@ -71,16 +72,28 @@ enum class ProfileScreenRowItemId {
 @Composable
 fun ProfileScreen(
     showCurrentUserProfile: Boolean,
-    onBack: () -> Unit,
-    onLogoutClick: (clearMessages: Boolean) -> Unit,
-    onDeviceLogoutClick: (device: Device, clearMessages: Boolean) -> Unit,
+    onBack: () -> Unit
 ) {
     val viewModel: ProfileScreenViewModel = koinViewModel()
 
     val devices by viewModel.devices.collectAsStateWithLifecycle()
     val blocklist by viewModel.blocklist.collectAsStateWithLifecycle()
-    val currentUser by MessagingState.currentUser.collectAsStateWithLifecycle()
-    val otherUser by MessagingState.otherUser.collectAsStateWithLifecycle()
+    val currentUser by AppState.currentUser.collectAsStateWithLifecycle()
+    val otherUser by AppState.otherUser.collectAsStateWithLifecycle()
+
+    val onLogoutClick: (Boolean) -> Unit = { clearMessages ->
+        viewModel.logoutCurrentDevice(
+            clearMessages = clearMessages,
+            onSuccess = { /*TODO*/ }
+        )
+    }
+    val onDeviceLogoutClick: (Device, Boolean) -> Unit = { device, clearMessages ->
+        viewModel.logoutDevice(
+            device = device,
+            clearMessages = clearMessages,
+            onSuccess = { /*nothing to do here*/ }
+        )
+    }
 
     BackHandler { onBack.invoke() }
 
@@ -389,7 +402,7 @@ private fun DevicesDialog(
                         onClick = {
                             showClearMessagesInDeviceDialog = true
                         },
-                        colors = ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.textButtonColors(
                             contentColor = MaterialTheme.colorScheme.error
                         )
                     ) {
@@ -416,7 +429,8 @@ private fun DevicesDialog(
         }
 
         if (showClearMessagesInDeviceDialog) {
-            val deviceToLogout = deviceToLogout ?: throw IllegalStateException("device to logout is null")
+            val deviceToLogout =
+                deviceToLogout ?: throw IllegalStateException("device to logout is null")
 
             AlertDialog(
                 onDismissRequest = onDismiss,
@@ -469,7 +483,7 @@ private fun DevicesDialog(
                     }
                 ) {
                     val text =
-                        if (device == MessagingState.currentDevice)
+                        if (device == AppState.currentDevice.collectAsState().value)
                             "${device.name} (current)"
                         else device.name
 

@@ -37,7 +37,7 @@ import dev.jason.app.compose.vaultchat.auth.data.UserDto
 import dev.jason.app.compose.vaultchat.auth.ui.AuthScreen
 import dev.jason.app.compose.vaultchat.auth.ui.AuthViewModel
 import dev.jason.app.compose.vaultchat.auth.ui.SnackbarController
-import dev.jason.app.compose.vaultchat.core.domain.Device
+import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.messaging.MessagingActivity
 import kotlinx.coroutines.Dispatchers
