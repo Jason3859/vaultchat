@@ -33,7 +33,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
     implementation(projects.messaging.domain)
     implementation(projects.featureService.logout)
 

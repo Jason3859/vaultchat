@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="auth_screen_title">Welcome to VaultChat</string>
+    <string name="auth_screen_text">Sign in to get started.</string>
+</resources>

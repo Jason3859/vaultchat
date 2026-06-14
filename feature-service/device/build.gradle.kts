@@ -22,7 +22,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
 
     implementation(libs.androidx.core.ktx)
 

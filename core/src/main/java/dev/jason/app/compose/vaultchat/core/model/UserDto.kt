@@ -8,6 +8,7 @@ data class UserDto(
     val displayName: String,
     val profilePictureUrl: String,
     val status: Status,
+    val device: DeviceDto? = null
 ) {
     @Serializable
     enum class Status {
@@ -32,9 +33,10 @@ fun UserDto.toUser() = User(
     status = status.toStatus()
 )
 
-fun User.toDto() = UserDto(
+fun User.toDto(device: DeviceDto? = null) = UserDto(
     uid = uid,
     displayName = displayName,
     profilePictureUrl = profilePictureUrl,
-    status = status.toStatus()
+    status = status.toStatus(),
+    device = device
 )

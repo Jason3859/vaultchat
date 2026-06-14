@@ -5,13 +5,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Bundle
-import dev.jason.app.compose.vaultchat.auth.AuthKoinModule
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.R
-import dev.jason.app.compose.vaultchat.local_storage.LocalStorageKoinModule
-import dev.jason.app.compose.vaultchat.messaging.MessagingKoinModule
-import dev.jason.app.compose.vaultchat.messaging.data.MessagingDataKoinModule
-import dev.jason.app.compose.vaultchat.messaging.ui.MessagingUiKoinModule
+import dev.jason.app.compose.vaultchat.ui.concrete.auth.AuthKoinModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -53,7 +49,7 @@ class MainApplication : Application() {
         createNotificationChannel()
         startKoin {
             androidContext(this@MainApplication)
-            modules(baseModule, AuthKoinModule, LocalStorageKoinModule, MessagingKoinModule, MessagingDataKoinModule, MessagingUiKoinModule)
+            modules(baseModule, AuthKoinModule)
         }
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {

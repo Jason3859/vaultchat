@@ -109,8 +109,8 @@ fun MessagingScreen(
 private fun MessagingScreen(
     otherUser: User,
     onBackClick: () -> Unit,
-    uiState: MessagingViewModel.UiState,
-    updateState: (MessagingViewModel.UiState) -> Unit,
+    uiState: MessagingUiState,
+    updateState: (MessagingUiState) -> Unit,
     sendMessage: () -> Unit,
     onUserInfoClick: () -> Unit,
     messages: List<Message>,
@@ -247,8 +247,8 @@ private fun TopBar(
 
 @Composable
 private fun BottomBar(
-    uiState: MessagingViewModel.UiState,
-    updateState: (MessagingViewModel.UiState) -> Unit,
+    uiState: MessagingUiState,
+    updateState: (MessagingUiState) -> Unit,
     onSend: () -> Unit
 ) {
     BottomAppBar(
@@ -307,7 +307,7 @@ private fun MessagingScreenPreview() {
         MessagingScreen(
             otherUser = User(other, other, other, User.Status.Online),
             onBackClick = {},
-            uiState = MessagingViewModel.UiState(),
+            uiState = MessagingUiState(),
             updateState = {},
             sendMessage = {},
             messages = messages,

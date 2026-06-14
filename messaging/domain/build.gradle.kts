@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

@@ -27,7 +27,6 @@ android {
 room { schemaDirectory("$projectDir/schema") }
 
 dependencies {
-    implementation(projects.core)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)

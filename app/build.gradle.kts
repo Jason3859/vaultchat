@@ -40,6 +40,10 @@ android {
 }
 
 dependencies {
+
+    implementation(projects.auth)
+    implementation(projects.ui.concrete.auth)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,13 +59,6 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.serialization.json)
-
-    implementation(projects.core)
-    implementation(projects.auth)
-    implementation(projects.messaging)
-    implementation(projects.messaging.data)
-    implementation(projects.messaging.domain)
-    implementation(projects.messaging.ui)
 
     testImplementation(libs.junit)
 

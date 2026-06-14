@@ -7,3 +7,18 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kotlin.plugin.serialization) apply false
 }
+
+subprojects {
+    if (path != ":core") {
+        pluginManager.withPlugin("com.android.library") {
+            dependencies {
+                add("implementation", projects.core)
+            }
+        }
+        pluginManager.withPlugin("com.android.application") {
+            dependencies {
+                add("implementation", projects.core)
+            }
+        }
+    }
+}
