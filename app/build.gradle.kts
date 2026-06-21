@@ -41,8 +41,28 @@ android {
 
 dependencies {
 
+    implementation(projects.core)
     implementation(projects.auth)
-    implementation(projects.ui.concrete.auth)
+    implementation(projects.main)
+
+    projects.feature.apply {
+        implementation(logout)
+        implementation(device)
+        implementation(connections)
+        implementation(user)
+        implementation(messaging)
+        implementation(messages)
+        implementation(blocklist)
+    }
+
+    projects.ui.apply {
+        implementation(auth)
+        implementation(auth.abstract)
+        implementation(auth.concrete)
+        implementation(main)
+        implementation(main.abstract)
+        implementation(main.concrete)
+    }
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

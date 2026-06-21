@@ -14,7 +14,6 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -33,7 +32,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.ui.concrete.auth)
+    implementation(projects.ui.auth.concrete)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)

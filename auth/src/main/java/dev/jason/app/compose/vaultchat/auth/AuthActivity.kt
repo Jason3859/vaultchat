@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.ui.concrete.auth.AuthScreen
+import dev.jason.app.compose.vaultchat.ui.auth.concrete.AuthScreen
 
 
 class AuthActivity : ComponentActivity() {
@@ -25,22 +25,22 @@ class AuthActivity : ComponentActivity() {
         requestNotificationPermission()
 
         Firebase.auth.currentUser?.let {
-            startMessagingActivity()
+            startMainActivity()
         }
 
         setContent {
             VaultChatTheme {
                 Surface {
                     AuthScreen(
-                        onAuthSuccess = ::startMessagingActivity
+                        onAuthSuccess = ::startMainActivity
                     )
                 }
             }
         }
     }
 
-    private fun startMessagingActivity() {
-        startActivity(Intent("dev.jason.app.compose.vaultchat.messaging.ACTION_OPEN_MESSAGING_ACTIVITY"))
+    private fun startMainActivity() {
+        startActivity(Intent("dev.jason.app.compose.vaultchat.main.ACTION_START_MAIN_ACTIVITY"))
         finish()
     }
 
