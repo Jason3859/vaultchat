@@ -1,5 +1,7 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -28,5 +30,10 @@ public class MessagingRepoNoFirebaseImpl implements MessagingRepository {
 	@Override
 	public void sendLogoutRequest(Device device, boolean bool) {
 		logger.info("sent logout request to device {}, clear messages is set to {}", device, bool);
+	}
+	
+	@Override
+	public void sendData(String token, String type, Map<String, String> data) {
+		logger.info("sent {} of type {} to {}", data.toString(), type, token);
 	}
 }

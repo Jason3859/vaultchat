@@ -1,9 +1,9 @@
 package dev.jason.project.spring.vc_server.social_microservice.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dev.jason.project.spring.vc_server.core.exception.VcException.SocialException.SelfBlockException;
@@ -12,14 +12,21 @@ import dev.jason.project.spring.vc_server.core.exception.VcException.SocialExcep
 import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserAlreadyExistsException;
 import dev.jason.project.spring.vc_server.core.exception.VcException.UserException.UserNotFoundException;
 import dev.jason.project.spring.vc_server.core.model.Message;
+import dev.jason.project.spring.vc_server.social_microservice.client.DeviceClient;
+import dev.jason.project.spring.vc_server.social_microservice.client.MessagingClient;
 import dev.jason.project.spring.vc_server.social_microservice.model.SocialEntity;
 import dev.jason.project.spring.vc_server.social_microservice.repo.SocialRepository;
+import lombok.AllArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
+@AllArgsConstructor
 public class SocialService {
 
-    @Autowired
-    private SocialRepository repository;
+    private final SocialRepository repository;    
+    private final DeviceClient deviceClient;
+	private final MessagingClient messagingClient;
+	private final ObjectMapper objectMapper;
     
 	public void registerNewUser(String uid) {
 		if (repository.findByUserId(uid) != null) {
@@ -84,6 +91,25 @@ public class SocialService {
 
         repository.save(entity1);
         repository.save(entity2);
+        
+        var devicesOfUser1 = deviceClient.getDevices(uid1);
+        var devicesOfUser2 = deviceClient.getDevices(uid2);
+        
+        final String dataType = "connections_update";
+        
+        devicesOfUser1.forEach(device -> {
+        	var connections = entity1.getConnections();
+        	var data = Map.of("connections", objectMapper.writeValueAsString(connections));
+        	
+        	messagingClient.sendData(device.token(), dataType, data);
+        });
+        
+        devicesOfUser2.forEach(device -> {
+        	var connections = entity2.getConnections();
+        	var data = Map.of("connections", objectMapper.writeValueAsString(connections));
+        	
+        	messagingClient.sendData(device.token(), dataType, data);
+        });
     }
 
     public SocialEntity getSocialEntityByUid(String uid) {

@@ -1,5 +1,7 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,15 @@ public class MessagingController {
 	public ResponseEntity<Void> send(@RequestBody Message message) {
 		messagingService.sendMessage(message);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@PostMapping(Endpoints.SEND_DATA)
+	public void send(
+	    @RequestParam String token,
+	    @RequestParam String type,
+	    @RequestBody Map<String, String> data
+	) {
+		messagingService.sendData(token, type, data);
 	}
 	
 	@PostMapping(Endpoints.NOTIFY_STATUS)

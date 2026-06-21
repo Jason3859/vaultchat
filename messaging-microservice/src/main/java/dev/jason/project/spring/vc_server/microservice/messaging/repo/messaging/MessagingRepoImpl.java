@@ -1,5 +1,7 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.repo.messaging;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -59,6 +61,17 @@ public class MessagingRepoImpl implements MessagingRepository {
     				.setPriority(Priority.HIGH)
     				.build()
     		)
+    		.build();
+    	
+    	sendMessage(firebaseMessage);
+    }
+    
+    @Override
+    public void sendData(String token, String type, Map<String, String> data) {
+    	Message firebaseMessage = Message.builder()
+    		.setToken(token)
+    		.putData("type", type)
+    		.putAllData(data)
     		.build();
     	
     	sendMessage(firebaseMessage);

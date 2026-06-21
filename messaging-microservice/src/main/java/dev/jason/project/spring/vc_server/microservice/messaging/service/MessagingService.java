@@ -1,6 +1,7 @@
 package dev.jason.project.spring.vc_server.microservice.messaging.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ public class MessagingService {
 	
 	@Autowired
     private ClientRepository client;
+	
+	public void sendData(String token, String type, Map<String, String> data) {
+		repository.sendData(token, type, data);
+	}
 
 	public void sendMessage(Message message) {
 		sendMessage(message, false);

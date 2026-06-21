@@ -27,6 +27,7 @@ public class Endpoints {
 	
 	public static final String NOTIFY_STATUS = "/notify-status";
 	public static final String SEND = "/send";
+	public static final String SEND_DATA = "/send-data";
 	
 	public static final String MESSAGING_NOTIFY_STATUS = MESSAGING + NOTIFY_STATUS;
 	
