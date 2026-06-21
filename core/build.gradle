@@ -16,6 +16,8 @@ dependencies {
     annotationProcessor libs.lombok
     
     implementation libs.firebase.admin
+	
+	implementation libs.spring.boot.starter.webmvc
 
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter

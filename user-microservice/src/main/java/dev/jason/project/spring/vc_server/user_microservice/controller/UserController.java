@@ -34,12 +34,23 @@ public class UserController {
 
 	@PostMapping(Endpoints.REGISTER)
 	public ResponseEntity<?> register(@RequestBody UserDto userDto) {
-		Map.Entry<User, Device> response =
-			userService.addUser(userDto.asUser(), userDto.device().toDevice(userDto.uid(), LocalDateTime.now()));
 		
-		UserDto dto = UserDto.fromUserAndDevice(response.getKey(), response.getValue());
+		Object returnValue = null;
 		
-		return new ResponseEntity<>(dto, HttpStatus.CREATED);
+		if (userDto.device() == null) {
+			userService.addUser(userDto.asUser());
+		} else {			
+			Map.Entry<User, Device> response =
+				userService.addUser(userDto.asUser(), userDto.device().toDevice(userDto.uid(), LocalDateTime.now()));
+			
+			returnValue = UserDto.fromUserAndDevice(response.getKey(), response.getValue());
+		}
+		
+		if (returnValue != null) {			
+			return new ResponseEntity<>(returnValue, HttpStatus.CREATED);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping(Endpoints.DELETE)

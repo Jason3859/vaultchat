@@ -47,6 +47,16 @@ public class UserService {
 		throw new UserNotFoundException();
 	}
 	
+	public void addUser(User user) {
+		var entity = repository.findById(user.uid());
+		
+		if (entity.isPresent()) {
+			throw new UserAlreadyExistsException();
+		}
+		
+		repository.save(UserEntity.asEntity(user));
+	}
+	
 	public Map.Entry<User, Device> addUser(User user, Device device) {
 		Optional<UserEntity> entity = repository.findById(user.uid());
 		
