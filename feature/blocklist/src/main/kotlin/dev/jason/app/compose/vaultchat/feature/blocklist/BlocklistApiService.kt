@@ -1,6 +1,8 @@
 package dev.jason.app.compose.vaultchat.feature.blocklist
 
 import android.util.Log
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.ToastController
 import dev.jason.app.compose.vaultchat.core.model.User
 
@@ -19,6 +21,8 @@ class BlocklistApiService(private val blocklistApiRepository: BlocklistApiReposi
     suspend fun blockUser(user: User) {
         try {
             blocklistApiRepository.blockUser(user)
+            AppEvents.sendEvent(AppEvent.ReFetchConnections)
+            Log.d("BlocklistApiService", "blockUser: sent app event")
         } catch (e: Exception) {
             Log.e("BlocklistService", "blockUser: exception occurred", e)
             ToastController.showErrorOccurredToast()
@@ -28,8 +32,9 @@ class BlocklistApiService(private val blocklistApiRepository: BlocklistApiReposi
     suspend fun unblockUser(user: User) {
         try {
             blocklistApiRepository.unblockUser(user)
+            AppEvents.sendEvent(AppEvent.ReFetchConnections)
         } catch (e: Exception) {
-            Log.e("BlocklistService", "blockUser: exception occurred", e)
+            Log.e("BlocklistService", "unblockUser: exception occurred", e)
             ToastController.showErrorOccurredToast()
         }
     }

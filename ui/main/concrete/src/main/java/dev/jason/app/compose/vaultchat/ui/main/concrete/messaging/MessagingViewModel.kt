@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.model.Message
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsService
@@ -25,6 +27,7 @@ import java.time.LocalDateTime
 
 class MessagingViewModel(
     private val otherUserUid: String,
+    private val otherUserFromConstructor: UserUi,
     private val connectionsService: ConnectionsService,
     private val messageDatabaseService: MessageDatabaseService,
     private val messagingApiService: MessagingApiService
@@ -50,7 +53,8 @@ class MessagingViewModel(
     fun onAction(action: MessagingUiAction) {
         when (action) {
             is MessagingUiAction.UpdateState -> updateState(action.state)
-            is MessagingUiAction.SendMessage -> sendMessage()
+            is MessagingUiAction.SendMessage -> sendMessage(action.message)
+            is MessagingUiAction.SendMessage.Companion -> sendMessage()
         }
     }
 
@@ -62,14 +66,20 @@ class MessagingViewModel(
         }
     }
 
-    private fun sendMessage() {
-        if (!_uiState.value.sendButtonEnabled) return
+    private fun sendMessage(msg: Message? = null) {
+        val uiState = _uiState.value.copy()
+
+        updateState { currentState ->
+            currentState.copy(
+                messageText = ""
+            )
+        }
 
         viewModelScope.launch {
-            val message = Message(
+            val message = msg ?: Message(
                 from = currentUser.uid,
                 to = otherUserUid,
-                text = _uiState.value.messageText,
+                text = uiState.messageText,
                 timestamp = LocalDateTime.now()
             )
             val messageUi = message.toUi()
@@ -83,15 +93,29 @@ class MessagingViewModel(
                     else -> _failedMessages.add(messageUi)
                 }
             }
+
+            // value of `msg` will be null only
+            // if the other user is not connected to current user
+            // if the user sent a message means that the 2 users are connected
+            // so, refetch connections for this
+            if (msg != null) {
+                AppEvents.sendEvent(AppEvent.ReFetchConnections)
+            }
         }
     }
 
     init {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            connectionsService.getConnection(otherUserUid).let { user ->
-                _otherUser.update { user.toUi() }
+
+            if (otherUserFromConstructor != UserUi.emptyUser()) {
+                _otherUser.update { otherUserFromConstructor }
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
             }
+
+            val user = connectionsService.getConnection(otherUserUid)
+            _otherUser.update { user?.toUi() }
             _uiState.update { it.copy(isLoading = false) }
         }
 

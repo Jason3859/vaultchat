@@ -10,7 +10,19 @@ data class UserUi(
     val displayName: String,
     val profilePictureUrl: String,
     val status: Status
-)
+) {
+    companion object {
+        // for the viewmodel if user exists inside database
+        fun emptyUser(): UserUi {
+            return UserUi(
+                uid = "empty",
+                displayName = "empty",
+                profilePictureUrl = "empty",
+                status = Status.Online
+            )
+        }
+    }
+}
 
 fun User.toUi() = UserUi(
     uid = uid,

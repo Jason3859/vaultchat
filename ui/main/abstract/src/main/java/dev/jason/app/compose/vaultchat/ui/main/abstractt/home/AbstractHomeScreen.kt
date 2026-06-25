@@ -57,6 +57,7 @@ fun AbstractHomeScreen(
     currentUserProfilePictureUrl: String?,
     onAction: (HomeUiAction) -> Unit,
     onUserClick: (UserUi) -> Unit,
+    onNonConnectedUserClick: (UserUi) -> Unit,
     onProfileClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -154,7 +155,7 @@ fun AbstractHomeScreen(
                                         selected = false,
                                         count = uiState.searchResults.count(),
                                         user = user,
-                                        onUserClick = onUserClick,
+                                        onUserClick = onNonConnectedUserClick,
                                         index = index,
                                     )
                                 }
@@ -257,7 +258,8 @@ private val previewContent = @Composable {
             currentUserProfilePictureUrl = "",
             onAction = {},
             onUserClick = { },
-            onProfileClick = { },
+            onNonConnectedUserClick = {},
+            onProfileClick = {}
         )
     }
 }

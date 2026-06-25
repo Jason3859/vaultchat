@@ -1,8 +1,11 @@
 package dev.jason.app.compose.vaultchat.feature.user
 
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
+import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.UserDto
 import dev.jason.app.compose.vaultchat.core.model.toDto
+import dev.jason.app.compose.vaultchat.core.model.toUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -33,10 +36,12 @@ internal class UserApiRepoImpl(
     }
 
     override suspend fun searchUser(displayName: String): List<User> {
-        val response = client.get("$BASE_URL/social/search") {
+        val response = client.get("$BASE_URL/user/search") {
+            parameter("from_uid", AppState.currentUser.value?.uid!!)
             parameter("search_query", displayName)
         }
 
-        return response.body()
+        return response.body<List<UserDto>>()
+            .map(UserDto::toUser)
     }
 }

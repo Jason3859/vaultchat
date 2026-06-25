@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ConnectionsDbRepository {
 
     fun getConnections(): Flow<List<User>>
-    suspend fun getConnection(uid: String): User
+    suspend fun getConnection(uid: String): User?
     suspend fun updateConnections(connections: List<User>)
     suspend fun updateStatus(uid: String, status: User.Status)
 }

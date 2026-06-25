@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -84,9 +85,11 @@ fun AbstractMessagingScreen(
     val pagingItems = messages.data.collectAsLazyPagingItems()
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(pagingItems.itemCount) {
-        if (pagingItems.itemCount > 0) {
-            lazyListState.animateScrollToItem(pagingItems.itemCount - 1)
+    val totalItemCount = pagingItems.itemCount + pendingMessages.size + failedMessages.size
+
+    LaunchedEffect(totalItemCount) {
+        if (totalItemCount > 0) {
+            lazyListState.animateScrollToItem(totalItemCount - 1)
         }
     }
 
@@ -106,43 +109,81 @@ fun AbstractMessagingScreen(
                 .padding(innerPadding)
         ) {
             item { Spacer(Modifier.height(6.dp)) }
+
             items(
                 count = pagingItems.itemCount,
                 key = pagingItems.itemKey { it.timestamp }
             ) { index ->
                 val msg = pagingItems[index] ?: return@items
-                Column(
-                    modifier = Modifier.fillParentMaxWidth(),
-                    horizontalAlignment = if (otherUser.uid == msg.from) Alignment.Start else Alignment.End
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp)
-                            .padding(top = 6.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = when {
-                                pendingMessages.contains(msg) -> Color.Cyan
-                                failedMessages.contains(msg) -> MaterialTheme.colorScheme.errorContainer
-                                else -> Color.Unspecified // default color
-                            }
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 8.dp, horizontal = 16.dp)
-                        ) {
-                            Text(msg.text)
-                        }
-                    }
+                MessageItem(
+                    msg = msg,
+                    isOtherUser = otherUser.uid == msg.from,
+                    status = MessageStatus.Sent
+                )
+            }
 
-                    Text(
-                        text = if (pendingMessages.contains(msg)) "Sending" else msg.timestamp,
-                        fontSize = 10.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
+            items(pendingMessages) { msg ->
+                MessageItem(
+                    msg = msg,
+                    isOtherUser = otherUser.uid == msg.from,
+                    status = MessageStatus.Pending
+                )
+            }
+
+            items(failedMessages) { msg ->
+                MessageItem(
+                    msg = msg,
+                    isOtherUser = otherUser.uid == msg.from,
+                    status = MessageStatus.Failed
+                )
             }
         }
+    }
+}
+
+private enum class MessageStatus {
+    Sent, Pending, Failed
+}
+
+@Composable
+private fun MessageItem(
+    msg: MessageUi,
+    isOtherUser: Boolean,
+    status: MessageStatus
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = if (isOtherUser) Alignment.Start else Alignment.End
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .padding(top = 6.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = when (status) {
+                    MessageStatus.Pending -> Color.Cyan
+                    MessageStatus.Failed -> MaterialTheme.colorScheme.errorContainer
+                    MessageStatus.Sent -> Color.Unspecified // default color
+                }
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Text(msg.text)
+            }
+        }
+
+        Text(
+            text = when (status) {
+                MessageStatus.Pending -> "Sending"
+                MessageStatus.Failed -> "Failed"
+                MessageStatus.Sent -> msg.timestamp
+            },
+            fontSize = 10.sp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
     }
 }
 

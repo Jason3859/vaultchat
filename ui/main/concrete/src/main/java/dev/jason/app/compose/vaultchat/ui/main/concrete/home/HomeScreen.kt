@@ -9,7 +9,11 @@ import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(onUserClick: (UserUi) -> Unit, onProfileClick: () -> Unit) {
+fun HomeScreen(
+    onUserClick: (UserUi) -> Unit,
+    onNonConnectedUserClick: (UserUi) -> Unit,
+    onProfileClick: () -> Unit
+) {
     val viewModel: HomeViewModel = koinViewModel()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -26,5 +30,6 @@ fun HomeScreen(onUserClick: (UserUi) -> Unit, onProfileClick: () -> Unit) {
         onAction = viewModel::onAction,
         onUserClick = onUserClick,
         onProfileClick = onProfileClick,
+        onNonConnectedUserClick = onNonConnectedUserClick,
     )
 }

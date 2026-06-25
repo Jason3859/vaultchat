@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.AbstractMessagingScreen
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.MessagePagingState
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUser
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
@@ -24,10 +25,11 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun MessagingScreen(
     uid: String,
+    otherUser: UserUi,
     onBackClick: () -> Unit,
     onUserInfoClick: () -> Unit
 ) {
-    val viewModel: MessagingViewModel = koinViewModel { parametersOf(uid) }
+    val viewModel: MessagingViewModel = koinViewModel { parametersOf(uid, otherUser) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val otherUser by viewModel.otherUser.collectAsStateWithLifecycle()
@@ -46,7 +48,7 @@ fun MessagingScreen(
                 modifier = Modifier.size(200.dp)
             )
         }
-    } else {
+    } else if (otherUser != null) {
         AbstractMessagingScreen(
             otherUser = otherUser!!,
             onBackClick = onBackClick,

@@ -26,9 +26,9 @@ fun ProfileScreen(
         AbstractProfileScreen(
             onBack = onBack,
             user = currentUser?.toUi()!!,
-            onAction = viewModel::onAction,
             devices = devices.toImmutableList(),
-            blocklist = blocklist.toImmutableList()
+            blocklist = blocklist.toImmutableList(),
+            onAction = viewModel::onAction
         )
     else
         AbstractProfileScreen(

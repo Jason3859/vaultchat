@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ConnectionsService(
@@ -18,27 +19,30 @@ class ConnectionsService(
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private var isRequestSentOnce = false
+    private var isRequestSent = false
 
-    suspend fun getConnection(uid: String): User {
+    suspend fun getConnection(uid: String): User? {
         return dbRepository.getConnection(uid)
     }
 
     fun getConnections(): Flow<List<User>> = channelFlow {
 
+        if (!isRequestSent) { // prevents from unnecessary calls
+            try {
+                Log.d("ConnectionsService", "getConnections: fetching connections")
+                val connections = apiRepository.getConnections()
+                Log.d("ConnectionsService", "getConnections: completed fetching connections")
+                Log.d("ConnectionsService", "getConnections: connections: $connections")
+                dbRepository.updateConnections(connections)
+                isRequestSent = true
+            } catch (e: Exception) {
+                Log.e("ConnectionsService", "getConnections: background refresh failed", e)
+            }
+        }
+        
         launch {
             dbRepository.getConnections().collect {
                 send(it)
-            }
-        }
-
-        if (!isRequestSentOnce) {
-            try {
-                val connections = apiRepository.getConnections()
-                dbRepository.updateConnections(connections)
-                isRequestSentOnce = true
-            } catch (e: Exception) {
-                Log.e("ConnectionsService", "getConnections: background refresh failed", e)
             }
         }
     }
@@ -63,6 +67,13 @@ class ConnectionsService(
 
                 if (event is AppEvent.UpdateConnections) {
                     updateConnections(event.connections)
+                }
+
+                if (event is AppEvent.ReFetchConnections) {
+                    Log.d("ConnectionsService", "init: collected app event to refetch connections")
+                    isRequestSent = false
+                    // Just collecting the flow once is enough to trigger the internal refresh logic
+                    getConnections().first()
                 }
             }
         }

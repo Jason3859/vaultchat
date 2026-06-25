@@ -20,4 +20,9 @@
 
     <string name="logout_by_clearing_messages">Logout by clearing messages</string>
     <string name="logout_without_clearing_messages">Logout without clearing messages</string>
+
+    <string name="block_user_warning_title">Do you want to block %1$s?</string>
+    <string name="block_user_warning_text">You can always unblock by going to your profile and clicking the user name in blocklist section</string>
+
+    <string name="block">Block</string>
 </resources>

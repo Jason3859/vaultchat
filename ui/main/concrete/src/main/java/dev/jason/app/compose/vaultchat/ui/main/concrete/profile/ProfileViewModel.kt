@@ -11,6 +11,7 @@ import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toDevice
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUser
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.profile.ProfileUiAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,8 +49,12 @@ class ProfileViewModel(
         when (action) {
             ProfileUiAction.LogoutCurrentDeviceByClearingMessages -> logoutCurrentDeviceByClearingMessages()
             ProfileUiAction.LogoutCurrentDeviceWithoutClearingMessages -> logoutCurrentDeviceWithoutClearingMessages()
+
             is ProfileUiAction.LogoutDeviceByClearingMessages -> logoutDeviceByClearingMessages(action.device)
             is ProfileUiAction.LogoutDeviceWithoutClearingMessages -> logoutDeviceWithoutClearingMessages(action.device)
+
+            is ProfileUiAction.BlockUser -> blockUser(action)
+            is ProfileUiAction.UnblockUser -> unblockUser(action)
         }
     }
 
@@ -94,6 +99,20 @@ class ProfileViewModel(
         viewModelScope.launch {
             val blocklist = blocklistApiService.getBlocklist()
             _blocklist.update { blocklist.map(User::toUi) }
+        }
+    }
+
+    private fun blockUser(action: ProfileUiAction.BlockUser) {
+        viewModelScope.launch {
+            blocklistApiService.blockUser(action.user.toUser())
+            action.onFinish.invoke()
+        }
+    }
+
+    private fun unblockUser(action: ProfileUiAction.UnblockUser) {
+        viewModelScope.launch {
+            blocklistApiService.unblockUser(action.user.toUser())
+            action.onFinish.invoke()
         }
     }
 }

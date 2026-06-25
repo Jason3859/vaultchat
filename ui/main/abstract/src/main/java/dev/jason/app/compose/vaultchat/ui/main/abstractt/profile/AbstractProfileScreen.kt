@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.TabletAndroid
@@ -45,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +58,7 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.AppState
+import dev.jason.app.compose.vaultchat.core.NavEvent
 import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
@@ -65,7 +68,8 @@ import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import kotlinx.collections.immutable.ImmutableList
 
 enum class ProfileScreenRowItemId {
-    Devices, Blocklist, Logout
+    Devices, Blocklist, Logout,
+    BlockUser, DeleteMessagesHistory
 }
 
 @Composable
@@ -76,125 +80,227 @@ fun AbstractProfileScreen(
     blocklist: ImmutableList<UserUi>? = null,
     onAction: (ProfileUiAction) -> Unit
 ) {
-    val context = LocalContext.current
-    val imageModifier = Modifier
-        .size(175.dp)
-        .clip(CircleShape)
-
     var currentDialog by remember { mutableStateOf<ProfileScreenRowItemId?>(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBack,
-                        colors = IconButtonDefaults.iconButtonVibrantColors()
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
-                }
-            )
+            ProfileTopBar(onBack)
         }
     ) { innerPadding ->
-        when (currentDialog) {
-            ProfileScreenRowItemId.Devices -> DevicesDialog(
-                // this should not throw any exception here because
-                // it will only be triggered when buttons below are visible
-                // but those buttons are hidden when these values (i.e., devices and blocklist) are null
-                devices = devices!!,
-                onAction = onAction,
-                onDismiss = { currentDialog = null }
-            )
-
-            ProfileScreenRowItemId.Blocklist -> BlocklistDialog(
-                blocklist = blocklist!!,
-                onDismiss = { currentDialog = null }
-            )
-
-            ProfileScreenRowItemId.Logout -> LogoutDialog(
-                onDismiss = { currentDialog = null },
-                onAction = onAction
-            )
-
-            null -> {}
-        }
+        ProfileDialogs(
+            currentDialog = currentDialog,
+            onDismiss = { currentDialog = null },
+            user = user,
+            devices = devices,
+            blocklist = blocklist,
+            onAction = onAction
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.5f),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(user.profilePictureUrl)
-                            .crossfade(true)
-                            .diskCachePolicy(CachePolicy.ENABLED)
-                            .memoryCachePolicy(CachePolicy.ENABLED)
-                            .build(),
-                        contentDescription = null,
-                        modifier = imageModifier,
-                        error = {
-                            Log.e(
-                                "ProfileScreen",
-                                "ProfileScreen: error while loading image",
-                                it.result.throwable
-                            )
+            UserInfoSection(user)
 
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = null,
-                                modifier = imageModifier
-                            )
-                        }
-                    )
-
-                    Text(
-                        text = user.displayName,
-                        fontSize = 24.sp,
-                        style = MaterialTheme.typography.labelMediumEmphasized
-                    )
-                }
-            }
-
-            if (devices != null && blocklist != null) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    mapOf(
-                        ProfileScreenRowItemId.Devices to Icons.Default.Devices,
-                        ProfileScreenRowItemId.Blocklist to Icons.Default.Block,
-                        ProfileScreenRowItemId.Logout to Icons.AutoMirrored.Filled.Logout
-                    ).forEach { (id, icon) ->
-                        OutlinedButton(
-                            onClick = { currentDialog = id },
-                            shape = RoundedCornerShape(20.dp)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(icon, null)
-                                Text(id.name)
-                            }
-                        }
-                    }
-                }
-            }
+            ActionButtonsRow(
+                isOwnProfile = (devices != null && blocklist != null),
+                onActionClick = { currentDialog = it }
+            )
         }
     }
+}
+
+@Composable
+private fun ProfileTopBar(onBack: () -> Unit) {
+    TopAppBar(
+        title = {},
+        navigationIcon = {
+            IconButton(
+                onClick = onBack,
+                colors = IconButtonDefaults.iconButtonVibrantColors()
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+            }
+        }
+    )
+}
+
+@Composable
+private fun ProfileDialogs(
+    currentDialog: ProfileScreenRowItemId?,
+    onDismiss: () -> Unit,
+    user: UserUi,
+    devices: ImmutableList<DeviceUi>?,
+    blocklist: ImmutableList<UserUi>?,
+    onAction: (ProfileUiAction) -> Unit
+) {
+    when (currentDialog) {
+        ProfileScreenRowItemId.Devices -> devices?.let {
+            DevicesDialog(
+                devices = it,
+                onAction = onAction,
+                onDismiss = onDismiss
+            )
+        }
+
+        ProfileScreenRowItemId.Blocklist -> blocklist?.let {
+            BlocklistDialog(
+                blocklist = it,
+                onAction = onAction,
+                onDismiss = onDismiss
+            )
+        }
+
+        ProfileScreenRowItemId.Logout -> LogoutDialog(
+            onDismiss = onDismiss,
+            onAction = onAction
+        )
+
+        ProfileScreenRowItemId.BlockUser -> BlockUserDialog(
+            userDisplayName = user.displayName,
+            onConfirmClick = {
+                onAction(
+                    ProfileUiAction.BlockUser(
+                        user = user,
+                        onFinish = {
+                            AppState.emitNavEvent(NavEvent.NavigateToHomeScreen)
+                        }
+                    )
+                )
+                onDismiss()
+            },
+            onDismiss = onDismiss
+        )
+
+        ProfileScreenRowItemId.DeleteMessagesHistory -> TODO()
+        null -> {}
+    }
+}
+
+@Composable
+private fun UserInfoSection(user: UserUi) {
+    val context = LocalContext.current
+    val imageModifier = Modifier
+        .size(175.dp)
+        .clip(CircleShape)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(user.profilePictureUrl)
+                    .crossfade(enable = true)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build(),
+                contentDescription = null,
+                modifier = imageModifier,
+                error = {
+                    Log.e("ProfileScreen", "Error while loading image", it.result.throwable)
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        modifier = imageModifier
+                    )
+                }
+            )
+
+            Text(
+                text = user.displayName,
+                fontSize = 24.sp,
+                style = MaterialTheme.typography.labelMediumEmphasized
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActionButtonsRow(
+    isOwnProfile: Boolean,
+    onActionClick: (ProfileScreenRowItemId) -> Unit
+) {
+    val items = if (isOwnProfile) {
+        listOf(
+            ProfileScreenRowItemId.Devices to Icons.Default.Devices,
+            ProfileScreenRowItemId.Blocklist to Icons.Default.Block,
+            ProfileScreenRowItemId.Logout to Icons.AutoMirrored.Filled.Logout
+        )
+    } else {
+        listOf(
+            ProfileScreenRowItemId.BlockUser to Icons.Default.Block,
+            ProfileScreenRowItemId.DeleteMessagesHistory to Icons.Default.DeleteForever
+        )
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items.forEach { (id, icon) ->
+            ProfileScreenRowItem(
+                id = id,
+                icon = icon,
+                onClick = { onActionClick(id) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileScreenRowItem(
+    id: ProfileScreenRowItemId,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(icon, null)
+            Text(id.name)
+        }
+    }
+}
+
+@Composable
+private fun BlockUserDialog(
+    userDisplayName: String,
+    onConfirmClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.block_user_warning_title, userDisplayName)) },
+        text = { Text(stringResource(R.string.block_user_warning_text)) },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmClick,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(stringResource(R.string.block))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable
@@ -202,36 +308,32 @@ private fun LogoutDialog(
     onDismiss: () -> Unit,
     onAction: (ProfileUiAction) -> Unit
 ) {
-    val showAnotherDialog = remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(stringResource(R.string.logout_warning_title))
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { showAnotherDialog.value = true },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
-                )
-            ) {
-                Text(stringResource(R.string.logout))
+    if (!showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(R.string.logout_warning_title)) },
+            confirmButton = {
+                TextButton(
+                    onClick = { showConfirmDialog = true },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.logout))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-
-    if (showAnotherDialog.value) {
+        )
+    } else {
         AlertDialog(
             onDismissRequest = {
-                showAnotherDialog.value = false
+                showConfirmDialog = false
                 onDismiss()
             },
             confirmButton = {
@@ -254,12 +356,8 @@ private fun LogoutDialog(
                     Text(stringResource(R.string.logout_without_clearing_messages))
                 }
             },
-            title = {
-                Text(stringResource(R.string.logout_clear_messages_title))
-            },
-            text = {
-                Text(stringResource(R.string.logout_clear_messages_text))
-            }
+            title = { Text(stringResource(R.string.logout_clear_messages_title)) },
+            text = { Text(stringResource(R.string.logout_clear_messages_text)) }
         )
     }
 }
@@ -268,19 +366,19 @@ private fun LogoutDialog(
 @Composable
 private fun BlocklistDialog(
     blocklist: ImmutableList<UserUi>,
+    onAction: (ProfileUiAction) -> Unit,
     onDismiss: () -> Unit
 ) {
     val imageModifier = Modifier
         .size(30.dp)
         .clip(CircleShape)
 
-    Dialog(
-        onDismissRequest = onDismiss
-    ) {
+    Dialog(onDismissRequest = onDismiss) {
         LazyColumn {
             if (blocklist.isEmpty()) {
                 item {
                     Box(
+                        modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(stringResource(R.string.no_blocked_users))
@@ -293,7 +391,9 @@ private fun BlocklistDialog(
                         index = index,
                         count = blocklist.count(),
                     ),
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        onAction(ProfileUiAction.UnblockUser(user, onDismiss))
+                    },
                     leadingContent = {
                         SubcomposeAsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
@@ -305,12 +405,6 @@ private fun BlocklistDialog(
                             contentDescription = null,
                             modifier = imageModifier,
                             error = {
-                                Log.e(
-                                    "ProfileScreen",
-                                    "BlocklistDialog: error while loading image",
-                                    it.result.throwable
-                                )
-
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     contentDescription = null,
@@ -338,113 +432,121 @@ private fun DevicesDialog(
     var showClearMessagesInDeviceDialog by remember { mutableStateOf(false) }
     var deviceToLogout by remember { mutableStateOf<DeviceUi?>(null) }
 
-    Dialog(
-        onDismissRequest = onDismiss
-    ) {
-        if (showLogoutDialog) {
-            AlertDialog(
-                onDismissRequest = {
-                    deviceToLogout = null
-                    showLogoutDialog = false
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showClearMessagesInDeviceDialog = true
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
-                    ) {
-                        Text(stringResource(R.string.logout))
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = {
-                            deviceToLogout = null
-                            showLogoutDialog = false
-                        }
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                },
-                title = {
-                    Text(stringResource(R.string.device_logout_warning_title))
-                },
-                text = {
-                    Text(stringResource(R.string.device_logout_warning_text))
-                }
-            )
-        }
-
-        if (showClearMessagesInDeviceDialog) {
-            val deviceToLogout =
-                deviceToLogout ?: throw IllegalStateException("device to logout is null")
-
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(stringResource(R.string.logout_clear_messages_title)) },
-                text = { Text(stringResource(R.string.logout_clear_messages_text)) },
-                confirmButton = {
-                    TextButton(
-                        onClick = { onAction(ProfileUiAction.LogoutDeviceByClearingMessages(deviceToLogout)) },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
-                    ) {
-                        Text(stringResource(R.string.logout_by_clearing_messages))
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { onAction(ProfileUiAction.LogoutDeviceWithoutClearingMessages(deviceToLogout)) },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
-                    ) {
-                        Text(stringResource(R.string.logout_without_clearing_messages))
-                    }
-                }
-            )
-        }
-
-        LazyColumn {
-            item {
-                Text(stringResource(R.string.your_devices))
-            }
-            itemsIndexed(devices) { index, device ->
-                SegmentedListItem(
-                    shapes = ListItemDefaults.segmentedShapes(
-                        index = index,
-                        count = devices.count(),
-                    ),
-                    onClick = {
-                        deviceToLogout = device
-                        showLogoutDialog = true
+    Dialog(onDismissRequest = onDismiss) {
+        Column {
+            if (showLogoutDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        deviceToLogout = null
+                        showLogoutDialog = false
                     },
-                    leadingContent = {
-                        val icon = when (device.type) {
-                            Device.Type.Mobile -> Icons.Default.PhoneAndroid
-                            Device.Type.Tablet -> Icons.Default.TabletAndroid
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showClearMessagesInDeviceDialog = true },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.logout))
                         }
+                    },
+                    dismissButton = {
+                        OutlinedButton(
+                            onClick = {
+                                deviceToLogout = null
+                                showLogoutDialog = false
+                            }
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    },
+                    title = { Text(stringResource(R.string.device_logout_warning_title)) },
+                    text = { Text(stringResource(R.string.device_logout_warning_text)) }
+                )
+            }
 
-                        Icon(icon, null)
+            if (showClearMessagesInDeviceDialog) {
+                val deviceToLogoutSafe =
+                    deviceToLogout ?: throw IllegalStateException("Device to logout is null")
+
+                AlertDialog(
+                    onDismissRequest = onDismiss,
+                    title = { Text(stringResource(R.string.logout_clear_messages_title)) },
+                    text = { Text(stringResource(R.string.logout_clear_messages_text)) },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                onAction(
+                                    ProfileUiAction.LogoutDeviceByClearingMessages(
+                                        deviceToLogoutSafe
+                                    )
+                                )
+                                onDismiss()
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.logout_by_clearing_messages))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                onAction(
+                                    ProfileUiAction.LogoutDeviceWithoutClearingMessages(
+                                        deviceToLogoutSafe
+                                    )
+                                )
+                                onDismiss()
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.logout_without_clearing_messages))
+                        }
                     }
-                ) {
-                    val text =
-                        if (device == AppState.currentDevice.collectAsState().value)
-                            "${device.name} (current)"
-                        else device.name
+                )
+            }
 
-                    Text(text)
+            LazyColumn {
+                item {
+                    Text(
+                        text = stringResource(R.string.your_devices),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                itemsIndexed(devices) { index, device ->
+                    SegmentedListItem(
+                        shapes = ListItemDefaults.segmentedShapes(
+                            index = index,
+                            count = devices.count(),
+                        ),
+                        onClick = {
+                            deviceToLogout = device
+                            showLogoutDialog = true
+                        },
+                        leadingContent = {
+                            val icon = when (device.type) {
+                                Device.Type.Mobile -> Icons.Default.PhoneAndroid
+                                Device.Type.Tablet -> Icons.Default.TabletAndroid
+                            }
+                            Icon(icon, null)
+                        }
+                    ) {
+                        val isCurrent = device == AppState.currentDevice.collectAsState().value
+                        val text = if (isCurrent) "${device.name} (current)" else device.name
+                        Text(text)
+                    }
                 }
             }
         }
     }
 }
 
-val previewContent = @Composable {
+private val previewContent = @Composable {
     VaultChatTheme {
         AbstractProfileScreen(
             onBack = {},

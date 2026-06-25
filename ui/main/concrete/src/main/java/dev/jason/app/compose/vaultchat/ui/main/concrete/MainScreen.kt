@@ -12,6 +12,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.NavEvent
+import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
 import dev.jason.app.compose.vaultchat.ui.main.concrete.home.HomeScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.messaging.MessagingScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.nav.Route
@@ -36,8 +39,13 @@ fun MainScreen() {
 
     LaunchedEffect(true) {
         AppState.navEvent.collect { navEvent ->
-            if (navEvent is NavEvent.NavigateToMessagingScreen) {
-                backStack.add(Route.Messaging(navEvent.uid))
+            when (navEvent) {
+                is NavEvent.NavigateToMessagingScreen -> backStack.add(Route.Messaging(navEvent.uid))
+                is NavEvent.NavigateToHomeScreen -> {
+                    while (backStack.last() !is Route.Home) {
+                        onBack.invoke()
+                    }
+                }
             }
         }
     }
@@ -56,15 +64,28 @@ fun MainScreen() {
             ) {
                 HomeScreen(
                     onUserClick = { backStack.add(Route.Messaging(it.uid)) },
+                    onNonConnectedUserClick = { user ->
+                        backStack.add(Route.Messaging.fromUser(user))
+                    },
                     onProfileClick = { backStack.add(Route.Profile) }
                 )
             }
 
             entry<Route.Messaging>(
                 metadata = ListDetailSceneStrategy.detailPane()
-            ) {
+            ) { route ->
+                var user: User? = null
+                route.displayName?.let {
+                    user = User(
+                        uid = route.uid,
+                        displayName = route.displayName,
+                        profilePictureUrl = route.profilePictureUrl!!,
+                        status = route.status!!
+                    )
+                }
                 MessagingScreen(
-                    uid = it.uid,
+                    uid = route.uid,
+                    otherUser = user?.toUi() ?: UserUi.emptyUser(),
                     onBackClick = onBack,
                     onUserInfoClick = {
                         backStack.add(Route.Profile)
