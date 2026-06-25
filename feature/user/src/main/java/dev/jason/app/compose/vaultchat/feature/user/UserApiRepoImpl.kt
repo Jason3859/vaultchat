@@ -2,9 +2,9 @@ package dev.jason.app.compose.vaultchat.feature.user
 
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
 import dev.jason.app.compose.vaultchat.core.AppState
+import dev.jason.app.compose.vaultchat.core.model.RegisterUserDto
 import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.model.UserDto
-import dev.jason.app.compose.vaultchat.core.model.toDto
 import dev.jason.app.compose.vaultchat.core.model.toUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -26,13 +26,11 @@ internal class UserApiRepoImpl(
         }
     }
 
-    override suspend fun registerUser(user: User): UserApiRepository.StatusCode {
-        val response = client.post("$BASE_URL/user/register") {
+    override suspend fun registerUser(body: RegisterUserDto) {
+        client.post("$BASE_URL/register-user") {
             contentType(ContentType.Application.Json)
-            setBody(user.toDto())
+            setBody(body)
         }
-
-        return response.status.value
     }
 
     override suspend fun searchUser(displayName: String): List<User> {

@@ -7,8 +7,7 @@ data class UserDto(
     val uid: String,
     val displayName: String,
     val profilePictureUrl: String,
-    val status: Status,
-    val device: DeviceDto? = null
+    val status: Status
 ) {
     @Serializable
     enum class Status {
@@ -21,22 +20,9 @@ fun UserDto.Status.toStatus() = when (this) {
     UserDto.Status.Online -> User.Status.Online
 }
 
-fun User.Status.toStatus() = when (this) {
-    User.Status.Online -> UserDto.Status.Online
-    User.Status.Offline -> UserDto.Status.Offline
-}
-
 fun UserDto.toUser() = User(
     uid = uid,
     displayName = displayName,
     profilePictureUrl = profilePictureUrl,
     status = status.toStatus()
-)
-
-fun User.toDto(device: DeviceDto? = null) = UserDto(
-    uid = uid,
-    displayName = displayName,
-    profilePictureUrl = profilePictureUrl,
-    status = status.toStatus(),
-    device = device
 )

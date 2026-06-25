@@ -2,6 +2,7 @@ package dev.jason.app.compose.vaultchat.feature.user
 
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.ToastController
+import dev.jason.app.compose.vaultchat.core.model.RegisterUserDto
 import dev.jason.app.compose.vaultchat.core.model.User
 
 class UserApiService(
@@ -17,13 +18,12 @@ class UserApiService(
         }
     }
 
-    suspend fun registerUser(user: User): Int {
-        return try {
-            repository.registerUser(user)
+    suspend fun registerUser(dto: RegisterUserDto) {
+        try {
+            repository.registerUser(dto)
         } catch (e: Exception) {
             Log.e("UserApiService", "registerUser: exception occurred", e)
             ToastController.showErrorOccurredToast()
-            1000
         }
     }
 
