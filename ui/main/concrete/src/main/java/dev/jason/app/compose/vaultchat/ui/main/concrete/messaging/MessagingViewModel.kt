@@ -18,6 +18,7 @@ import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.MessagingUiSt
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.MessageUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
@@ -116,6 +117,7 @@ class MessagingViewModel(
 
             val user = connectionsService.getConnection(otherUserUid)
             _otherUser.update { user?.toUi() }
+            AppState.updateOtherUser(_otherUser.value?.toUser())
             _uiState.update { it.copy(isLoading = false) }
         }
 

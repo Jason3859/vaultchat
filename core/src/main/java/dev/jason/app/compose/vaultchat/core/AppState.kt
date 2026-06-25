@@ -2,16 +2,11 @@ package dev.jason.app.compose.vaultchat.core
 
 import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.model.User
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 object AppState {
-
-    private val _navEvent = MutableSharedFlow<NavEvent>()
-    val navEvent = _navEvent.asSharedFlow()
 
     private val _otherUser = MutableStateFlow<User?>(null)
     val otherUser = _otherUser.asStateFlow()
@@ -27,10 +22,6 @@ object AppState {
 
     private val _isAppInForeground = MutableStateFlow(false)
     val isAppInForeground = _isAppInForeground.asStateFlow()
-
-    fun emitNavEvent(navEvent: NavEvent) {
-        _navEvent.tryEmit(navEvent)
-    }
 
     fun updateOtherUser(user: User?) {
         _otherUser.update { user }

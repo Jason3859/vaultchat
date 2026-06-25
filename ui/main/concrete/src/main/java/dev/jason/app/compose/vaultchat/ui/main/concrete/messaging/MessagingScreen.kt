@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +15,6 @@ import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.AbstractMessagingScreen
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.MessagePagingState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUser
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -34,10 +32,6 @@ fun MessagingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val otherUser by viewModel.otherUser.collectAsStateWithLifecycle()
     val isOnline by AppState.isOnline.collectAsStateWithLifecycle()
-
-    LaunchedEffect(otherUser) {
-        AppState.updateOtherUser(otherUser?.toUser())
-    }
 
     if (uiState.isLoading) {
         Box(

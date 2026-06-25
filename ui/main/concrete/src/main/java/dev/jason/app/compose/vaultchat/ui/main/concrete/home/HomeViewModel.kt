@@ -65,7 +65,8 @@ class HomeViewModel(
             connectionsService.getConnections().collect { connections ->
                 _uiState.update {
                     it.copy(
-                        connections = connections.toUi()
+                        connections = connections.toUi(),
+                        areConnectionsFetched = true
                     )
                 }
             }

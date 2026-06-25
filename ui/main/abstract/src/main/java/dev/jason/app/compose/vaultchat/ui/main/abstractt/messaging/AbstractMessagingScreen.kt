@@ -112,7 +112,7 @@ fun AbstractMessagingScreen(
 
             items(
                 count = pagingItems.itemCount,
-                key = pagingItems.itemKey { it.timestamp }
+                key = pagingItems.itemKey { "${it.hashCode()}" }
             ) { index ->
                 val msg = pagingItems[index] ?: return@items
                 MessageItem(

@@ -10,8 +10,9 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.NavEvent
 import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
@@ -28,22 +29,20 @@ fun MainScreen() {
         if (backStack.last() is Route.Messaging) {
             AppState.updateOtherUser(null)
         }
-
-        // only clear last entry of backStack
-        // if user is not at HomeScreen.
-        // app is crashing otherwise
         if (backStack.last() !is Route.Home) {
             backStack.removeLastOrNull()
         }
     }
 
     LaunchedEffect(true) {
-        AppState.navEvent.collect { navEvent ->
-            when (navEvent) {
-                is NavEvent.NavigateToMessagingScreen -> backStack.add(Route.Messaging(navEvent.uid))
-                is NavEvent.NavigateToHomeScreen -> {
-                    while (backStack.last() !is Route.Home) {
-                        onBack.invoke()
+        AppEvents.event.collect { event ->
+            if (event is AppEvent.NavEvent) {
+                when (event) {
+                    is AppEvent.NavEvent.NavigateToMessagingScreen -> backStack.add(Route.Messaging(event.uid))
+                    is AppEvent.NavEvent.NavigateToHomeScreen -> {
+                        while (backStack.last() !is Route.Home) {
+                            onBack.invoke()
+                        }
                     }
                 }
             }

@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
@@ -178,24 +179,37 @@ fun AbstractHomeScreen(
         LazyColumn(
             contentPadding = innerPadding + PaddingValues(12.dp)
         ) {
-            if (uiState.connections.isEmpty()) {
+            if (uiState.areConnectionsFetched && uiState.connections.isEmpty()) {
                 item {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(stringResource(R.string.no_recent_connections))
                     }
                 }
             } else {
-                itemsIndexed(uiState.connections) { index, user ->
-                    UserItem(
-                        selected = selectedUserUid == user.uid,
-                        count = uiState.connections.count(),
-                        user = user,
-                        onUserClick = onUserClick,
-                        index = index
-                    )
+                if (uiState.areConnectionsFetched) {
+                    itemsIndexed(uiState.connections) { index, user ->
+                        UserItem(
+                            selected = selectedUserUid == user.uid,
+                            count = uiState.connections.count(),
+                            user = user,
+                            onUserClick = onUserClick,
+                            index = index
+                        )
+                    }
+                } else {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LoadingIndicator(
+                                modifier = Modifier.size(150.dp)
+                            )
+                        }
+                    }
                 }
             }
         }

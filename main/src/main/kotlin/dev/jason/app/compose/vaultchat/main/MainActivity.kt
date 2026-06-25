@@ -19,8 +19,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.NavEvent
 import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
@@ -115,7 +116,7 @@ class MainActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent) {
         val destination = intent.getStringExtra("nav_destination")
         if (destination != null) {
-            AppState.emitNavEvent(NavEvent.NavigateToMessagingScreen(intent.getStringExtra("uid") ?: return))
+            AppEvents.sendEvent(AppEvent.NavEvent.NavigateToMessagingScreen(intent.getStringExtra("uid") ?: return))
         }
     }
 

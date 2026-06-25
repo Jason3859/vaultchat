@@ -29,4 +29,10 @@ sealed interface AppEvent {
     data object DeleteAllMessages : AppEvent
 
     data object ReFetchConnections : AppEvent
+
+    sealed interface NavEvent : AppEvent {
+
+        data class NavigateToMessagingScreen(val uid: String) : NavEvent
+        data object NavigateToHomeScreen : NavEvent
+    }
 }

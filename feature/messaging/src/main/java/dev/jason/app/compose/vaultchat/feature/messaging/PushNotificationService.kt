@@ -100,6 +100,10 @@ class PushNotificationService : FirebaseMessagingService() {
         if (AppState.otherUser.value?.uid != from) {
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
         }
+
+        if (!AppState.isAppInForeground.value) {
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        }
     }
 
     private fun handleStatusUpdate(data: Map<String, String>) {

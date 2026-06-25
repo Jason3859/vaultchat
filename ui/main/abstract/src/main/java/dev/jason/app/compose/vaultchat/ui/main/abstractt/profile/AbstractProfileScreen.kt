@@ -57,8 +57,9 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.NavEvent
 import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
@@ -165,7 +166,7 @@ private fun ProfileDialogs(
                     ProfileUiAction.BlockUser(
                         user = user,
                         onFinish = {
-                            AppState.emitNavEvent(NavEvent.NavigateToHomeScreen)
+                            AppEvents.sendEvent(AppEvent.NavEvent.NavigateToHomeScreen)
                         }
                     )
                 )
@@ -308,15 +309,15 @@ private fun LogoutDialog(
     onDismiss: () -> Unit,
     onAction: (ProfileUiAction) -> Unit
 ) {
-    var showConfirmDialog by remember { mutableStateOf(false) }
+    val showConfirmDialog = remember { mutableStateOf(false) }
 
-    if (!showConfirmDialog) {
+    if (!showConfirmDialog.value) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.logout_warning_title)) },
             confirmButton = {
                 TextButton(
-                    onClick = { showConfirmDialog = true },
+                    onClick = { showConfirmDialog.value = true },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
@@ -333,7 +334,7 @@ private fun LogoutDialog(
     } else {
         AlertDialog(
             onDismissRequest = {
-                showConfirmDialog = false
+                showConfirmDialog.value = false
                 onDismiss()
             },
             confirmButton = {

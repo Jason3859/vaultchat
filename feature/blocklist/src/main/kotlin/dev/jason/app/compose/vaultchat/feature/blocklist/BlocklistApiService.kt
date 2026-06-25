@@ -13,7 +13,6 @@ class BlocklistApiService(private val blocklistApiRepository: BlocklistApiReposi
             blocklistApiRepository.getBlocklist()
         } catch (e: Exception) {
             Log.e("BlocklistService", "getBlocklist: exception occurred", e)
-            ToastController.showErrorOccurredToast()
             emptyList()
         }
     }
