@@ -1,8 +1,6 @@
 package dev.jason.project.spring.vc_server.user_microservice.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.jason.project.spring.vc_server.core.Endpoints;
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.dto.UserDto;
-import dev.jason.project.spring.vc_server.core.model.Device;
 import dev.jason.project.spring.vc_server.core.model.User;
 import dev.jason.project.spring.vc_server.user_microservice.service.UserService;
 
@@ -34,23 +31,8 @@ public class UserController {
 
 	@PostMapping(Endpoints.REGISTER)
 	public ResponseEntity<?> register(@RequestBody UserDto userDto) {
-		
-		Object returnValue = null;
-		
-		if (userDto.device() == null) {
-			userService.addUser(userDto.asUser());
-		} else {			
-			Map.Entry<User, Device> response =
-				userService.addUser(userDto.asUser(), userDto.device().toDevice(userDto.uid(), LocalDateTime.now()));
-			
-			returnValue = UserDto.fromUserAndDevice(response.getKey(), response.getValue());
-		}
-		
-		if (returnValue != null) {			
-			return new ResponseEntity<>(returnValue, HttpStatus.CREATED);
-		}
-		
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		userService.addUser(userDto.asUser());
+		return new ResponseEntity<>(userDto, HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping(Endpoints.DELETE)

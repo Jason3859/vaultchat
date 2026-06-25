@@ -13,8 +13,13 @@ repositories {
 }
 
 dependencies {
+	
+	implementation projects.core
+	
 	implementation platform(libs.spring.cloud.dependencies)
 	implementation libs.spring.boot.starter.gateway.server.webmvc
+	implementation libs.spring.cloud.starter.openfeign
+	implementation libs.feign.okhttp
 	
 	implementation libs.spring.boot.starter.webmvc
 

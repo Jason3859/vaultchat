@@ -1,8 +1,6 @@
 package dev.jason.project.spring.vc_server.user_microservice.service;
 
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,20 +53,6 @@ public class UserService {
 		}
 		
 		repository.save(UserEntity.asEntity(user));
-	}
-	
-	public Map.Entry<User, Device> addUser(User user, Device device) {
-		Optional<UserEntity> entity = repository.findById(user.uid());
-		
-		if (entity.isPresent()) {
-			throw new UserAlreadyExistsException();
-		}
-		
-		repository.save(UserEntity.asEntity(user));
-		socialClient.register(user.uid());
-		Device d = deviceClient.register(DeviceDto.asDto(device)).toDevice(null);
-		
-		return new AbstractMap.SimpleEntry<>(user, d);
 	}
 
 	public void deleteUser(String uid) {

@@ -66,4 +66,5 @@ public class Endpoints {
 	public static final String SEARCH = "/search";
 	
 	public static final String USER_GET_USER_BY_UID = USER + GET_USER_BY_UID;
+	public static final String USER_REGISTER = USER + REGISTER;
 }
