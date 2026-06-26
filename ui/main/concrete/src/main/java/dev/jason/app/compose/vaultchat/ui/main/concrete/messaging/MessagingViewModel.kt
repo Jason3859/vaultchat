@@ -13,6 +13,7 @@ import dev.jason.app.compose.vaultchat.core.model.Message
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsService
 import dev.jason.app.compose.vaultchat.feature.messages.MessageDatabaseService
 import dev.jason.app.compose.vaultchat.feature.messaging.MessagingApiService
+import dev.jason.app.compose.vaultchat.feature.open_links.OpenLinksService
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.MessagingUiAction
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging.MessagingUiState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.MessageUi
@@ -31,7 +32,8 @@ class MessagingViewModel(
     private val otherUserFromConstructor: UserUi,
     private val connectionsService: ConnectionsService,
     private val messageDatabaseService: MessageDatabaseService,
-    private val messagingApiService: MessagingApiService
+    private val messagingApiService: MessagingApiService,
+    private val openLinksService: OpenLinksService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MessagingUiState())
@@ -55,6 +57,7 @@ class MessagingViewModel(
         when (action) {
             is MessagingUiAction.UpdateState -> updateState(action.state)
             is MessagingUiAction.SendMessage -> sendMessage()
+            is MessagingUiAction.OpenLink -> openLink(action.url)
         }
     }
 
@@ -102,6 +105,10 @@ class MessagingViewModel(
                 AppEvents.sendEvent(AppEvent.ReFetchConnections)
             }
         }
+    }
+
+    private fun openLink(url: String) {
+        openLinksService.open(url)
     }
 
     init {

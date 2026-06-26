@@ -1,5 +1,6 @@
 package dev.jason.app.compose.vaultchat.ui.main.abstractt.messaging
 
+import android.util.Patterns
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -118,7 +123,8 @@ fun AbstractMessagingScreen(
                 MessageItem(
                     msg = msg,
                     isOtherUser = otherUser.uid == msg.from,
-                    status = MessageStatus.Sent
+                    status = MessageStatus.Sent,
+                    onAction = onAction
                 )
             }
 
@@ -126,7 +132,8 @@ fun AbstractMessagingScreen(
                 MessageItem(
                     msg = msg,
                     isOtherUser = otherUser.uid == msg.from,
-                    status = MessageStatus.Pending
+                    status = MessageStatus.Pending,
+                    onAction = onAction
                 )
             }
 
@@ -134,7 +141,8 @@ fun AbstractMessagingScreen(
                 MessageItem(
                     msg = msg,
                     isOtherUser = otherUser.uid == msg.from,
-                    status = MessageStatus.Failed
+                    status = MessageStatus.Failed,
+                    onAction = onAction
                 )
             }
         }
@@ -149,7 +157,8 @@ private enum class MessageStatus {
 private fun MessageItem(
     msg: MessageUi,
     isOtherUser: Boolean,
-    status: MessageStatus
+    status: MessageStatus,
+    onAction: (MessagingUiAction) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -171,7 +180,7 @@ private fun MessageItem(
                 modifier = Modifier
                     .padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
-                Text(msg.text)
+                MessageText(msg.text, onAction)
             }
         }
 
@@ -185,6 +194,43 @@ private fun MessageItem(
             modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
+}
+
+@Composable
+private fun MessageText(text: String, onAction: (MessagingUiAction) -> Unit) {
+    val annotatedString = buildAnnotatedString {
+        append(text)
+        val matcher = Patterns.WEB_URL.matcher(text)
+        while (matcher.find()) {
+            val start = matcher.start()
+            val end = matcher.end()
+            val url = matcher.group()
+
+            addStyle(
+                style = SpanStyle(
+                    color = Color(0xFF1E88E5),
+                    textDecoration = TextDecoration.Underline
+                ),
+                start = start,
+                end = end
+            )
+
+            addLink(
+                url = LinkAnnotation.Url(
+                    url = url,
+                    linkInteractionListener = {
+                        onAction(MessagingUiAction.OpenLink(url))
+                    }
+                ),
+                start = start,
+                end = end
+            )
+        }
+    }
+
+    Text(
+        text = annotatedString
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

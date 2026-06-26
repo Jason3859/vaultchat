@@ -53,6 +53,7 @@ dependencies {
         implementation(messaging)
         implementation(messages)
         implementation(blocklist)
+        implementation(openLinks)
     }
 
     projects.ui.apply {

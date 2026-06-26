@@ -33,6 +33,7 @@ dependencies {
     implementation(projects.feature.messages)
     implementation(projects.feature.messaging)
     implementation(projects.feature.user)
+    implementation(projects.feature.openLinks)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.androidx.compose)

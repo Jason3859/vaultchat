@@ -13,6 +13,7 @@ import dev.jason.app.compose.vaultchat.feature.device.DeviceFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.logout.FeatureLogoutKoinModule
 import dev.jason.app.compose.vaultchat.feature.messages.MessagesFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.messaging.MessagingFeatureKoinModule
+import dev.jason.app.compose.vaultchat.feature.open_links.OpenLinksFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.user.UserServiceKoinModule
 import dev.jason.app.compose.vaultchat.ui.auth.concrete.AuthKoinModule
 import dev.jason.app.compose.vaultchat.ui.main.concrete.MainKoinModule
@@ -62,7 +63,8 @@ class MainApplication : Application() {
                 MainKoinModule,
                 BlocklistFeatureKoinModule,
                 MessagesFeatureKoinModule,
-                DeviceFeatureKoinModule
+                DeviceFeatureKoinModule,
+                OpenLinksFeatureKoinModule
             )
         }
 
