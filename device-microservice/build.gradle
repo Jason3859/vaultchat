@@ -4,9 +4,7 @@ plugins {
     alias libs.plugins.spring.boot.dependency.management
 }
 
-group = 'dev.jason.project.spring'
-version = '0.0.1-SNAPSHOT'
-description = 'device-microservice'
+group = 'dev.jason.project'
 
 repositories {
     mavenCentral()

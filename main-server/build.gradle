@@ -4,9 +4,7 @@ plugins {
 	alias libs.plugins.spring.boot.dependency.management
 }
 
-group = 'dev.jason.project.spring'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+group = 'dev.jason.project'
 
 repositories {
 	mavenCentral()
