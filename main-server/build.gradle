@@ -21,6 +21,8 @@ dependencies {
 	implementation libs.spring.cloud.starter.openfeign
 	implementation libs.feign.okhttp
 	
+	implementation libs.spring.boot.starter.data.mongodb
+	
 	implementation libs.spring.boot.starter.webmvc
 
 	testImplementation libs.spring.boot.starter.webmvc.test
