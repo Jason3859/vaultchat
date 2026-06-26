@@ -66,11 +66,12 @@ import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toDevice
 import kotlinx.collections.immutable.ImmutableList
 
 enum class ProfileScreenRowItemId {
     Devices, Blocklist, Logout,
-    BlockUser, DeleteMessagesHistory
+    BlockUser, DeleteAllMessages
 }
 
 data class ProfileScreenRowItem(
@@ -183,7 +184,7 @@ private fun ProfileDialogs(
             onDismiss = onDismiss
         )
 
-        ProfileScreenRowItemId.DeleteMessagesHistory -> DeleteMessagesHistoryDialog(
+        ProfileScreenRowItemId.DeleteAllMessages -> DeleteMessagesHistoryDialog(
             displayName = user.displayName,
             onDismiss = onDismiss,
             onConfirmClick = {
@@ -273,8 +274,8 @@ private fun ActionButtonsRow(
                 icon = Icons.Default.Block
             ),
             ProfileScreenRowItem(
-                id = ProfileScreenRowItemId.DeleteMessagesHistory,
-                name = "Delete messages history",
+                id = ProfileScreenRowItemId.DeleteAllMessages,
+                name = "Delete all messages",
                 icon = Icons.Default.DeleteForever
             )
         )
@@ -321,8 +322,8 @@ fun DeleteMessagesHistoryDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.delete_message_history_warning_title, displayName)) },
-        text = { Text(stringResource(R.string.delete_message_history_warning_text)) },
+        title = { Text(stringResource(R.string.delete_all_messages_warning_title, displayName)) },
+        text = { Text(stringResource(R.string.delete_all_messages_warning_text)) },
         confirmButton = {
             TextButton(
                 onClick = onConfirmClick,
@@ -519,7 +520,7 @@ private fun DevicesDialog(
                         }
                     },
                     dismissButton = {
-                        OutlinedButton(
+                        TextButton(
                             onClick = {
                                 deviceToLogout = null
                                 showLogoutDialog = false
@@ -587,14 +588,18 @@ private fun DevicesDialog(
                     )
                 }
                 itemsIndexed(devices) { index, device ->
+                    val isCurrentDevice = device.toDevice() == AppState.currentDevice.collectAsState().value
+
                     SegmentedListItem(
                         shapes = ListItemDefaults.segmentedShapes(
                             index = index,
                             count = devices.count(),
                         ),
                         onClick = {
-                            deviceToLogout = device
-                            showLogoutDialog = true
+                            if (!isCurrentDevice) {
+                                deviceToLogout = device
+                                showLogoutDialog = true
+                            }
                         },
                         leadingContent = {
                             val icon = when (device.type) {
@@ -604,8 +609,7 @@ private fun DevicesDialog(
                             Icon(icon, null)
                         }
                     ) {
-                        val isCurrent = device == AppState.currentDevice.collectAsState().value
-                        val text = if (isCurrent) "${device.name} (current)" else device.name
+                        val text = if (isCurrentDevice) "${device.name} (current)" else device.name
                         Text(text)
                     }
                 }
