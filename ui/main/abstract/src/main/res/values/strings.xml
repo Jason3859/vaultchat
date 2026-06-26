@@ -25,4 +25,7 @@
     <string name="block_user_warning_text">You can always unblock by going to your profile and clicking the user name in blocklist section</string>
 
     <string name="block">Block</string>
+    <string name="delete_message_history_warning_text">Messages will be lost forever. This action cannot be undone</string>
+    <string name="delete_message_history_warning_title">Do you want to delete message history of user %1$s?</string>
+    <string name="delete_all_messages">Delete all messages</string>
 </resources>

@@ -73,6 +73,12 @@ enum class ProfileScreenRowItemId {
     BlockUser, DeleteMessagesHistory
 }
 
+data class ProfileScreenRowItem(
+    val id: ProfileScreenRowItemId,
+    val name: String,
+    val icon: ImageVector
+)
+
 @Composable
 fun AbstractProfileScreen(
     onBack: () -> Unit,
@@ -95,7 +101,8 @@ fun AbstractProfileScreen(
             user = user,
             devices = devices,
             blocklist = blocklist,
-            onAction = onAction
+            onAction = onAction,
+            onBack = onBack
         )
 
         Column(
@@ -130,6 +137,7 @@ private fun ProfileTopBar(onBack: () -> Unit) {
 
 @Composable
 private fun ProfileDialogs(
+    onBack: () -> Unit,
     currentDialog: ProfileScreenRowItemId?,
     onDismiss: () -> Unit,
     user: UserUi,
@@ -175,7 +183,16 @@ private fun ProfileDialogs(
             onDismiss = onDismiss
         )
 
-        ProfileScreenRowItemId.DeleteMessagesHistory -> TODO()
+        ProfileScreenRowItemId.DeleteMessagesHistory -> DeleteMessagesHistoryDialog(
+            displayName = user.displayName,
+            onDismiss = onDismiss,
+            onConfirmClick = {
+                onAction(ProfileUiAction.DeleteMessagesHistory)
+                onDismiss.invoke()
+                onBack.invoke()
+            }
+        )
+
         null -> {}
     }
 }
@@ -232,14 +249,34 @@ private fun ActionButtonsRow(
 ) {
     val items = if (isOwnProfile) {
         listOf(
-            ProfileScreenRowItemId.Devices to Icons.Default.Devices,
-            ProfileScreenRowItemId.Blocklist to Icons.Default.Block,
-            ProfileScreenRowItemId.Logout to Icons.AutoMirrored.Filled.Logout
+            ProfileScreenRowItem(
+                id = ProfileScreenRowItemId.Devices,
+                name = ProfileScreenRowItemId.Devices.toString(),
+                icon = Icons.Default.Devices
+            ),
+            ProfileScreenRowItem(
+                id = ProfileScreenRowItemId.Blocklist,
+                name = ProfileScreenRowItemId.Blocklist.toString(),
+                icon = Icons.Default.Block
+            ),
+            ProfileScreenRowItem(
+                id = ProfileScreenRowItemId.Logout,
+                name = ProfileScreenRowItemId.Logout.toString(),
+                icon = Icons.AutoMirrored.Filled.Logout
+            )
         )
     } else {
         listOf(
-            ProfileScreenRowItemId.BlockUser to Icons.Default.Block,
-            ProfileScreenRowItemId.DeleteMessagesHistory to Icons.Default.DeleteForever
+            ProfileScreenRowItem(
+                id = ProfileScreenRowItemId.BlockUser,
+                name = "Block user",
+                icon = Icons.Default.Block
+            ),
+            ProfileScreenRowItem(
+                id = ProfileScreenRowItemId.DeleteMessagesHistory,
+                name = "Delete messages history",
+                icon = Icons.Default.DeleteForever
+            )
         )
     }
 
@@ -247,9 +284,9 @@ private fun ActionButtonsRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
-        items.forEach { (id, icon) ->
+        items.forEach { (id, name, icon) ->
             ProfileScreenRowItem(
-                id = id,
+                name = name,
                 icon = icon,
                 onClick = { onActionClick(id) }
             )
@@ -259,7 +296,7 @@ private fun ActionButtonsRow(
 
 @Composable
 private fun ProfileScreenRowItem(
-    id: ProfileScreenRowItemId,
+    name: String,
     icon: ImageVector,
     onClick: () -> Unit,
 ) {
@@ -271,9 +308,39 @@ private fun ProfileScreenRowItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(icon, null)
-            Text(id.name)
+            Text(name)
         }
     }
+}
+
+@Composable
+fun DeleteMessagesHistoryDialog(
+    displayName: String,
+    onDismiss: () -> Unit,
+    onConfirmClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.delete_message_history_warning_title, displayName)) },
+        text = { Text(stringResource(R.string.delete_message_history_warning_text)) },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirmClick,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(stringResource(R.string.delete_all_messages))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable

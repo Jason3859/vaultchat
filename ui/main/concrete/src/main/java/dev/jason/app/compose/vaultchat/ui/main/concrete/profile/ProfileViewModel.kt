@@ -2,11 +2,13 @@ package dev.jason.app.compose.vaultchat.ui.main.concrete.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.model.Device
 import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.feature.blocklist.BlocklistApiService
 import dev.jason.app.compose.vaultchat.feature.device.DeviceApiService
 import dev.jason.app.compose.vaultchat.feature.logout.LogoutService
+import dev.jason.app.compose.vaultchat.feature.messages.MessageDatabaseService
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toDevice
@@ -24,7 +26,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val logoutService: LogoutService,
     private val deviceApiService: DeviceApiService,
-    private val blocklistApiService: BlocklistApiService
+    private val blocklistApiService: BlocklistApiService,
+    private val messageDatabaseService: MessageDatabaseService
 ) : ViewModel() {
 
     private val _devices = MutableStateFlow<List<DeviceUi>>(emptyList())
@@ -55,6 +58,8 @@ class ProfileViewModel(
 
             is ProfileUiAction.BlockUser -> blockUser(action)
             is ProfileUiAction.UnblockUser -> unblockUser(action)
+
+            is ProfileUiAction.DeleteMessagesHistory -> deleteMessagesHistory()
         }
     }
 
@@ -113,6 +118,15 @@ class ProfileViewModel(
         viewModelScope.launch {
             blocklistApiService.unblockUser(action.user.toUser())
             action.onFinish.invoke()
+        }
+    }
+
+    private fun deleteMessagesHistory() {
+        viewModelScope.launch {
+            val currentUser = AppState.currentUser.value!!
+            val otherUser = AppState.otherUser.value!!
+
+            messageDatabaseService.deleteMessageHistory(currentUser.uid, otherUser.uid)
         }
     }
 }

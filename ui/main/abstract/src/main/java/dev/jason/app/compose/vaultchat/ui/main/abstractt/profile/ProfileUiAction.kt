@@ -13,4 +13,6 @@ sealed interface ProfileUiAction {
 
     data class BlockUser(val user: UserUi, val onFinish: () -> Unit) : ProfileUiAction
     data class UnblockUser(val user: UserUi, val onFinish: () -> Unit) : ProfileUiAction
+
+    data object DeleteMessagesHistory : ProfileUiAction
 }
