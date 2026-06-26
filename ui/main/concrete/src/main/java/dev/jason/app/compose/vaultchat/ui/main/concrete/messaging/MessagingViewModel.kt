@@ -54,8 +54,7 @@ class MessagingViewModel(
     fun onAction(action: MessagingUiAction) {
         when (action) {
             is MessagingUiAction.UpdateState -> updateState(action.state)
-            is MessagingUiAction.SendMessage -> sendMessage(action.message)
-            is MessagingUiAction.SendMessage.Companion -> sendMessage()
+            is MessagingUiAction.SendMessage -> sendMessage()
         }
     }
 
@@ -67,7 +66,7 @@ class MessagingViewModel(
         }
     }
 
-    private fun sendMessage(msg: Message? = null) {
+    private fun sendMessage() {
         val uiState = _uiState.value.copy()
 
         updateState { currentState ->
@@ -77,7 +76,7 @@ class MessagingViewModel(
         }
 
         viewModelScope.launch {
-            val message = msg ?: Message(
+            val message = Message(
                 from = currentUser.uid,
                 to = otherUserUid,
                 text = uiState.messageText,
@@ -95,11 +94,11 @@ class MessagingViewModel(
                 }
             }
 
-            // value of `msg` will be null only
+            // value of `otherUserFromConstructor` will not be `UserUi.emptyUser()` only
             // if the other user is not connected to current user
             // if the user sent a message means that the 2 users are connected
             // so, refetch connections for this
-            if (msg != null) {
+            if (otherUserFromConstructor != UserUi.emptyUser()) {
                 AppEvents.sendEvent(AppEvent.ReFetchConnections)
             }
         }
