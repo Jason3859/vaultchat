@@ -12,7 +12,7 @@ COPY . .
 RUN chmod +x gradlew
 
 # Build all services from root
-RUN ./gradlew bootJar --no-daemon -x test
+RUN ./gradlew :main-server:bootJar :device-microservice:bootJar :messaging-microservice:bootJar :social-microservice:bootJar :user-microservice:bootJar --no-daemon -x test
 
 # ================================
 # Stage 2: Run all services
