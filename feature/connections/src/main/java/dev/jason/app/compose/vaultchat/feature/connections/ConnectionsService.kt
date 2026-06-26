@@ -3,6 +3,8 @@ package dev.jason.app.compose.vaultchat.feature.connections
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
+import dev.jason.app.compose.vaultchat.core.AppRequest
+import dev.jason.app.compose.vaultchat.core.AppRequests
 import dev.jason.app.compose.vaultchat.core.model.User
 import dev.jason.app.compose.vaultchat.feature.connections.api.ConnectionsApiRepository
 import dev.jason.app.compose.vaultchat.feature.connections.db.ConnectionsDbRepository
@@ -74,6 +76,15 @@ class ConnectionsService(
                     isRequestSent = false
                     // Just collecting the flow once is enough to trigger the internal refresh logic
                     getConnections().first()
+                }
+            }
+        }
+
+        coroutineScope.launch {
+            AppRequests.requests.collect { request ->
+                if (request is AppRequest.GetConnectionRequest) {
+                    val connection = getConnection(request.uid)
+                    AppRequests.sendResponse(AppRequest.Response.GetConnectionResponse(connection))
                 }
             }
         }

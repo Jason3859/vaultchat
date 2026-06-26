@@ -13,17 +13,17 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
+import dev.jason.app.compose.vaultchat.core.AppRequest
+import dev.jason.app.compose.vaultchat.core.AppRequests
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.model.Message
 import dev.jason.app.compose.vaultchat.core.model.User
-import dev.jason.app.compose.vaultchat.core.model.UserDto
-import dev.jason.app.compose.vaultchat.core.model.toUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh") // TODO
@@ -42,7 +42,6 @@ class PushNotificationService : FirebaseMessagingService() {
             "message" -> handleMessage(message.data)
             "status_update" -> handleStatusUpdate(message.data)
             "logout_request" -> handleLogout(message.data)
-            "connections_update" -> handleConnectionsUpdate(message.data)
         }
     }
 
@@ -55,6 +54,21 @@ class PushNotificationService : FirebaseMessagingService() {
         val timestamp = data["timestamp"]!!.toLocalDateTime()
 
         showNotification(text, from)
+
+        AppRequests.sendRequest(AppRequest.GetConnectionRequest(uid = from))
+
+        coroutineScope.launch {
+            AppRequests.responses.collect { response ->
+                if (response is AppRequest.Response.GetConnectionResponse) {
+                    val user = response.connection
+
+                    if (user == null) {
+                        AppEvents.sendEvent(AppEvent.ReFetchConnections)
+                        this.cancel()
+                    }
+                }
+            }
+        }
 
         coroutineScope.launch {
             val message = Message(from, to, text, timestamp)
@@ -99,10 +113,10 @@ class PushNotificationService : FirebaseMessagingService() {
 
         if (AppState.otherUser.value?.uid != from) {
             notificationManager.notify(System.currentTimeMillis().toInt(), notification)
-        }
-
-        if (!AppState.isAppInForeground.value) {
-            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        } else {
+            if (!AppState.isAppInForeground.value) {
+                notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+            }
         }
     }
 
@@ -134,14 +148,5 @@ class PushNotificationService : FirebaseMessagingService() {
             delay(500)
             Runtime.getRuntime().exit(0)
         }
-    }
-
-    private fun handleConnectionsUpdate(data: Map<String, String>) {
-        val connections = data["connections"]!!.let { connectionsJsonString ->
-            Json.decodeFromString<List<UserDto>>(connectionsJsonString)
-                .map(UserDto::toUser)
-        }
-
-        AppEvents.sendEvent(AppEvent.UpdateConnections(connections))
     }
 }
