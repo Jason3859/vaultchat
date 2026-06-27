@@ -35,7 +35,7 @@ fun MainScreen() {
     }
 
     LaunchedEffect(true) {
-        AppEvents.event.collect { event ->
+        AppEvents.events.collect { event ->
             if (event is AppEvent.NavEvent) {
                 when (event) {
                     is AppEvent.NavEvent.NavigateToMessagingScreen -> backStack.add(Route.Messaging(event.uid))

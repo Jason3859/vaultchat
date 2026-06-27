@@ -28,8 +28,6 @@ import org.koin.dsl.module
 
 class MainApplication : Application() {
 
-    private var activityCount = 0
-
     private val baseModule = module {
         single<HttpClient> {
             HttpClient(Android) {
@@ -51,6 +49,11 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        initKoin()
+        registerActivityLifecycleCallbacks(VcActivityLifecycleCallbacks)
+    }
+
+    private fun initKoin() {
         startKoin {
             androidContext(this@MainApplication)
             modules(
@@ -67,26 +70,6 @@ class MainApplication : Application() {
                 OpenLinksFeatureKoinModule
             )
         }
-
-        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-            override fun onActivityStarted(activity: Activity) {
-                if (activityCount == 0) {
-                    AppState.appInForeground()
-                }
-                activityCount++
-            }
-            override fun onActivityResumed(activity: Activity) {}
-            override fun onActivityPaused(activity: Activity) {}
-            override fun onActivityStopped(activity: Activity) {
-                activityCount--
-                if (activityCount == 0) {
-                    AppState.appInBackground()
-                }
-            }
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-            override fun onActivityDestroyed(activity: Activity) {}
-        })
     }
 
     private fun createNotificationChannel() {
@@ -99,5 +82,29 @@ class MainApplication : Application() {
 
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
+    }
+
+    private object VcActivityLifecycleCallbacks : ActivityLifecycleCallbacks {
+        private var activityCount = 0
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+        override fun onActivityStarted(activity: Activity) {
+            if (activityCount == 0) {
+                AppState.appInForeground()
+            }
+            activityCount++
+        }
+        override fun onActivityResumed(activity: Activity) {}
+        override fun onActivityPaused(activity: Activity) {
+            AppState.updateOtherUser(null)
+        }
+        override fun onActivityStopped(activity: Activity) {
+            activityCount--
+            if (activityCount == 0) {
+                AppState.appInBackground()
+            }
+        }
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivityDestroyed(activity: Activity) {}
     }
 }

@@ -3,8 +3,6 @@ package dev.jason.app.compose.vaultchat.feature.connections
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
-import dev.jason.app.compose.vaultchat.core.AppRequest
-import dev.jason.app.compose.vaultchat.core.AppRequests
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.feature.connections.api.ConnectionsApiRepository
 import dev.jason.app.compose.vaultchat.feature.connections.db.ConnectionsDbRepository
@@ -62,7 +60,7 @@ class ConnectionsService(
 
     init {
         coroutineScope.launch {
-            AppEvents.event.collect { event ->
+            AppEvents.events.collect { event ->
                 if (event is AppEvent.UpdateConnectionStatus) {
                     updateStatus(event.uid, event.status)
                 }
@@ -81,10 +79,10 @@ class ConnectionsService(
         }
 
         coroutineScope.launch {
-            AppRequests.requests.collect { request ->
-                if (request is AppRequest.GetConnectionRequest) {
+            AppEvents.requests.collect { request ->
+                if (request is AppEvent.Request.GetConnectionRequest) {
                     val connection = getConnection(request.uid)
-                    AppRequests.sendResponse(AppRequest.Response.GetConnectionResponse(connection))
+                    AppEvents.sendResponse(AppEvent.Response.GetConnectionResponse(connection))
                 }
             }
         }

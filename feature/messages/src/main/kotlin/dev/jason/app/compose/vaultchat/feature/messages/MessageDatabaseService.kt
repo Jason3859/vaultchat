@@ -30,7 +30,7 @@ class MessageDatabaseService(
 
     init {
         coroutineScope.launch {
-            AppEvents.event.collect { event ->
+            AppEvents.events.collect { event ->
                 if (event is AppEvent.AddMessage) {
                     Log.d("MessageDatabaseService", "init: received add message event")
                     addMessage(event.message)

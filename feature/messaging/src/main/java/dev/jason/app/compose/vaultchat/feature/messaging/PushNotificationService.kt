@@ -13,8 +13,6 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
-import dev.jason.app.compose.vaultchat.core.AppRequest
-import dev.jason.app.compose.vaultchat.core.AppRequests
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.core.model.message.Message
@@ -55,12 +53,12 @@ class PushNotificationService : FirebaseMessagingService() {
 
         showNotification(text, from)
 
-        AppRequests.sendRequest(AppRequest.GetConnectionRequest(uid = from))
+        AppEvents.sendRequest(AppEvent.Request.GetConnectionRequest(uid = from))
 
         coroutineScope.launch {
-            AppRequests.responses.collect { response ->
-                if (response is AppRequest.Response.GetConnectionResponse) {
-                    val user = response.connection
+            AppEvents.responses.collect { response ->
+                if (response is AppEvent.Response.GetConnectionResponse) {
+                    val user = response.user
 
                     if (user == null) {
                         AppEvents.sendEvent(AppEvent.ReFetchConnections)
