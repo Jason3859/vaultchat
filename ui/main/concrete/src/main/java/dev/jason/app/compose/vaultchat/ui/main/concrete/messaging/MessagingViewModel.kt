@@ -97,7 +97,7 @@ class MessagingViewModel(
                 }
             }
 
-            // value of `otherUserFromConstructor` will not be `UserUi.emptyUser()` only
+            // value of `otherUserFromConstructor` will be `UserUi.emptyUser()` only
             // if the other user is not connected to current user
             // if the user sent a message means that the 2 users are connected
             // so, refetch connections for this
