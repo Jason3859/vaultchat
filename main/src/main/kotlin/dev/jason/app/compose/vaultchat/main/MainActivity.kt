@@ -22,8 +22,8 @@ import com.google.firebase.messaging.messaging
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.feature.user.UserApiService
 import dev.jason.app.compose.vaultchat.ui.main.concrete.MainScreen

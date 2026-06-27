@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.logout
 
-import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.device.Device
 
 interface LogoutRemoteRepository {
 

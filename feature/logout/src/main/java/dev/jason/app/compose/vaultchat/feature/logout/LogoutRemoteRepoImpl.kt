@@ -1,8 +1,8 @@
 package dev.jason.app.compose.vaultchat.feature.logout
 
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.toDto
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.device.toDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.parameter

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao

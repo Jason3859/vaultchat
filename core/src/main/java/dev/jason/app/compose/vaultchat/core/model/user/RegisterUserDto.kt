@@ -1,5 +1,6 @@
-package dev.jason.app.compose.vaultchat.core.model
+package dev.jason.app.compose.vaultchat.core.model.user
 
+import dev.jason.app.compose.vaultchat.core.model.device.DeviceDto
 import kotlinx.serialization.Serializable
 
 @Serializable

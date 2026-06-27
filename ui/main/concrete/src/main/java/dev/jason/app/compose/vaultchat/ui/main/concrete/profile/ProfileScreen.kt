@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
+import dev.jason.app.compose.vaultchat.core.model.user.toUi
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.profile.AbstractProfileScreen
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel

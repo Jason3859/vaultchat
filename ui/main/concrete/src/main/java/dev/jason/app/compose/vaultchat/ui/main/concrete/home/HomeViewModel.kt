@@ -2,13 +2,13 @@ package dev.jason.app.compose.vaultchat.ui.main.concrete.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
+import dev.jason.app.compose.vaultchat.core.model.user.toUi
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsService
 import dev.jason.app.compose.vaultchat.feature.user.UserApiService
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiAction
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiState
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow

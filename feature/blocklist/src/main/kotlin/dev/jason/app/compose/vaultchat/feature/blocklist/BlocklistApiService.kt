@@ -4,7 +4,7 @@ import android.util.Log
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 
 class BlocklistApiService(private val blocklistApiRepository: BlocklistApiRepository) {
 

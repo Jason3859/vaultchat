@@ -1,6 +1,5 @@
 package dev.jason.app.compose.vaultchat.ui.main.abstractt.profile
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Devices
@@ -47,26 +45,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil3.compose.SubcomposeAsyncImage
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.device.DeviceUi
+import dev.jason.app.compose.vaultchat.core.model.device.toDevice
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
+import dev.jason.app.compose.vaultchat.core.ui.LoadImage
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiState
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toDevice
 import kotlinx.collections.immutable.ImmutableList
 
 enum class ProfileScreenRowItemId {
@@ -200,7 +194,6 @@ private fun ProfileDialogs(
 
 @Composable
 private fun UserInfoSection(user: UserUi) {
-    val context = LocalContext.current
     val imageModifier = Modifier
         .size(175.dp)
         .clip(CircleShape)
@@ -215,23 +208,9 @@ private fun UserInfoSection(user: UserUi) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(user.profilePictureUrl)
-                    .crossfade(enable = true)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .build(),
-                contentDescription = null,
-                modifier = imageModifier,
-                error = {
-                    Log.e("ProfileScreen", "Error while loading image", it.result.throwable)
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = imageModifier
-                    )
-                }
+            LoadImage(
+                url = user.profilePictureUrl,
+                modifier = imageModifier
             )
 
             Text(
@@ -464,22 +443,9 @@ private fun BlocklistDialog(
                         onAction(ProfileUiAction.UnblockUser(user, onDismiss))
                     },
                     leadingContent = {
-                        SubcomposeAsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(user.profilePictureUrl)
-                                .crossfade(true)
-                                .memoryCachePolicy(CachePolicy.ENABLED)
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .build(),
-                            contentDescription = null,
-                            modifier = imageModifier,
-                            error = {
-                                Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = null,
-                                    modifier = imageModifier
-                                )
-                            }
+                        LoadImage(
+                            url = user.profilePictureUrl,
+                            modifier = imageModifier
                         )
                     }
                 ) {

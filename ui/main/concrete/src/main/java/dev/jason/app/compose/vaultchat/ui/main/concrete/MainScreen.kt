@@ -13,9 +13,9 @@ import androidx.navigation3.ui.NavDisplay
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.model.User
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.toUi
+import dev.jason.app.compose.vaultchat.core.model.user.User
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
+import dev.jason.app.compose.vaultchat.core.model.user.toUi
 import dev.jason.app.compose.vaultchat.ui.main.concrete.home.HomeScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.messaging.MessagingScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.nav.Route

@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.core
 
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

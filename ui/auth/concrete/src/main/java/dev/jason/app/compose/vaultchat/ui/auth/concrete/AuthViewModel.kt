@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.messaging
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.RegisterUserDto
-import dev.jason.app.compose.vaultchat.core.model.toDto
+import dev.jason.app.compose.vaultchat.core.model.user.RegisterUserDto
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.device.toDto
 import dev.jason.app.compose.vaultchat.feature.user.UserApiService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

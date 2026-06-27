@@ -1,8 +1,8 @@
 package dev.jason.app.compose.vaultchat.ui.main.concrete.nav
 
 import androidx.navigation3.runtime.NavKey
-import dev.jason.app.compose.vaultchat.core.model.User
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.core.model.user.User
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import kotlinx.serialization.Serializable
 
 sealed interface Route : NavKey {

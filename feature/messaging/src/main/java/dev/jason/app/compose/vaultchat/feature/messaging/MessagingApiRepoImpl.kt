@@ -1,8 +1,8 @@
 package dev.jason.app.compose.vaultchat.feature.messaging
 
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
-import dev.jason.app.compose.vaultchat.core.model.Message
-import dev.jason.app.compose.vaultchat.core.model.toDto
+import dev.jason.app.compose.vaultchat.core.model.message.Message
+import dev.jason.app.compose.vaultchat.core.model.message.toDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

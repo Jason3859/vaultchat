@@ -5,7 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.device.Device
 
 class LogoutService(
     private val repository: LogoutRemoteRepository

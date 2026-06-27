@@ -2,7 +2,7 @@ package dev.jason.app.compose.vaultchat.feature.device
 
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.Device
+import dev.jason.app.compose.vaultchat.core.model.device.Device
 
 class DeviceApiService(private val repository: DeviceApiRepository) {
 
@@ -13,15 +13,6 @@ class DeviceApiService(private val repository: DeviceApiRepository) {
             Log.e("DeviceApiService", "getDevices: exception occurred", e)
             ToastController.showErrorOccurredToast()
             emptyList()
-        }
-    }
-
-    suspend fun addDevice(device: Device) {
-        try {
-            repository.addDevice(device)
-        } catch (e: Exception) {
-            Log.e("DeviceApiService", "addDevice: exception occurred", e)
-            ToastController.showErrorOccurredToast()
         }
     }
 }

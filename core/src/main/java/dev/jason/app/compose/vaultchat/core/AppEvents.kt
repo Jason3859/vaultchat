@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.core
 
-import dev.jason.app.compose.vaultchat.core.model.Message
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.message.Message
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

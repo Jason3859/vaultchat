@@ -1,7 +1,6 @@
-package dev.jason.app.compose.vaultchat.ui.main.abstractt.model
+package dev.jason.app.compose.vaultchat.core.model.message
 
 import androidx.compose.runtime.Immutable
-import dev.jason.app.compose.vaultchat.core.model.Message
 import java.time.LocalDateTime
 
 @Immutable

@@ -1,9 +1,9 @@
 package dev.jason.app.compose.vaultchat.ui.main.abstractt.home
 
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.User
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.user.User
+import dev.jason.app.compose.vaultchat.core.model.device.DeviceUi
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

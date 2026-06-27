@@ -5,7 +5,7 @@ import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppRequest
 import dev.jason.app.compose.vaultchat.core.AppRequests
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.feature.connections.api.ConnectionsApiRepository
 import dev.jason.app.compose.vaultchat.feature.connections.db.ConnectionsDbRepository
 import kotlinx.coroutines.CoroutineScope

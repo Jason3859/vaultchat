@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.core.model
+package dev.jason.app.compose.vaultchat.core.model.user
 
 data class User(
     val uid: String,

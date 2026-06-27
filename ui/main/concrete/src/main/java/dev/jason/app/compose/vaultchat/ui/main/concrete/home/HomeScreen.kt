@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.AbstractHomeScreen
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

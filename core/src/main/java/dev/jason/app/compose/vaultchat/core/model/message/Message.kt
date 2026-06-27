@@ -1,4 +1,4 @@
-package dev.jason.app.compose.vaultchat.core.model
+package dev.jason.app.compose.vaultchat.core.model.message
 
 import java.time.LocalDateTime
 

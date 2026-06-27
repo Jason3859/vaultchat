@@ -1,7 +1,6 @@
 package dev.jason.app.compose.vaultchat.ui.main.abstractt.home
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.AppBarWithSearch
@@ -35,17 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.SubcomposeAsyncImage
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
+import dev.jason.app.compose.vaultchat.core.ui.LoadImage
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -62,7 +56,6 @@ fun AbstractHomeScreen(
     onProfileClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior()
 
     val searchBarState = rememberSearchBarWithGapState(initialValue = SearchBarValue.Collapsed)
@@ -116,28 +109,9 @@ fun AbstractHomeScreen(
                         }
 
                         IconButton(onProfileClick) {
-                            SubcomposeAsyncImage(
-                                model = ImageRequest.Builder(context)
-                                    .data(currentUserProfilePictureUrl)
-                                    .crossfade(true)
-                                    .diskCachePolicy(CachePolicy.ENABLED)
-                                    .memoryCachePolicy(CachePolicy.ENABLED)
-                                    .build(),
-                                contentDescription = null,
-                                modifier = imageModifier,
-                                error = {
-                                    Log.e(
-                                        "HomeScreen",
-                                        "HomeScreen: error while loading image",
-                                        it.result.throwable
-                                    )
-
-                                    Icon(
-                                        imageVector = Icons.Default.AccountCircle,
-                                        contentDescription = null,
-                                        modifier = imageModifier
-                                    )
-                                }
+                            LoadImage(
+                                url = currentUserProfilePictureUrl!!,
+                                modifier = imageModifier
                             )
                         }
                     }
@@ -238,24 +212,9 @@ private fun UserItem(
             count = count
         ),
         leadingContent = {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(user.profilePictureUrl)
-                    .crossfade(true)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .build(),
-                contentDescription = null,
-                modifier = profilePictureModifier,
-                error = {
-                    Log.e(
-                        "HomeScreen",
-                        "HomeScreen: exception while loading image",
-                        it.result.throwable
-                    )
-
-                    Icon(Icons.Default.AccountCircle, null, profilePictureModifier)
-                }
+            LoadImage(
+                url = user.profilePictureUrl,
+                modifier = profilePictureModifier
             )
         }
     ) {

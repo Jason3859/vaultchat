@@ -4,18 +4,13 @@ import android.util.Log
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.Device
-import dev.jason.app.compose.vaultchat.core.model.DeviceDto
-import dev.jason.app.compose.vaultchat.core.model.toDevice
-import dev.jason.app.compose.vaultchat.core.model.toDto
+import dev.jason.app.compose.vaultchat.core.model.device.Device
+import dev.jason.app.compose.vaultchat.core.model.device.DeviceDto
+import dev.jason.app.compose.vaultchat.core.model.device.toDevice
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 
 class DeviceApiRepoImpl(
     private val client: HttpClient
@@ -32,13 +27,6 @@ class DeviceApiRepoImpl(
             Log.e("RemoteDeviceApiRepoImpl", "getDevices: exception occurred", e)
             ToastController.showErrorOccurredToast()
             emptyList()
-        }
-    }
-
-    override suspend fun addDevice(device: Device) {
-        client.post("$BASE_URL/device/add") {
-            contentType(ContentType.Application.Json)
-            setBody(device.toDto())
         }
     }
 }

@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.blocklist
 
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 
 interface BlocklistApiRepository {
 

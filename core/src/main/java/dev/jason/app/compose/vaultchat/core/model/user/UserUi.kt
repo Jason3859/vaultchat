@@ -1,8 +1,7 @@
-package dev.jason.app.compose.vaultchat.ui.main.abstractt.model
+package dev.jason.app.compose.vaultchat.core.model.user
 
 import androidx.compose.runtime.Immutable
-import dev.jason.app.compose.vaultchat.core.model.User
-import dev.jason.app.compose.vaultchat.core.model.User.Status
+import dev.jason.app.compose.vaultchat.core.model.user.User.Status
 
 @Immutable
 data class UserUi(

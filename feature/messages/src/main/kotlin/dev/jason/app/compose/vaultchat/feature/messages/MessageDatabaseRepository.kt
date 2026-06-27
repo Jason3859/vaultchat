@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.feature.messages
 
 import androidx.paging.PagingData
-import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.message.Message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.paging.PagingData
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
-import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.message.Message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

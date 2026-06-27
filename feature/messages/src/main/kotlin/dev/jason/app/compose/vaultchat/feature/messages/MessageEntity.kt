@@ -2,7 +2,7 @@ package dev.jason.app.compose.vaultchat.feature.messages
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.message.Message
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

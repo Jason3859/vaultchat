@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.ui.main.abstractt.profile
 
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.DeviceUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
+import dev.jason.app.compose.vaultchat.core.model.device.DeviceUi
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 
 sealed interface ProfileUiAction {
 

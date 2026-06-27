@@ -21,7 +21,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -44,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,15 +54,11 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import coil3.compose.SubcomposeAsyncImage
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.message.MessageUi
+import dev.jason.app.compose.vaultchat.core.model.user.User
+import dev.jason.app.compose.vaultchat.core.model.user.UserUi
+import dev.jason.app.compose.vaultchat.core.ui.LoadImage
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.MessageUi
-import dev.jason.app.compose.vaultchat.ui.main.abstractt.model.UserUi
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -241,8 +235,6 @@ private fun TopBar(
     onUserInfoClick: () -> Unit,
     isOffline: Boolean
 ) {
-    val context = LocalContext.current
-
     TopAppBar(
         title = {
             Row(
@@ -251,21 +243,11 @@ private fun TopBar(
                     .fillMaxWidth()
                     .clickable { onUserInfoClick() }
             ) {
-                SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(otherUser.profilePictureUrl)
-                        .crossfade(true)
-                        .diskCachePolicy(CachePolicy.ENABLED)
-                        .memoryCachePolicy(CachePolicy.ENABLED)
-                        .build(),
-                    contentDescription = null,
+                LoadImage(
+                    url = otherUser.profilePictureUrl,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .size(40.dp),
-                    error = {
-                        Icon(Icons.Default.AccountCircle, null)
-                        ToastController.showToast("Error loading image")
-                    }
+                        .size(40.dp)
                 )
 
                 Spacer(Modifier.width(10.dp))

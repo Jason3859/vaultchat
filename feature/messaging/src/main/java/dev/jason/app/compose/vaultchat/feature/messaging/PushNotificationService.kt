@@ -17,8 +17,8 @@ import dev.jason.app.compose.vaultchat.core.AppRequest
 import dev.jason.app.compose.vaultchat.core.AppRequests
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.R
-import dev.jason.app.compose.vaultchat.core.model.Message
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.message.Message
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

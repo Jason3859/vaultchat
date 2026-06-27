@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.connections.db
 
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 import kotlinx.coroutines.flow.Flow
 
 interface ConnectionsDbRepository {

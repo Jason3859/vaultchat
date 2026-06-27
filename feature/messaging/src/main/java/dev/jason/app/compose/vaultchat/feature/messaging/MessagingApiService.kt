@@ -2,7 +2,7 @@ package dev.jason.app.compose.vaultchat.feature.messaging
 
 import android.util.Log
 import dev.jason.app.compose.vaultchat.core.ToastController
-import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.message.Message
 
 class MessagingApiService(
     private val repository: MessagingApiRepository

@@ -2,7 +2,7 @@ package dev.jason.app.compose.vaultchat.feature.connections.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.User
 
 @Entity(tableName = "connections")
 data class ConnectionsEntity(

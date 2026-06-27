@@ -44,6 +44,7 @@ dependencies {
     implementation(projects.core)
     implementation(projects.auth)
     implementation(projects.main)
+    implementation(projects.share)
 
     projects.feature.apply {
         implementation(logout)

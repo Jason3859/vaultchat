@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.feature.user
 
-import dev.jason.app.compose.vaultchat.core.model.RegisterUserDto
-import dev.jason.app.compose.vaultchat.core.model.User
+import dev.jason.app.compose.vaultchat.core.model.user.RegisterUserDto
+import dev.jason.app.compose.vaultchat.core.model.user.User
 
 interface UserApiRepository {
 

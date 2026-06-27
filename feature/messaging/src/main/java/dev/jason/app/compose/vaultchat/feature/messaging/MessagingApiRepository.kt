@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.messaging
 
-import dev.jason.app.compose.vaultchat.core.model.Message
+import dev.jason.app.compose.vaultchat.core.model.message.Message
 
 interface MessagingApiRepository {
 
