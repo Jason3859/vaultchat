@@ -22,6 +22,7 @@ COPY messaging-microservice/src ./messaging-microservice/src
 COPY social-microservice/src ./social-microservice/src
 COPY user-microservice/src ./user-microservice/src
 
+RUN chmod +x ./gradlew
 RUN ./gradlew :main-server:bootJar :device-microservice:bootJar :messaging-microservice:bootJar :social-microservice:bootJar :user-microservice:bootJar --no-daemon
 
 # --- STAGE 2: Low-Memory JRE Runtime using Temurin 25 ---
