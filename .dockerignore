@@ -1,0 +1,8 @@
+.gradle
+.gradle-sandbox
+.idea
+.settings
+.vscode
+build
+*/build
+bin
