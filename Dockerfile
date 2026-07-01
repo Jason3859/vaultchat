@@ -1,37 +1,43 @@
-# ================================
-# Stage 1: Build all services
-# ================================
-FROM eclipse-temurin:25-jdk AS builder
-
+# --- STAGE 1: Build all modules ---
+FROM gradle:9.4.1-jdk25-alpine AS builder
 WORKDIR /app
 
-# Copy everything from root
-COPY . .
+# Cache gradle layers
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
 
-# Give execute permission to gradlew
-RUN chmod +x gradlew
+# Copy build configurations
+COPY core/build.gradle ./core/
+COPY device-microservice/build.gradle ./device-microservice/
+COPY main-server/build.gradle ./main-server/
+COPY messaging-microservice/build.gradle ./messaging-microservice/
+COPY social-microservice/build.gradle ./social-microservice/
+COPY user-microservice/build.gradle ./user-microservice/
 
-# Build all services from root
-RUN ./gradlew :main-server:bootJar :device-microservice:bootJar :messaging-microservice:bootJar :social-microservice:bootJar :user-microservice:bootJar --no-daemon -x test
+# Copy source code
+COPY core/src ./core/src
+COPY device-microservice/src ./device-microservice/src
+COPY main-server/src ./main-server/src
+COPY messaging-microservice/src ./messaging-microservice/src
+COPY social-microservice/src ./social-microservice/src
+COPY user-microservice/src ./user-microservice/src
 
-# ================================
-# Stage 2: Run all services
-# ================================
-FROM eclipse-temurin:25-jdk
+RUN ./gradlew :main-server:bootJar :device-microservice:bootJar :messaging-microservice:bootJar :social-microservice:bootJar :user-microservice:bootJar --no-daemon
 
-RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists/*
-
+# --- STAGE 2: Low-Memory JRE Runtime using Temurin 25 ---
+FROM eclipse-temurin:25-jdk-alpine AS runtime
 WORKDIR /app
 
-# Copy each built jar
-COPY --from=builder /app/main-server/build/libs/*.jar main-server.jar
-COPY --from=builder /app/device-microservice/build/libs/*.jar device-microservice.jar
-COPY --from=builder /app/messaging-microservice/build/libs/*.jar messaging-microservice.jar
-COPY --from=builder /app/social-microservice/build/libs/*.jar social-microservice.jar
-COPY --from=builder /app/user-microservice/build/libs/*.jar user-microservice.jar
+# Argument to target a specific microservice per deployment
+ARG MODULE_NAME
+ENV MODULE=${MODULE_NAME}
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Copy any generated jar file from the build folder into the runtime directory
+COPY --from=builder /app/${MODULE_NAME}/build/libs/*.jar ./
+
+# Aggressive memory optimization for 512MB RAM constraints
+ENV JAVA_OPTS="-Xms150m -Xmx280m -XX:+UseSerialGC -Xss256k -XX:MaxMetaspaceSize=80m"
 
 EXPOSE 8080
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar $(ls *.jar | head -n 1)  --spring.profiles.active=prod"]

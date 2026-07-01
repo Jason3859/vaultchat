@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: device-microservice
+    mongodb:
+        uri: mongodb://localhost:27017
+        database: vaultchat
+
+server:
+    port: 9000

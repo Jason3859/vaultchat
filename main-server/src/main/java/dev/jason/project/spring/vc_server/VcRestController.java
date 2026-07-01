@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.jason.project.spring.vc_server.client.DeviceClient;
+import dev.jason.project.spring.vc_server.client.SocialClient;
+import dev.jason.project.spring.vc_server.client.UserClient;
 import dev.jason.project.spring.vc_server.core.dto.DeviceDto;
 import dev.jason.project.spring.vc_server.core.dto.UserDto;
 import dev.jason.project.spring.vc_server.core.exception.VcException.DeviceException.DeviceAlreadyExistsException;
+import dev.jason.project.spring.vc_server.dto.RegisterUserDto;
 import feign.FeignException;
 
 @RestController

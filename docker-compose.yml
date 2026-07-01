@@ -1,0 +1,61 @@
+version: '3.8'
+
+networks:
+  vc-network:
+    driver: bridge
+
+services:
+  main-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_NAME: main-server
+    ports:
+      - "8080:8080"
+    networks:
+      - vc-network
+
+  user-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_NAME: user-microservice
+    ports:
+      - "9003:8080"
+    networks:
+      - vc-network
+
+  device-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_NAME: device-microservice
+    ports:
+      - "9000:8080"
+    networks:
+      - vc-network
+
+  messaging-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_NAME: messaging-microservice
+    ports:
+      - "9001:8080"
+    networks:
+      - vc-network
+
+  social-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE_NAME: social-microservice
+    ports:
+      - "9002:8080"
+    networks:
+      - vc-network
