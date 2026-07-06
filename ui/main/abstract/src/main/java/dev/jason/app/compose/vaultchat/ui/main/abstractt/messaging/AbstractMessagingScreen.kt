@@ -57,7 +57,7 @@ import androidx.paging.compose.itemKey
 import dev.jason.app.compose.vaultchat.core.model.message.MessageUi
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
-import dev.jason.app.compose.vaultchat.core.ui.LoadImage
+import dev.jason.app.compose.vaultchat.core.ui.LoadProfilePicture
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -243,7 +243,7 @@ private fun TopBar(
                     .fillMaxWidth()
                     .clickable { onUserInfoClick() }
             ) {
-                LoadImage(
+                LoadProfilePicture(
                     url = otherUser.profilePictureUrl,
                     modifier = Modifier
                         .clip(CircleShape)

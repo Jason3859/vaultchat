@@ -28,7 +28,7 @@ import dev.jason.app.compose.vaultchat.core.model.message.Message
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import dev.jason.app.compose.vaultchat.core.model.user.toUi
-import dev.jason.app.compose.vaultchat.core.ui.LoadImage
+import dev.jason.app.compose.vaultchat.core.ui.LoadProfilePicture
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsService
 import dev.jason.app.compose.vaultchat.feature.messages.MessageDatabaseService
@@ -68,37 +68,45 @@ class ShareActivity : ComponentActivity() {
         }
 
         setContent {
-            Scaffold(
-                topBar = {
-                    TopAppBar(title = { Text("Share") })
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = ::sendMessage,
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, null)
-                    }
-                }
-            ) { innerPadding ->
-                ShareScreen(
-                    connections = connections.toImmutableList(),
-                    innerPadding = innerPadding,
-                    selectedUsers = selectedUsers.toImmutableList(),
-                    onUserItemClick = { user ->
-                        selectedUsers.apply {
-                            if (contains(user)) {
-                                remove(user)
-                            } else {
-                                add(user)
-                            }
+            VaultChatTheme {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(title = { Text("Share") })
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = ::sendMessage,
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Send, null)
                         }
                     }
-                )
+                ) { innerPadding ->
+                    ShareScreen(
+                        connections = connections.toImmutableList(),
+                        innerPadding = innerPadding,
+                        selectedUsers = selectedUsers.toImmutableList(),
+                        onUserItemClick = { user ->
+                            selectedUsers.apply {
+                                if (contains(user)) {
+                                    remove(user)
+                                } else {
+                                    add(user)
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 
     private fun sendMessage() {
+
+        if (selectedUsers.isEmpty()) {
+            Toast.makeText(this, "No users selected", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         lifecycleScope.launch {
             selectedUsers.forEach { user ->
                 val uid = Firebase.auth.currentUser?.uid!!
@@ -162,7 +170,7 @@ private fun UserItem(
             count = count
         ),
         leadingContent = {
-            LoadImage(
+            LoadProfilePicture(
                 url = user.profilePictureUrl
             )
         }

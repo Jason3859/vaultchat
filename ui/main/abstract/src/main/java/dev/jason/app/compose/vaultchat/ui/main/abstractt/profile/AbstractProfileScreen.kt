@@ -57,7 +57,7 @@ import dev.jason.app.compose.vaultchat.core.model.device.Device
 import dev.jason.app.compose.vaultchat.core.model.device.DeviceUi
 import dev.jason.app.compose.vaultchat.core.model.device.toDevice
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
-import dev.jason.app.compose.vaultchat.core.ui.LoadImage
+import dev.jason.app.compose.vaultchat.core.ui.LoadProfilePicture
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiState
@@ -208,7 +208,7 @@ private fun UserInfoSection(user: UserUi) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            LoadImage(
+            LoadProfilePicture(
                 url = user.profilePictureUrl,
                 modifier = imageModifier
             )
@@ -443,7 +443,7 @@ private fun BlocklistDialog(
                         onAction(ProfileUiAction.UnblockUser(user, onDismiss))
                     },
                     leadingContent = {
-                        LoadImage(
+                        LoadProfilePicture(
                             url = user.profilePictureUrl,
                             modifier = imageModifier
                         )

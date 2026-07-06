@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
-import dev.jason.app.compose.vaultchat.core.ui.LoadImage
+import dev.jason.app.compose.vaultchat.core.ui.LoadProfilePicture
 import dev.jason.app.compose.vaultchat.core.ui.theme.VaultChatTheme
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.R
 import kotlinx.collections.immutable.persistentListOf
@@ -109,7 +109,7 @@ fun AbstractHomeScreen(
                         }
 
                         IconButton(onProfileClick) {
-                            LoadImage(
+                            LoadProfilePicture(
                                 url = currentUserProfilePictureUrl!!,
                                 modifier = imageModifier
                             )
@@ -212,7 +212,7 @@ private fun UserItem(
             count = count
         ),
         leadingContent = {
-            LoadImage(
+            LoadProfilePicture(
                 url = user.profilePictureUrl,
                 modifier = profilePictureModifier
             )
