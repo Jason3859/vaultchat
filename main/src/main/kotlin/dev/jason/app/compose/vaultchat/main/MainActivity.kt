@@ -135,7 +135,6 @@ class MainActivity : ComponentActivity() {
         }
 
         val stringFromReceivedIntent = intent.getStringExtra(SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION)
-        Log.d("MainActivity", "handleIntent: $stringFromReceivedIntent")
 
         if (stringFromReceivedIntent == ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER) {
             AppState.updateOtherUser(null)

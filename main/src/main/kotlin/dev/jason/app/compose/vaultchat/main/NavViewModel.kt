@@ -1,6 +1,5 @@
 package dev.jason.app.compose.vaultchat.main
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,12 +29,10 @@ class NavViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            Log.d("NavViewModel", "init: started coroutine scope")
             AppEvents.events.collect { event ->
                 if (event is AppEvent.NavEvent) {
                     when (event) {
                         is AppEvent.NavEvent.NavigateToMessagingScreen -> {
-                            Log.d("NavViewModel", "init: navigating to $event")
                             navigate(Route.Messaging(event.uid))
                         }
                         is AppEvent.NavEvent.NavigateToHomeScreen -> {

@@ -21,7 +21,6 @@ class BlocklistApiService(private val blocklistApiRepository: BlocklistApiReposi
         try {
             blocklistApiRepository.blockUser(user)
             AppEvents.sendEvent(AppEvent.ReFetchConnections)
-            Log.d("BlocklistApiService", "blockUser: sent app event")
         } catch (e: Exception) {
             Log.e("BlocklistService", "blockUser: exception occurred", e)
             ToastController.showErrorOccurredToast()

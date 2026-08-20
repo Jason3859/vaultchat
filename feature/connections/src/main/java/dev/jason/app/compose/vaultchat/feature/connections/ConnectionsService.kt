@@ -29,10 +29,7 @@ class ConnectionsService(
 
         if (!isRequestSent) { // prevents from unnecessary calls
             try {
-                Log.d("ConnectionsService", "getConnections: fetching connections")
                 val connections = apiRepository.getConnections()
-                Log.d("ConnectionsService", "getConnections: completed fetching connections")
-                Log.d("ConnectionsService", "getConnections: connections: $connections")
                 dbRepository.updateConnections(connections)
                 isRequestSent = true
             } catch (e: Exception) {
@@ -70,9 +67,7 @@ class ConnectionsService(
                 }
 
                 if (event is AppEvent.ReFetchConnections) {
-                    Log.d("ConnectionsService", "init: collected app event to refetch connections")
                     isRequestSent = false
-                    // Just collecting the flow once is enough to trigger the internal refresh logic
                     getConnections().first()
                 }
             }

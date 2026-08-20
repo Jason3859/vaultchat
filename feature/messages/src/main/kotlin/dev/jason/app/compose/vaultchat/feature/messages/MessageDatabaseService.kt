@@ -1,6 +1,5 @@
 package dev.jason.app.compose.vaultchat.feature.messages
 
-import android.util.Log
 import androidx.paging.PagingData
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
@@ -32,7 +31,6 @@ class MessageDatabaseService(
         coroutineScope.launch {
             AppEvents.events.collect { event ->
                 if (event is AppEvent.AddMessage) {
-                    Log.d("MessageDatabaseService", "init: received add message event")
                     addMessage(event.message)
                 }
 
