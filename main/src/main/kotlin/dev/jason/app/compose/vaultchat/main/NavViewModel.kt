@@ -9,6 +9,7 @@ import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.ui.main.concrete.nav.Route
 import kotlinx.coroutines.launch
 
+// FIXME: i guess something is wrong with navigation inside the app
 class NavViewModel : ViewModel() {
 
     val backStack = mutableStateListOf<Route>(Route.Home)
@@ -21,7 +22,7 @@ class NavViewModel : ViewModel() {
     }
 
     fun back() {
-        if (backStack.last() is Route.Messaging) {
+        if (backStack.last() is Route.Messaging || backStack.last() is Route.Profile) {
             AppState.updateOtherUser(null)
         }
 
