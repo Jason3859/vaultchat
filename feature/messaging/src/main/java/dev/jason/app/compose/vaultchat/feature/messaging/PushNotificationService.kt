@@ -11,6 +11,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_START_MAIN_ACTIVITY
+import dev.jason.app.compose.vaultchat.core.AppConstants.EXTRA_NAV_DESTINATION_KEY
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
@@ -23,6 +25,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh") // TODO
 class PushNotificationService : FirebaseMessagingService() {
@@ -88,8 +91,8 @@ class PushNotificationService : FirebaseMessagingService() {
             enableVibration(true)
         }
 
-        val intent = Intent("dev.jason.app.compose.vaultchat.main.ACTION_START_MAIN_ACTIVITY").apply {
-            putExtra("nav_destination", "messaging")
+        val intent = Intent(ACTION_START_MAIN_ACTIVITY).apply {
+            putExtra(EXTRA_NAV_DESTINATION_KEY, "messaging")
             putExtra("uid", from)
 
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -143,7 +146,7 @@ class PushNotificationService : FirebaseMessagingService() {
                 startActivity(intent)
             }
 
-            delay(500)
+            delay(500.milliseconds)
             Runtime.getRuntime().exit(0)
         }
     }

@@ -329,7 +329,7 @@ private fun BottomBar(
 @Composable
 private fun AbstractMessagingScreenPreview() {
     val me = "me"
-    val other = "other-user"
+    val other = "Other User"
 
     val list = List(20) { index ->
         MessageUi(
@@ -339,7 +339,7 @@ private fun AbstractMessagingScreenPreview() {
             timestamp = "2026-04-01T11:02:10.692796400"
         )
     }
-    
+
     val messagesFlow = flowOf(PagingData.from(list))
 
     VaultChatTheme {

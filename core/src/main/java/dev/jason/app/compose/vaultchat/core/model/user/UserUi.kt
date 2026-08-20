@@ -11,7 +11,6 @@ data class UserUi(
     val status: Status
 ) {
     companion object {
-        // for the viewmodel if user exists inside database
         fun emptyUser(): UserUi {
             return UserUi(
                 uid = "empty",
@@ -20,6 +19,21 @@ data class UserUi(
                 status = Status.Online
             )
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        if (other !is UserUi) return false
+        if (this.uid != other.uid) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = uid.hashCode()
+        result = 31 * result + displayName.hashCode()
+        result = 31 * result + profilePictureUrl.hashCode()
+        result = 31 * result + status.hashCode()
+        return result
     }
 }
 

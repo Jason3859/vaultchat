@@ -7,8 +7,10 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.messaging.messaging
+import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER
+import dev.jason.app.compose.vaultchat.core.AppConstants.EXTRA_NAV_DESTINATION_KEY
+import dev.jason.app.compose.vaultchat.core.AppConstants.SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION
 import dev.jason.app.compose.vaultchat.core.AppEvent
 import dev.jason.app.compose.vaultchat.core.AppEvents
 import dev.jason.app.compose.vaultchat.core.AppState
@@ -36,6 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
 
+    private val navViewModel: NavViewModel by viewModels()
     private val userApiService: UserApiService by inject()
 
     private val firebaseUser = Firebase.auth.currentUser!!
@@ -101,7 +107,11 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        MainScreen()
+                        MainScreen(
+                            backStack = navViewModel.backStack,
+                            onBack = navViewModel::back,
+                            navigate = navViewModel::navigate
+                        )
                     }
                 }
             }
@@ -114,9 +124,35 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        val destination = intent.getStringExtra("nav_destination")
-        if (destination != null) {
-            AppEvents.sendEvent(AppEvent.NavEvent.NavigateToMessagingScreen(intent.getStringExtra("uid") ?: return))
+        val navigateToMessagingScreenString = intent.getStringExtra(EXTRA_NAV_DESTINATION_KEY)
+        if (navigateToMessagingScreenString != null) {
+            AppEvents.sendEvent(
+                AppEvent.NavEvent.NavigateToMessagingScreen(
+                    intent.getStringExtra("uid") ?: return // received from notification
+                )
+            )
+            return
+        }
+
+        val stringFromReceivedIntent = intent.getStringExtra(SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION)
+        Log.d("MainActivity", "handleIntent: $stringFromReceivedIntent")
+
+        if (stringFromReceivedIntent == ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER) {
+            AppState.updateOtherUser(null)
+        } else {
+            // here, value of `stringFromReceivedIntent` will be the uid of user
+
+            // send event to navigate to the screen
+            // with the uid of the user that current user
+            // is wanting to send something to.
+            AppEvents.sendEvent(
+                AppEvent.NavEvent.NavigateToMessagingScreen(
+                    stringFromReceivedIntent ?: run {
+                        Log.w("MainActivity", "invalid intent received")
+                        return
+                    }
+                )
+            )
         }
     }
 

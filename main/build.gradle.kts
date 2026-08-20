@@ -44,6 +44,7 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.androidx.compose)
+    implementation(libs.bundles.androidx.navigation3)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)

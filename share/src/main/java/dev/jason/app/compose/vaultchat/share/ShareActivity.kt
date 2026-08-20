@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -20,10 +21,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER
+import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_START_MAIN_ACTIVITY
+import dev.jason.app.compose.vaultchat.core.AppConstants.SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION
+import dev.jason.app.compose.vaultchat.core.AppConstants.TEXT_PLAIN
 import dev.jason.app.compose.vaultchat.core.model.message.Message
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
@@ -122,11 +129,18 @@ class ShareActivity : ComponentActivity() {
             }
         }.invokeOnCompletion { finish() }
 
-        startActivity(Intent("dev.jason.app.compose.vaultchat.main.ACTION_START_MAIN_ACTIVITY"))
+        val intent = Intent(ACTION_START_MAIN_ACTIVITY)
+
+        intent.putExtra(
+            SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION,
+            if (selectedUsers.size > 1) ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER else selectedUsers.first().uid
+        )
+
+        startActivity(intent)
     }
 
     private fun getSharedText(): String? {
-        return if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+        return if (intent.action == Intent.ACTION_SEND && intent.type == TEXT_PLAIN) {
             intent.getStringExtra(Intent.EXTRA_TEXT)
         } else null
     }
@@ -162,6 +176,8 @@ private fun UserItem(
     index: Int,
     count: Int
 ) {
+    val itemPadding = 6.dp
+
     SegmentedListItem(
         selected = selected,
         onClick = onClick,
@@ -173,7 +189,8 @@ private fun UserItem(
             LoadProfilePicture(
                 url = user.profilePictureUrl
             )
-        }
+        },
+        modifier = Modifier.padding(horizontal = itemPadding, vertical = itemPadding / 2)
     ) {
         Text(user.displayName)
     }
@@ -192,7 +209,7 @@ private fun ShareScreenPreview() {
                     status = User.Status.Online
                 )
             }.toImmutableList(),
-            selectedUsers = List(10) { index ->
+            selectedUsers = List(5) { index ->
                 UserUi(
                     uid = "user @$index",
                     displayName = "Name @$index",
@@ -200,7 +217,14 @@ private fun ShareScreenPreview() {
                     status = User.Status.Online
                 )
             }.toImmutableList(),
-            onUserItemClick = {  }
+            onUserItemClick = { }
         )
     }
 }
+
+//        val intent = Intent(ACTION_START_MAIN_ACTIVITY)
+//
+//        intent.putExtra(
+//            SHARE_ACTIVITY_LAUNCH_MAIN_ACTIVITY_ACTION,
+//            if (selectedUsers.size > 1) ACTION_MAIN_ACTIVITY_CLEAR_OTHER_USER else selectedUsers.first().uid
+//        )
