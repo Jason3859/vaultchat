@@ -14,6 +14,9 @@ class NavViewModel : ViewModel() {
     val backStack = mutableStateListOf<Route>(Route.Home)
 
     fun navigate(route: Route) {
+        if (backStack.last() is Route.Messaging) {
+            backStack.removeLastOrNull()
+        }
         backStack.add(route)
     }
 
