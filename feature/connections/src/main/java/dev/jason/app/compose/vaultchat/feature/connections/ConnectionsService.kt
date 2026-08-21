@@ -27,6 +27,12 @@ class ConnectionsService(
 
     fun getConnections(): Flow<List<User>> = channelFlow {
 
+        launch {
+            dbRepository.getConnections().collect {
+                send(it)
+            }
+        }
+
         if (!isRequestSent) { // prevents from unnecessary calls
             try {
                 val connections = apiRepository.getConnections()
@@ -34,12 +40,6 @@ class ConnectionsService(
                 isRequestSent = true
             } catch (e: Exception) {
                 Log.e("ConnectionsService", "getConnections: background refresh failed", e)
-            }
-        }
-        
-        launch {
-            dbRepository.getConnections().collect {
-                send(it)
             }
         }
     }

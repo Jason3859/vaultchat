@@ -2,6 +2,7 @@ package dev.jason.app.compose.vaultchat.ui.main.abstractt.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +20,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
@@ -97,25 +98,33 @@ fun AbstractHomeScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             Box {
-                AppBarWithSearch(
-                    scrollBehavior = scrollBehavior,
-                    state = searchBarState,
-                    inputField = inputField,
-                    actions = {
-                        val imageModifier = Modifier.size(50.dp)
+                Column {
+                    AppBarWithSearch(
+                        scrollBehavior = scrollBehavior,
+                        state = searchBarState,
+                        inputField = inputField,
+                        actions = {
+                            val imageModifier = Modifier.size(50.dp)
 
-                        if (isOffline) {
-                            Icon(Icons.Default.WifiOff, null)
-                        }
+                            if (isOffline) {
+                                Icon(Icons.Default.WifiOff, null)
+                            }
 
-                        IconButton(onProfileClick) {
-                            LoadProfilePicture(
-                                url = currentUserProfilePictureUrl!!,
-                                modifier = imageModifier
-                            )
+                            IconButton(onProfileClick) {
+                                LoadProfilePicture(
+                                    url = currentUserProfilePictureUrl!!,
+                                    modifier = imageModifier
+                                )
+                            }
                         }
+                    )
+
+                    if (!uiState.areConnectionsFetched) {
+                        LinearWavyProgressIndicator(
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                )
+                }
 
                 ExpandedDockedSearchBarWithGap(
                     state = searchBarState,
@@ -163,27 +172,14 @@ fun AbstractHomeScreen(
                     }
                 }
             } else {
-                if (uiState.areConnectionsFetched) {
-                    itemsIndexed(uiState.connections) { index, user ->
-                        UserItem(
-                            selected = selectedUserUid == user.uid,
-                            count = uiState.connections.count(),
-                            user = user,
-                            onUserClick = onUserClick,
-                            index = index
-                        )
-                    }
-                } else {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator(
-                                modifier = Modifier.size(150.dp)
-                            )
-                        }
-                    }
+                itemsIndexed(uiState.connections) { index, user ->
+                    UserItem(
+                        selected = selectedUserUid == user.uid,
+                        count = uiState.connections.count(),
+                        user = user,
+                        onUserClick = onUserClick,
+                        index = index
+                    )
                 }
             }
         }
