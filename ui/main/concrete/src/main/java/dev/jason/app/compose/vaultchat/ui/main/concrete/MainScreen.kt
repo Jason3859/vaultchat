@@ -9,9 +9,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
-import dev.jason.app.compose.vaultchat.core.model.user.toUi
 import dev.jason.app.compose.vaultchat.ui.main.concrete.home.HomeScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.messaging.MessagingScreen
 import dev.jason.app.compose.vaultchat.ui.main.concrete.nav.Route
@@ -22,7 +20,8 @@ import dev.jason.app.compose.vaultchat.ui.main.concrete.profile.ProfileScreen
 fun MainScreen(
     backStack: SnapshotStateList<Route>,
     onBack: () -> Unit,
-    navigate: (Route) -> Unit
+    navigate: (Route) -> Unit,
+    onBackToHome: () -> Unit
 ) {
 
     NavDisplay(
@@ -49,19 +48,10 @@ fun MainScreen(
             entry<Route.Messaging>(
                 metadata = ListDetailSceneStrategy.detailPane()
             ) { route ->
-                var user: User? = null
-                route.displayName?.let {
-                    user = User(
-                        uid = route.uid,
-                        displayName = route.displayName,
-                        profilePictureUrl = route.profilePictureUrl!!,
-                        status = route.status!!
-                    )
-                }
+                val user = UserUi(route.uid)
                 MessagingScreen(
-                    uid = route.uid,
-                    otherUser = user?.toUi() ?: UserUi.emptyUser(),
-                    onBackClick = onBack,
+                    otherUser = user,
+                    onBackClick = onBackToHome,
                     onUserInfoClick = {
                         navigate(Route.Profile)
                     }
@@ -69,6 +59,11 @@ fun MainScreen(
             }
 
             entry<Route.Profile>(
+//                metadata = if (Device.getDeviceType(context) == Device.Type.Tablet) {
+//                    ListDetailSceneStrategy.extraPane()
+//                } else {
+//                    ListDetailSceneStrategy.detailPane()
+//                }
                 metadata = ListDetailSceneStrategy.extraPane()
             ) {
                 ProfileScreen(

@@ -29,8 +29,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class MessagingViewModel(
-    private val otherUserUid: String,
-    private val otherUserFromConstructor: UserUi,
+    otherUser: UserUi,
     private val connectionsService: ConnectionsService,
     private val messageDatabaseService: MessageDatabaseService,
     private val messagingApiService: MessagingApiService,
@@ -72,6 +71,7 @@ class MessagingViewModel(
 
     private fun sendMessage() {
         val uiState = _uiState.value.copy()
+        val otherUser = _otherUser.value!!
 
         updateState { currentState ->
             currentState.copy(
@@ -82,7 +82,7 @@ class MessagingViewModel(
         viewModelScope.launch {
             val message = Message(
                 from = currentUser.uid,
-                to = otherUserUid,
+                to = otherUser.uid,
                 text = uiState.messageText,
                 timestamp = LocalDateTime.now()
             )
@@ -102,7 +102,7 @@ class MessagingViewModel(
             // if the other user is not connected to current user
             // if the user sent a message means that the 2 users are connected
             // so, refetch connections for this
-            if (otherUserFromConstructor != UserUi.emptyUser()) {
+            if (otherUser.displayName != "null") {
                 AppEvents.sendEvent(AppEvent.ReFetchConnections)
             }
         }
@@ -116,13 +116,13 @@ class MessagingViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            if (otherUserFromConstructor != UserUi.emptyUser()) {
-                _otherUser.update { otherUserFromConstructor }
+            if (otherUser.displayName != "null") {
+                _otherUser.update { otherUser }
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
 
-            val user = connectionsService.getConnection(otherUserUid)
+            val user = connectionsService.getConnection(otherUser.uid)
             _otherUser.update { user?.toUi() }
             AppState.updateOtherUser(_otherUser.value?.toUser())
             _uiState.update { it.copy(isLoading = false) }
@@ -131,7 +131,7 @@ class MessagingViewModel(
         viewModelScope.launch {
             messageDatabaseService.getMessagesPaginated(
                 currentUserUid = currentUser.uid,
-                otherUserUid = otherUserUid,
+                otherUserUid = otherUser.uid,
                 coroutineScope = this
             ).map { pagingData ->
                 pagingData.map { it.toUi() }

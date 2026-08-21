@@ -37,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
+import java.net.UnknownHostException
 import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
@@ -72,12 +73,12 @@ class MainActivity : ComponentActivity() {
             .build()
         connectivityManager.registerNetworkCallback(request, networkCallback)
 
-        AppState.apply {
-            if (isNetworkAvailable(connectivityManager))
-                deviceOnline()
-            else
-                deviceOffline()
-        }
+//        AppState.apply {
+//            if (isNetworkAvailable(connectivityManager))
+//                deviceOnline()
+//            else
+//                deviceOffline()
+//        }
 
         lifecycleScope.launch {
             AppState.updateCurrentUser(currentUser)
@@ -90,10 +91,13 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val isOnline = isNetworkAvailable(connectivityManager)
             while (true) {
-                if (isOnline) {
-                    userApiService.heartbeat(currentUser.uid)
+                try {
+                    if (isOnline) {
+                        userApiService.heartbeat(currentUser.uid)
+                    }
+                    delay(15.seconds)
+                } catch (_: UnknownHostException) {
                 }
-                delay(15.seconds)
             }
         }
 
@@ -110,7 +114,8 @@ class MainActivity : ComponentActivity() {
                         MainScreen(
                             backStack = navViewModel.backStack,
                             onBack = navViewModel::back,
-                            navigate = navViewModel::navigate
+                            navigate = navViewModel::navigate,
+                            onBackToHome = navViewModel::backToHome
                         )
                     }
                 }

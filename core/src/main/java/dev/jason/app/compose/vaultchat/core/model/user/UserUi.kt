@@ -10,16 +10,12 @@ data class UserUi(
     val profilePictureUrl: String,
     val status: Status
 ) {
-    companion object {
-        fun emptyUser(): UserUi {
-            return UserUi(
-                uid = "empty",
-                displayName = "empty",
-                profilePictureUrl = "empty",
-                status = Status.Online
-            )
-        }
-    }
+    /**
+     * For known users. i.e., for the users that are already connected.
+     * This constructor is used by navigation and is being passed to
+     * [MessagingViewModel] for fetching the user from database
+     */
+    constructor(uid: String) : this(uid, "null", "null", Status.Offline)
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false

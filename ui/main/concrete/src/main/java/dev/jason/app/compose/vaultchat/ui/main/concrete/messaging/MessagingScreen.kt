@@ -22,12 +22,11 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MessagingScreen(
-    uid: String,
     otherUser: UserUi,
     onBackClick: () -> Unit,
     onUserInfoClick: () -> Unit
 ) {
-    val viewModel: MessagingViewModel = koinViewModel { parametersOf(uid, otherUser) }
+    val viewModel: MessagingViewModel = koinViewModel { parametersOf(otherUser) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val otherUser by viewModel.otherUser.collectAsStateWithLifecycle()
