@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -35,6 +36,7 @@ class PushNotificationService : FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         val type = message.data["type"]
+        Log.d("PushNotificationService", "onMessageReceived: ${message.data}")
 
         when (type) {
             "message" -> handleMessage(message.data)
@@ -51,18 +53,20 @@ class PushNotificationService : FirebaseMessagingService() {
         val text = data["text"]!!
         val timestamp = data["timestamp"]!!.toLocalDateTime()
 
-        showNotification(text, from)
+        if (AppState.currentUser.value?.uid != from) {
+            showNotification(text, from)
+            AppEvents.sendRequest(AppEvent.Request.GetConnectionRequest(uid = from))
 
-        AppEvents.sendRequest(AppEvent.Request.GetConnectionRequest(uid = from))
+            coroutineScope.launch {
+                AppEvents.responses.collect { response ->
+                    if (response is AppEvent.Response.GetConnectionResponse) {
+                        val user = response.user
 
-        coroutineScope.launch {
-            AppEvents.responses.collect { response ->
-                if (response is AppEvent.Response.GetConnectionResponse) {
-                    val user = response.user
-
-                    if (user == null) {
-                        AppEvents.sendEvent(AppEvent.ReFetchConnections)
-                        this.cancel()
+                        if (user == null) { // it will be null if the user is not connected before
+                            // so, refetch connections and update them
+                            AppEvents.sendEvent(AppEvent.ReFetchConnections)
+                            this.cancel()
+                        }
                     }
                 }
             }
