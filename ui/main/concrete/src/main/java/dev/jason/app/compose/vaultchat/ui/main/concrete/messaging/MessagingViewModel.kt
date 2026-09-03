@@ -90,6 +90,9 @@ class MessagingViewModel(
             _pendingMessages.add(messageUi)
 
             messagingApiService.sendMessage(message)
+                .onSuccess {
+                    _pendingMessages.remove(messageUi)
+                }
 
             // value of `otherUserFromConstructor` will be `UserUi.emptyUser()` only
             // if the other user is not connected to current user

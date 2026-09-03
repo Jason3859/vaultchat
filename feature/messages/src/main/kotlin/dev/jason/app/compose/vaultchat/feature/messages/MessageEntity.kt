@@ -9,13 +9,15 @@ import java.time.ZoneId
 
 @Entity(tableName = "messages")
 data class MessageEntity(
+    @PrimaryKey val id: String,
     val from: String,
     val to: String,
     val text: String,
-    @PrimaryKey val timestamp: Long
+    val timestamp: Long
 )
 
 fun MessageEntity.toMessage() = Message(
+    id = id,
     from = from,
     to = to,
     text = text,
@@ -23,6 +25,7 @@ fun MessageEntity.toMessage() = Message(
 )
 
 fun Message.toEntity() = MessageEntity(
+    id = id!!,
     from = from,
     to = to,
     text = text,
