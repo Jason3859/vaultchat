@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.connections.api
 
-import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
+import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserDto
@@ -19,7 +19,7 @@ class ConnectionsApiRepoImpl(
     }
 
     override suspend fun getConnections(): List<User> {
-        return client.get("$BASE_URL/social/connections") {
+        return client.get("$BASE_HTTP_URL/social/connections") {
             parameter("uid", currentUserUid)
         }
             .body<List<UserDto>>()

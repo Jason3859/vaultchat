@@ -28,6 +28,7 @@ dependencies {
 
     implementation(platform(libs.ktor.bom))
     implementation(libs.bundles.remote.communication)
+    implementation(libs.bundles.websocket)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

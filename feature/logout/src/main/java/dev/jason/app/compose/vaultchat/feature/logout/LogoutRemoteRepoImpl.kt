@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.logout
 
-import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
+import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.model.device.Device
 import dev.jason.app.compose.vaultchat.core.model.device.toDto
 import io.ktor.client.HttpClient
@@ -19,7 +19,7 @@ internal class LogoutRemoteRepoImpl(
         clearMessages: Boolean,
         onLogoutSuccessful: () -> Unit
     ): Int {
-        val response = client.delete("$BASE_URL/user/logout") {
+        val response = client.delete("$BASE_HTTP_URL/user/logout") {
             contentType(ContentType.Application.Json)
             setBody(device.toDto())
             parameter("clearMessages", clearMessages.toString())

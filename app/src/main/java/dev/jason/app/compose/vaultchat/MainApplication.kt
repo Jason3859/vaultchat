@@ -2,11 +2,8 @@ package dev.jason.app.compose.vaultchat
 
 import android.app.Activity
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.os.Bundle
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.R
 import dev.jason.app.compose.vaultchat.feature.blocklist.BlocklistFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.device.DeviceFeatureKoinModule
@@ -18,8 +15,9 @@ import dev.jason.app.compose.vaultchat.feature.user.UserServiceKoinModule
 import dev.jason.app.compose.vaultchat.ui.auth.concrete.AuthKoinModule
 import dev.jason.app.compose.vaultchat.ui.main.concrete.MainKoinModule
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
@@ -30,7 +28,8 @@ class MainApplication : Application() {
 
     private val baseModule = module {
         single<HttpClient> {
-            HttpClient(Android) {
+            HttpClient(CIO) {
+                install(WebSockets)
                 install(ContentNegotiation) {
                     json(Json {
                         prettyPrint = true
@@ -39,8 +38,7 @@ class MainApplication : Application() {
                     })
                 }
                 engine {
-                    connectTimeout = 100_000
-                    socketTimeout = 100_000
+                    requestTimeout = 100_000
                 }
             }
         }
@@ -48,7 +46,6 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
         initKoin()
         registerActivityLifecycleCallbacks(VcActivityLifecycleCallbacks)
     }
@@ -70,18 +67,6 @@ class MainApplication : Application() {
                 OpenLinksFeatureKoinModule
             )
         }
-    }
-
-    private fun createNotificationChannel() {
-        val id = getString(R.string.notification_channel_id)
-        val name = getString(R.string.notification_channel_name)
-        val description = getString(R.string.notification_channel_description)
-
-        val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
-        channel.description = description
-
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.createNotificationChannel(channel)
     }
 
     private object VcActivityLifecycleCallbacks : ActivityLifecycleCallbacks {

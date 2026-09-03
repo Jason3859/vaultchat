@@ -1,7 +1,7 @@
 package dev.jason.app.compose.vaultchat.feature.device
 
 import android.util.Log
-import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
+import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.ToastController
 import dev.jason.app.compose.vaultchat.core.model.device.Device
@@ -18,7 +18,7 @@ class DeviceApiRepoImpl(
 
     override suspend fun getDevices(): List<Device> {
         return try {
-            val response = client.get("$BASE_URL/device/mine") {
+            val response = client.get("$BASE_HTTP_URL/device/mine") {
                 parameter("uid", AppState.currentUser.value?.uid ?: throw IllegalStateException("user is null"))
             }
 

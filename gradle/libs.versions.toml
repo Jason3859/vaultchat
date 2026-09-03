@@ -29,6 +29,7 @@ ktor = "3.5.0"
 material3-adaptive = "1.3.0-beta02"
 paging = "3.5.0"
 kotlinx-collections-immutable = "0.5.0"
+krossbow = "10.0.0"
 
 [libraries]
 androidx-compose-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
@@ -67,13 +68,15 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
 ktor-bom = { module = "io.ktor:ktor-bom", version.ref = "ktor" }
-ktor-client-android = { module = "io.ktor:ktor-client-android" }
+ktor-client = { module = "io.ktor:ktor-client-cio" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json" }
 paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
+krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", version.ref = "krossbow" }
+krossbow-websocket-ktor = { module = "org.hildan.krossbow:krossbow-websocket-ktor", version.ref = "krossbow" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -86,7 +89,7 @@ room = { id = "androidx.room", version.ref = "room" }
 
 [bundles]
 remote-communication = [
-    "ktor-client-android",
+    "ktor-client",
     "ktor-client-content-negotiation",
     "ktor-serialization-kotlinx-json",
     "kotlinx-serialization-json"
@@ -105,3 +108,4 @@ androidx-navigation3 = [
     "androidx-compose-material3-adaptive-navigation3",
     "androidx-lifecycle-viewmodel-navigation3"
 ]
+websocket = ["krossbow-stomp-core", "krossbow-websocket-ktor"]

@@ -89,14 +89,7 @@ class MessagingViewModel(
             val messageUi = message.toUi()
             _pendingMessages.add(messageUi)
 
-            messagingApiService.sendMessage(message).let { statusCode ->
-                _pendingMessages.remove(messageUi)
-
-                when (statusCode) {
-                    in 200..299 -> messageDatabaseService.addMessage(message)
-                    else -> _failedMessages.add(messageUi)
-                }
-            }
+            messagingApiService.sendMessage(message)
 
             // value of `otherUserFromConstructor` will be `UserUi.emptyUser()` only
             // if the other user is not connected to current user

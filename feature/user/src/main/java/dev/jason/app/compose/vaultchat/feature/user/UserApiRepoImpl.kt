@@ -1,6 +1,6 @@
 package dev.jason.app.compose.vaultchat.feature.user
 
-import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_URL
+import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.AppState
 import dev.jason.app.compose.vaultchat.core.model.user.RegisterUserDto
 import dev.jason.app.compose.vaultchat.core.model.user.User
@@ -21,20 +21,20 @@ internal class UserApiRepoImpl(
 ) : UserApiRepository {
 
     override suspend fun heartbeat(uid: String) {
-        client.patch("$BASE_URL/user/heartbeat") {
+        client.patch("$BASE_HTTP_URL/user/heartbeat") {
             parameter("uid", uid)
         }
     }
 
     override suspend fun registerUser(body: RegisterUserDto) {
-        client.post("$BASE_URL/register-user") {
+        client.post("$BASE_HTTP_URL/register-user") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
     }
 
     override suspend fun searchUser(displayName: String): List<User> {
-        val response = client.get("$BASE_URL/user/search") {
+        val response = client.get("$BASE_HTTP_URL/user/search") {
             parameter("from_uid", AppState.currentUser.value?.uid!!)
             parameter("search_query", displayName)
         }

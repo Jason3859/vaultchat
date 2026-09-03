@@ -79,16 +79,15 @@ class PushNotificationService : FirebaseMessagingService() {
     }
 
     private fun showNotification(text: String, from: String) {
-        val channelId = getString(R.string.notification_channel_id)
-        val channelName = getString(R.string.notification_channel_name)
-        val channelDescription = getString(R.string.notification_channel_description)
+        val channelId = getString(R.string.messages_channel_id)
+        val channelName = getString(R.string.messages_channel_name)
 
         val channel = NotificationChannel(
             channelId,
             channelName,
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = channelDescription
+//            description = channelDescription
             enableVibration(true)
         }
 
