@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_START_MAIN_ACTIVITY
+import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_WS_URL
 import dev.jason.app.compose.vaultchat.core.AppConstants.EXTRA_NAV_DESTINATION_KEY
 import dev.jason.app.compose.vaultchat.core.AppEvent
@@ -20,6 +21,9 @@ import dev.jason.app.compose.vaultchat.core.model.message.MessageDto
 import dev.jason.app.compose.vaultchat.core.model.message.toDto
 import dev.jason.app.compose.vaultchat.core.model.message.toMessage
 import dev.jason.app.compose.vaultchat.core.model.user.User
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +34,8 @@ import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.stomp.subscribeText
 
 class MessagingApiRepoImpl(
-    private val client: StompClient,
+    private val stompClient: StompClient,
+    private val httpClient: HttpClient,
     private val context: Context
 ) : MessagingApiRepository {
 
@@ -49,10 +54,17 @@ class MessagingApiRepoImpl(
         webSocketSession.sendText("/app/send", Json.encodeToString(message.toDto()))
     }
 
+    override suspend fun fetchMessages(): List<Message> {
+        val urlString = "$BASE_HTTP_URL/messages/fetch?uid=${AppState.currentUser.value?.uid!!}"
+        return httpClient.get(urlString)
+            .body<List<MessageDto>>()
+            .map(MessageDto::toMessage)
+    }
+
     private suspend fun connectToWebSocketServer() {
         try {
-            webSocketSession =
-                client.connect("$BASE_WS_URL/messages?uid=${AppState.currentUser.value?.uid!!}")
+            val url = "$BASE_WS_URL/messages?uid=${AppState.currentUser.value?.uid!!}"
+            webSocketSession = stompClient.connect(url)
         } catch (e: Exception) {
             Log.e("MessagingApiRepoImpl", "connectToWebSocketServer: websocket connection error", e)
             ToastController.showToast("error while connecting to websocket")
@@ -70,7 +82,8 @@ class MessagingApiRepoImpl(
     private suspend fun subscribeToConnectionStatusUpdates() {
         webSocketSession.subscribeText("/user/topic/connections-status")
             .collect { connectionsStatusUpdateJsonString ->
-                val map = Json.decodeFromString<Map<String, String>>(connectionsStatusUpdateJsonString)
+                val map =
+                    Json.decodeFromString<Map<String, String>>(connectionsStatusUpdateJsonString)
 
                 val uid = map["uid"] ?: run {
                     Log.w(

@@ -21,6 +21,9 @@ class MessageDatabaseService(
     suspend fun addMessage(message: Message) =
         repository.addMessage(message)
 
+    suspend fun addMessages(messages: List<Message>) =
+        repository.addMessages(messages)
+
     suspend fun deleteAllMessages() =
         repository.deleteAllMessages()
 

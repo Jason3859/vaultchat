@@ -119,7 +119,7 @@ fun AbstractHomeScreen(
                         }
                     )
 
-                    if (!uiState.areConnectionsFetched) {
+                    if (!uiState.isLoading) {
                         LinearWavyProgressIndicator(
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -162,7 +162,7 @@ fun AbstractHomeScreen(
         LazyColumn(
             contentPadding = innerPadding + PaddingValues(12.dp)
         ) {
-            if (uiState.areConnectionsFetched && uiState.connections.isEmpty()) {
+            if (uiState.isLoading && uiState.connections.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),

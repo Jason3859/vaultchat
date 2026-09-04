@@ -10,7 +10,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 data class HomeUiState(
     val connections: ImmutableList<UserUi> = persistentListOf(),
-    val areConnectionsFetched: Boolean = false,
+    val isLoading: Boolean = false,
     val searchResults: ImmutableList<UserUi> = persistentListOf(),
     val searchQuery: String = "",
     val isSearchSuccessful: Boolean = false,

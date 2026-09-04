@@ -1,16 +1,20 @@
 package dev.jason.app.compose.vaultchat.ui.main.concrete.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import dev.jason.app.compose.vaultchat.core.model.user.toUi
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsService
+import dev.jason.app.compose.vaultchat.feature.messages.MessageDatabaseService
+import dev.jason.app.compose.vaultchat.feature.messaging.MessagingApiService
 import dev.jason.app.compose.vaultchat.feature.user.UserApiService
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiAction
 import dev.jason.app.compose.vaultchat.ui.main.abstractt.home.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +25,9 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val userApiService: UserApiService,
-    private val connectionsService: ConnectionsService
+    private val connectionsService: ConnectionsService,
+    private val messageDatabaseService: MessageDatabaseService,
+    private val messagingApiService: MessagingApiService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -66,10 +72,24 @@ class HomeViewModel(
                 _uiState.update {
                     it.copy(
                         connections = connections.toUi(),
-                        areConnectionsFetched = true
+                        isLoading = true
                     )
                 }
             }
+        }
+    }
+
+    private suspend fun fetchAndAddMessagesToDatabase() {
+        val messages = messagingApiService.fetchMessages()
+        Log.d("HomeViewModel", "fetchAndAddMessagesToDatabase: $messages")
+        messageDatabaseService.addMessages(messages)
+    }
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isLoading = true) }
+            fetchAndAddMessagesToDatabase()
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }

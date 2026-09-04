@@ -46,6 +46,10 @@ class MessageDatabaseRepoImpl(
         dao.addMessage(message.toEntity())
     }
 
+    override suspend fun addMessages(messages: List<Message>) {
+        dao.addMessages(messages.map(Message::toEntity))
+    }
+
     override suspend fun deleteAllMessages() {
         dao.deleteAllMessages()
     }

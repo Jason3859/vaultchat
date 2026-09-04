@@ -2,14 +2,17 @@ package dev.jason.app.compose.vaultchat.feature.messages
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 
 @Dao
 interface MessageDao {
 
-    @Insert
+    @Upsert
     suspend fun addMessage(messageEntity: MessageEntity)
+
+    @Upsert
+    fun addMessages(messages: List<MessageEntity>)
 
     @Query("DELETE FROM messages")
     suspend fun deleteAllMessages()
@@ -20,7 +23,6 @@ interface MessageDao {
                 "(`from` = :otherUserUid AND `to` = :currentUserUid)"
     )
     suspend fun deleteMessageHistory(currentUserUid: String, otherUserUid: String)
-
     @Query(
         "SELECT * FROM messages WHERE " +
                 "(`from` = :currentUserUid AND `to` = :otherUserUid) OR " +
