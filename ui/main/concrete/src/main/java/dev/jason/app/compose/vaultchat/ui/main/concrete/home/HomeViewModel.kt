@@ -94,7 +94,7 @@ class HomeViewModel(
                     title = "New Message",
                     content = message.text,
                     channel = NotificationChannel.MESSAGES,
-                    extras = message.from
+                    extras = listOf(message.from, message.fromDisplayName)
                 )
             )
         }

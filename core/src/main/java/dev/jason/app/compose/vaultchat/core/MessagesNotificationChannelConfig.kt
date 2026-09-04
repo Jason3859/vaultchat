@@ -19,14 +19,14 @@ class MessagesNotificationChannelConfig(private val context: Context) :
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    @Suppress("UNCHECKED_CAST")
     override fun showNotification(vararg args: Any?) {
-        val title = "New message"
-        val from = args[0] as? String ?: return
+        val (fromUid, fromDisplayName) = args[0] as? List<String> ?: return
         val content = args[1] as? String ?: return
 
         val intent = Intent(ACTION_START_MAIN_ACTIVITY).apply {
             putExtra(EXTRA_NAV_DESTINATION_KEY, "messaging")
-            putExtra("uid", from)
+            putExtra("uid", fromUid)
 
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -36,7 +36,7 @@ class MessagesNotificationChannelConfig(private val context: Context) :
 
         val notificationManager = AppNotificationManager(context)
         val notification = NotificationCompat.Builder(context, id)
-            .setContentTitle(title)
+            .setContentTitle(fromDisplayName)
             .setContentText(content)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // FIXME: to be replaced
             .setContentIntent(pendingIntent)

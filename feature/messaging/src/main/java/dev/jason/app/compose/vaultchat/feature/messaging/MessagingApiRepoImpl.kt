@@ -17,6 +17,7 @@ import dev.jason.app.compose.vaultchat.core.model.user.User
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ class MessagingApiRepoImpl(
     override suspend fun fetchMessages(): List<Message> {
         val urlString = "$BASE_HTTP_URL/messages/fetch?uid=${AppState.currentUser.value?.uid!!}"
         return httpClient.get(urlString)
+            .apply { bodyAsText().let(::println) }
             .body<List<MessageDto>>()
             .map(MessageDto::toMessage)
     }
@@ -108,7 +110,7 @@ class MessagingApiRepoImpl(
                 title = "New message",
                 content = message.text,
                 channel = NotificationChannel.MESSAGES,
-                extras = message.from
+                extras = listOf(message.from, message.fromDisplayName)
             )
         )
     }
