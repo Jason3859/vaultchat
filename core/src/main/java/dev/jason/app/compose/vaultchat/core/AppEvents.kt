@@ -52,6 +52,13 @@ sealed interface AppEvent {
 
     data object ReFetchConnections : AppEvent
 
+    data class ShowNotification(
+        val title: String,
+        val content: String,
+        val channel: NotificationChannel,
+        val extras: Any? = null
+    ) : AppEvent
+
     sealed interface NavEvent : AppEvent {
 
         data class NavigateToMessagingScreen(val uid: String) : NavEvent

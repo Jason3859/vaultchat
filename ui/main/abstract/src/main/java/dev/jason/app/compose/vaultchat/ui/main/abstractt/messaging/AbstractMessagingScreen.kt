@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import dev.jason.app.compose.vaultchat.core.model.message.MessageUi
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
@@ -110,8 +109,7 @@ fun AbstractMessagingScreen(
             item { Spacer(Modifier.height(6.dp)) }
 
             items(
-                count = pagingItems.itemCount,
-                key = pagingItems.itemKey { "${it.hashCode()}" }
+                count = pagingItems.itemCount
             ) { index ->
                 val msg = pagingItems[index] ?: return@items
                 MessageItem(

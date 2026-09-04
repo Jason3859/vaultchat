@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import dev.jason.app.compose.vaultchat.core.AppState
+import dev.jason.app.compose.vaultchat.core.MessagesNotificationChannelConfig
 import dev.jason.app.compose.vaultchat.feature.blocklist.BlocklistFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.connections.ConnectionsFeatureKoinModule
 import dev.jason.app.compose.vaultchat.feature.device.DeviceFeatureKoinModule
@@ -48,6 +49,7 @@ class MainApplication : Application() {
         super.onCreate()
         initKoin()
         registerActivityLifecycleCallbacks(VcActivityLifecycleCallbacks)
+        MessagesNotificationChannelConfig(this)
     }
 
     private fun initKoin() {

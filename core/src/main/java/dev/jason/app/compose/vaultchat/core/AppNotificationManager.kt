@@ -5,13 +5,14 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.content.getSystemService
 
-class AppNotificationManager(private val notificationChannelConfig: AppNotificationChannelConfig) {
+class AppNotificationManager(
+    private val context: Context
+) {
 
-    fun showNotification(context: Context, notification: Notification) {
+    fun showNotification(notification: Notification, notificationChannel: AppNotificationChannelConfig) {
         val notificationManager = context.getSystemService<NotificationManager>()!!
-        val notificationChannel = notificationChannelConfig.notificationChannel(NotificationManager.IMPORTANCE_HIGH)
 
-        notificationManager.createNotificationChannel(notificationChannel)
+        notificationManager.createNotificationChannel(notificationChannel.channel())
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }

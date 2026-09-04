@@ -18,6 +18,8 @@ class MessageDatabaseService(
     fun getMessagesPaginated(currentUserUid: String, otherUserUid: String, coroutineScope: CoroutineScope): Flow<PagingData<Message>> =
         repository.getMessagesPaginated(currentUserUid, otherUserUid, coroutineScope)
 
+    suspend fun getAllMessages() = repository.getAllMessages()
+
     suspend fun addMessage(message: Message) =
         repository.addMessage(message)
 

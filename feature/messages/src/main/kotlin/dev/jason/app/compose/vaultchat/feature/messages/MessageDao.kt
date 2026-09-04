@@ -30,4 +30,7 @@ interface MessageDao {
                 "ORDER BY `timestamp` ASC"
     )
     fun getMessages(currentUserUid: String, otherUserUid: String): PagingSource<Int, MessageEntity>
+
+    @Query("SELECT * FROM messages")
+    suspend fun getAllMessages(): List<MessageEntity>
 }

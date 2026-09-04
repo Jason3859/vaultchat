@@ -1,20 +1,13 @@
 package dev.jason.app.compose.vaultchat.feature.messaging
 
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import dev.jason.app.compose.vaultchat.core.AppConstants.ACTION_START_MAIN_ACTIVITY
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_HTTP_URL
 import dev.jason.app.compose.vaultchat.core.AppConstants.BASE_WS_URL
-import dev.jason.app.compose.vaultchat.core.AppConstants.EXTRA_NAV_DESTINATION_KEY
 import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvent.ShowNotification
 import dev.jason.app.compose.vaultchat.core.AppEvents
-import dev.jason.app.compose.vaultchat.core.AppNotificationChannelConfig
-import dev.jason.app.compose.vaultchat.core.AppNotificationManager
 import dev.jason.app.compose.vaultchat.core.AppState
-import dev.jason.app.compose.vaultchat.core.R
+import dev.jason.app.compose.vaultchat.core.NotificationChannel
 import dev.jason.app.compose.vaultchat.core.ToastController
 import dev.jason.app.compose.vaultchat.core.model.message.Message
 import dev.jason.app.compose.vaultchat.core.model.message.MessageDto
@@ -36,7 +29,6 @@ import org.hildan.krossbow.stomp.subscribeText
 class MessagingApiRepoImpl(
     private val stompClient: StompClient,
     private val httpClient: HttpClient,
-    private val context: Context
 ) : MessagingApiRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -99,36 +91,25 @@ class MessagingApiRepoImpl(
     }
 
     private fun showNotification(message: Message) {
-
-        val intent = Intent(ACTION_START_MAIN_ACTIVITY).apply {
-            putExtra(EXTRA_NAV_DESTINATION_KEY, "messaging")
-            putExtra("uid", message.from)
-
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-
-        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, flags)
-
-        val channel = AppNotificationChannelConfig.messagesNotificationChannel(context)
-        val notification = NotificationCompat.Builder(context, channel.id)
-            .setContentTitle("New message")
-            .setContentText(message.text)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // FIXME: to be replaced
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        val notificationManager = AppNotificationManager(channel)
-
         if (message.from != AppState.currentUser.value?.uid) {
             if (AppState.otherUser.value?.uid != message.from) {
-                notificationManager.showNotification(context, notification)
+                sendShowNotificationEvent(message)
             } else {
                 if (!AppState.isAppInForeground.value) {
-                    notificationManager.showNotification(context, notification)
+                    sendShowNotificationEvent(message)
                 }
             }
         }
+    }
+
+    private fun sendShowNotificationEvent(message: Message) {
+        AppEvents.sendEvent(
+            ShowNotification(
+                title = "New message",
+                content = message.text,
+                channel = NotificationChannel.MESSAGES,
+                extras = message.from
+            )
+        )
     }
 }

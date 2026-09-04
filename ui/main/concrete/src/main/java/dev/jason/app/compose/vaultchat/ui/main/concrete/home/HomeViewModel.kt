@@ -1,8 +1,10 @@
 package dev.jason.app.compose.vaultchat.ui.main.concrete.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.jason.app.compose.vaultchat.core.AppEvent
+import dev.jason.app.compose.vaultchat.core.AppEvents
+import dev.jason.app.compose.vaultchat.core.NotificationChannel
 import dev.jason.app.compose.vaultchat.core.model.user.User
 import dev.jason.app.compose.vaultchat.core.model.user.UserUi
 import dev.jason.app.compose.vaultchat.core.model.user.toUi
@@ -80,9 +82,22 @@ class HomeViewModel(
     }
 
     private suspend fun fetchAndAddMessagesToDatabase() {
-        val messages = messagingApiService.fetchMessages()
-        Log.d("HomeViewModel", "fetchAndAddMessagesToDatabase: $messages")
-        messageDatabaseService.addMessages(messages)
+        val localMessages = messageDatabaseService.getAllMessages()
+        val fetchedMessages = messagingApiService.fetchMessages()
+        val newMessages = fetchedMessages.filter { it !in localMessages }
+
+        messageDatabaseService.addMessages(fetchedMessages)
+
+        newMessages.forEach { message ->
+            AppEvents.sendEvent(
+                AppEvent.ShowNotification(
+                    title = "New Message",
+                    content = message.text,
+                    channel = NotificationChannel.MESSAGES,
+                    extras = message.from
+                )
+            )
+        }
     }
 
     init {
