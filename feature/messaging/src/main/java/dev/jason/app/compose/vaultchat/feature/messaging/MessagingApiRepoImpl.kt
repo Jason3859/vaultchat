@@ -110,7 +110,8 @@ class MessagingApiRepoImpl(
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, flags)
 
-        val notification = NotificationCompat.Builder(context, "notificationChannelConfig.id")
+        val channel = AppNotificationChannelConfig.messagesNotificationChannel(context)
+        val notification = NotificationCompat.Builder(context, channel.id)
             .setContentTitle("New message")
             .setContentText(message.text)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // FIXME: to be replaced
@@ -118,14 +119,15 @@ class MessagingApiRepoImpl(
             .setAutoCancel(true)
             .build()
 
-        val notificationManager =
-            AppNotificationManager(AppNotificationChannelConfig.messagesNotificationChannel(context))
+        val notificationManager = AppNotificationManager(channel)
 
-        if (AppState.otherUser.value?.uid != message.from) {
-            notificationManager.showNotification(context, notification)
-        } else {
-            if (!AppState.isAppInForeground.value) {
+        if (message.from != AppState.currentUser.value?.uid) {
+            if (AppState.otherUser.value?.uid != message.from) {
                 notificationManager.showNotification(context, notification)
+            } else {
+                if (!AppState.isAppInForeground.value) {
+                    notificationManager.showNotification(context, notification)
+                }
             }
         }
     }
